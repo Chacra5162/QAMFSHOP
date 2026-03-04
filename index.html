@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>QubicaAMF — Official Merch Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --red:#D01020;
+  --red2:#E8192C;
+  --red-light:#fff0f1;
+  --dark:#111213;
+  --mid:#3a3b3c;
+  --muted:#767676;
+  --line:#e4e4e4;
+  --bg:#f8f8f8;
+  --white:#ffffff;
+  --card:#ffffff;
+  --shadow:0 2px 16px rgba(0,0,0,.08);
+  --shadow-lg:0 8px 40px rgba(0,0,0,.13);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--dark);font-size:15px;line-height:1.5}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font-family:'Inter',sans-serif;cursor:pointer}
+
+/* ─── TOP ANNOUNCEMENT BAR ─── */
+.announce{background:var(--red);color:#fff;text-align:center;font-size:12.5px;font-weight:500;letter-spacing:.04em;padding:9px 16px}
+.announce span{opacity:.75;margin:0 10px}
+
+/* ─── HEADER ─── */
+.header{background:var(--white);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:200}
+.header-inner{max-width:1320px;margin:0 auto;padding:0 40px;display:flex;align-items:center;height:72px;gap:40px}
+.logo{display:flex;align-items:center;gap:14px;flex-shrink:0}
+.logo-mark{width:44px;height:44px}
+.logo-wordmark{display:flex;flex-direction:column;line-height:1}
+.logo-main{font-family:'Montserrat',sans-serif;font-weight:900;font-size:19px;letter-spacing:-.02em;color:var(--dark)}
+.logo-main em{color:var(--red);font-style:normal}
+.logo-sub{font-size:9.5px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-top:2px}
+.header-nav{display:flex;gap:2px;flex:1;justify-content:center}
+.header-nav a{font-size:13.5px;font-weight:500;color:var(--mid);padding:6px 14px;border-radius:6px;transition:all .18s}
+.header-nav a:hover{color:var(--dark);background:#f2f2f2}
+.header-nav a.active{color:var(--red);font-weight:700}
+.header-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.h-search{display:flex;align-items:center;gap:8px;background:#f2f2f2;border:none;border-radius:8px;padding:9px 14px;font-size:13px;color:var(--muted);width:200px;outline:none}
+.h-search svg{flex-shrink:0;opacity:.5}
+.h-btn{display:flex;align-items:center;gap:7px;padding:9px 18px;border-radius:8px;border:none;font-size:13.5px;font-weight:600;transition:all .18s}
+.h-btn.outline{background:transparent;border:1.5px solid var(--line);color:var(--mid)}
+.h-btn.outline:hover{border-color:#aaa;color:var(--dark)}
+.h-btn.primary{background:var(--red);color:#fff}
+.h-btn.primary:hover{background:var(--red2)}
+.cart-pill{background:var(--dark);color:#fff;border-radius:100px;font-size:10px;font-weight:800;width:18px;height:18px;display:flex;align-items:center;justify-content:center}
+
+/* ─── HERO ─── */
+.hero{background:var(--white);overflow:hidden}
+.hero-inner{max-width:1320px;margin:0 auto;padding:0 40px;display:grid;grid-template-columns:1fr 1fr;align-items:center;min-height:520px;gap:60px}
+.hero-copy{padding:60px 0}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:6px;background:var(--red-light);color:var(--red);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:5px 12px;border-radius:100px;margin-bottom:22px}
+.hero-eyebrow::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0}
+.hero h1{font-family:'Montserrat',sans-serif;font-weight:900;font-size:54px;line-height:1.02;letter-spacing:-.03em;color:var(--dark);margin-bottom:18px}
+.hero h1 mark{background:none;color:var(--red)}
+.hero-desc{font-size:16px;color:var(--muted);line-height:1.65;margin-bottom:32px;max-width:420px}
+.hero-actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.btn-hero{padding:14px 28px;border-radius:10px;font-size:14px;font-weight:700;letter-spacing:.01em;border:none;transition:all .2s}
+.btn-hero.solid{background:var(--red);color:#fff}
+.btn-hero.solid:hover{background:var(--red2);transform:translateY(-1px);box-shadow:0 6px 24px rgba(208,16,32,.3)}
+.btn-hero.ghost{background:transparent;border:1.5px solid var(--line);color:var(--mid)}
+.btn-hero.ghost:hover{border-color:var(--dark);color:var(--dark)}
+.hero-stats{display:flex;gap:32px;margin-top:40px;padding-top:32px;border-top:1px solid var(--line)}
+.h-stat-num{font-family:'Montserrat',sans-serif;font-weight:900;font-size:28px;color:var(--dark)}
+.h-stat-num sup{color:var(--red);font-size:16px}
+.h-stat-label{font-size:11.5px;color:var(--muted);margin-top:1px}
+.hero-visual{position:relative;display:flex;align-items:center;justify-content:center;height:100%}
+.hero-img-wrap{position:relative;width:100%;aspect-ratio:1;max-width:480px;border-radius:24px;overflow:hidden;background:linear-gradient(140deg,#f5f5f5 0%,#ebebeb 100%)}
+.hero-img-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.hero-img-bg svg{width:60%;opacity:.06}
+.hero-product-display{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px}
+.hero-tshirt{font-size:140px;filter:drop-shadow(0 20px 40px rgba(0,0,0,.15))}
+.hero-badge-float{position:absolute;top:28px;right:28px;background:var(--red);color:#fff;border-radius:10px;padding:8px 14px;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 4px 16px rgba(208,16,32,.4)}
+.hero-badge-float2{position:absolute;bottom:28px;left:28px;background:var(--white);border-radius:10px;padding:10px 16px;box-shadow:0 4px 20px rgba(0,0,0,.12)}
+.hbf2-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.hbf2-price{font-family:'Montserrat',sans-serif;font-weight:900;font-size:20px;color:var(--dark)}
+.hbf2-sub{font-size:11px;color:var(--muted)}
+
+/* ─── TRUST BAR ─── */
+.trust{background:var(--dark);color:#fff;padding:18px 40px}
+.trust-inner{max-width:1320px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap}
+.trust-item{display:flex;align-items:center;gap:9px;padding:0 32px;font-size:12.5px;font-weight:500;border-right:1px solid rgba(255,255,255,.1)}
+.trust-item:last-child{border-right:none}
+.trust-item svg{flex-shrink:0;opacity:.7}
+.trust-item strong{color:#fff}
+.trust-item span{opacity:.6}
+
+/* ─── SECTION WRAPPER ─── */
+.section{max-width:1320px;margin:0 auto;padding:72px 40px}
+.section-sm{padding:48px 40px}
+.sec-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:36px}
+.sec-title{font-family:'Montserrat',sans-serif;font-weight:900;font-size:28px;letter-spacing:-.02em;color:var(--dark)}
+.sec-title em{color:var(--red);font-style:normal}
+.sec-sub{font-size:13px;color:var(--muted);margin-top:5px}
+.sec-link{font-size:13px;font-weight:700;color:var(--red);display:flex;align-items:center;gap:4px;white-space:nowrap}
+.sec-link:hover{text-decoration:underline}
+
+/* ─── CATEGORY PILLS ─── */
+.cats{background:var(--white);border-bottom:1px solid var(--line)}
+.cats-inner{max-width:1320px;margin:0 auto;padding:0 40px;display:flex;gap:4px;overflow-x:auto}
+.cat-pill{display:flex;align-items:center;gap:6px;padding:13px 18px;font-size:13px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;cursor:pointer;transition:all .18s;white-space:nowrap;border:none;background:none}
+.cat-pill:hover{color:var(--dark)}
+.cat-pill.active{color:var(--red);border-color:var(--red)}
+.cat-count{font-size:10px;background:#f0f0f0;color:var(--muted);border-radius:100px;padding:1px 7px;font-weight:700}
+.cat-pill.active .cat-count{background:var(--red-light);color:var(--red)}
+
+/* ─── PRODUCT GRID ─── */
+.product-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.pcard{background:var(--white);border-radius:16px;overflow:hidden;border:1px solid var(--line);transition:all .25s;position:relative;display:flex;flex-direction:column}
+.pcard:hover{box-shadow:var(--shadow-lg);transform:translateY(-3px);border-color:#d0d0d0}
+.pcard-img{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:96px;position:relative;overflow:hidden;background:#f7f7f7}
+.pcard:hover .pcard-img{background:#f2f2f2}
+.pcard-badge{position:absolute;top:12px;left:12px;font-size:9.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:5px;color:#fff}
+.badge-new{background:#16a34a}
+.badge-sale{background:var(--red)}
+.badge-staff{background:#6366f1}
+.badge-limited{background:#d97706}
+.pcard-wish{position:absolute;top:12px;right:12px;width:34px;height:34px;background:#fff;border:1px solid var(--line);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;opacity:0;transition:opacity .18s;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.pcard:hover .pcard-wish{opacity:1}
+.pcard-body{padding:18px;flex:1;display:flex;flex-direction:column}
+.pcard-name{font-size:14.5px;font-weight:700;color:var(--dark);margin-bottom:3px}
+.pcard-desc{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:12px;flex:1}
+.pcard-foot{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.pcard-price{font-family:'Montserrat',sans-serif;font-weight:900;font-size:20px;color:var(--dark)}
+.pcard-price s{font-size:13px;color:#b0b0b0;font-weight:400;font-family:'Inter',sans-serif;margin-left:5px}
+.pcard-colors{display:flex;gap:4px}
+.cdot{width:13px;height:13px;border-radius:50%;border:1.5px solid rgba(0,0,0,.1);box-shadow:inset 0 0 0 1px rgba(255,255,255,.5)}
+.pcard-add{width:100%;padding:10px;border-radius:8px;border:1.5px solid var(--line);background:transparent;color:var(--dark);font-size:12.5px;font-weight:700;letter-spacing:.02em;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:6px}
+.pcard-add:hover{background:var(--red);border-color:var(--red);color:#fff}
+
+/* ─── PERKS STRIP ─── */
+.perks{background:var(--white);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.perks-inner{max-width:1320px;margin:0 auto;padding:32px 40px;display:grid;grid-template-columns:repeat(5,1fr);gap:0;text-align:center}
+.perk{padding:0 20px;border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;gap:8px}
+.perk:last-child{border-right:none}
+.perk-icon{width:42px;height:42px;border-radius:10px;background:var(--red-light);display:flex;align-items:center;justify-content:center;font-size:20px}
+.perk-name{font-size:13px;font-weight:700;color:var(--dark)}
+.perk-sub{font-size:11.5px;color:var(--muted)}
+
+/* ─── BUNDLE HERO CARDS ─── */
+.bundle-grid{display:grid;grid-template-columns:1.55fr 1fr;gap:24px}
+.bcard{border-radius:20px;overflow:hidden;position:relative;min-height:300px;display:flex;flex-direction:column;justify-content:flex-end;padding:36px}
+.bcard-1{background:linear-gradient(120deg,#111213 60%,#2a0608 100%)}
+.bcard-2{background:linear-gradient(120deg,#D01020 0%,#8b0000 100%)}
+.bcard-emoji{position:absolute;top:0;right:0;bottom:0;display:flex;align-items:center;padding-right:36px;font-size:130px;opacity:.18;pointer-events:none}
+.bcard-tag{font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;margin-bottom:10px}
+.bcard-1 .bcard-tag{color:var(--red)}
+.bcard-2 .bcard-tag{color:rgba(255,255,255,.7)}
+.bcard-title{font-family:'Montserrat',sans-serif;font-weight:900;font-size:30px;color:#fff;line-height:1.05;margin-bottom:10px}
+.bcard-desc{font-size:13px;color:rgba(255,255,255,.6);margin-bottom:22px;max-width:300px;line-height:1.5}
+.bcard-row{display:flex;align-items:center;gap:16px}
+.bcard-price{font-family:'Montserrat',sans-serif;font-weight:900;font-size:30px;color:#fff}
+.bcard-price s{font-size:16px;opacity:.5;font-family:'Inter',sans-serif;font-weight:400}
+.btn-bundle{padding:12px 22px;border-radius:9px;border:none;font-size:13px;font-weight:700;letter-spacing:.02em;transition:all .2s}
+.bcard-1 .btn-bundle{background:var(--red);color:#fff}
+.bcard-1 .btn-bundle:hover{background:var(--red2)}
+.bcard-2 .btn-bundle{background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.35);color:#fff}
+.bcard-2 .btn-bundle:hover{background:rgba(255,255,255,.25)}
+
+/* ─── FOOTER ─── */
+.footer-top{background:var(--white);border-top:1px solid var(--line);padding:60px 40px 48px}
+.footer-top-inner{max-width:1320px;margin:0 auto;display:grid;grid-template-columns:2.2fr 1fr 1fr 1fr;gap:56px}
+.footer-logo{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.footer-desc{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:20px}
+.footer-social{display:flex;gap:8px}
+.fsoc{width:34px;height:34px;border-radius:8px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--muted);transition:all .18s}
+.fsoc:hover{border-color:var(--red);color:var(--red)}
+.footer-col h5{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--dark);margin-bottom:16px}
+.footer-col a{display:block;font-size:13px;color:var(--muted);margin-bottom:11px;transition:color .15s}
+.footer-col a:hover{color:var(--red)}
+.footer-bot{background:#f2f2f2;padding:18px 40px;border-top:1px solid var(--line)}
+.footer-bot-inner{max-width:1320px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.footer-bot p{font-size:12px;color:var(--muted)}
+.pay-badges{display:flex;gap:6px;align-items:center}
+.pay-badge{background:var(--white);border:1px solid var(--line);border-radius:5px;padding:4px 10px;font-size:11px;font-weight:700;color:var(--mid)}
+</style>
+</head>
+<body>
+
+<!-- ANNOUNCEMENT BAR -->
+<div class="announce">🎳 Free shipping on all orders over $75 — Official QubicaAMF Merchandise <span>|</span> Powered by Printify &amp; Stripe</div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <svg class="logo-mark" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="22" cy="22" r="21" stroke="#D01020" stroke-width="2.2"/>
+        <circle cx="22" cy="22" r="13.5" stroke="#D01020" stroke-width="1.5" opacity=".35"/>
+        <circle cx="22" cy="22" r="6" fill="#D01020"/>
+        <line x1="22" y1="3" x2="22" y2="0" stroke="#D01020" stroke-width="2.2" stroke-linecap="round"/>
+        <line x1="22" y1="44" x2="22" y2="41" stroke="#D01020" stroke-width="2.2" stroke-linecap="round"/>
+        <line x1="41" y1="22" x2="44" y2="22" stroke="#D01020" stroke-width="2.2" stroke-linecap="round"/>
+        <line x1="0" y1="22" x2="3" y2="22" stroke="#D01020" stroke-width="2.2" stroke-linecap="round"/>
+      </svg>
+      <div class="logo-wordmark">
+        <div class="logo-main">Qubica<em>AMF</em></div>
+        <div class="logo-sub">Official Merch Store</div>
+      </div>
+    </div>
+
+    <nav class="header-nav">
+      <a href="#" class="active">Shop All</a>
+      <a href="#">Apparel</a>
+      <a href="#">Accessories</a>
+      <a href="#">Drinkware</a>
+      <a href="#">Bundles</a>
+      <a href="#">New Arrivals</a>
+    </nav>
+
+    <div class="header-right">
+      <div class="h-search">
+        <svg width="14" height="14" fill="none" viewBox="0 0 16 16"><circle cx="6.5" cy="6.5" r="5.5" stroke="#666" stroke-width="1.5"/><path d="M11 11l3 3" stroke="#666" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Search merch…
+      </div>
+      <button class="h-btn outline">Sign In</button>
+      <button class="h-btn primary">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Cart
+        <span class="cart-pill">3</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-copy">
+      <div class="hero-eyebrow">Fall 2025 Collection</div>
+      <h1>Gear Up.<br><mark>Strike Bold.</mark></h1>
+      <p class="hero-desc">Official QubicaAMF merchandise for employees, bowling centers, and fans worldwide. Premium print-on-demand — delivered to your door.</p>
+      <div class="hero-actions">
+        <button class="btn-hero solid">Shop the Collection</button>
+        <button class="btn-hero ghost">View Lookbook →</button>
+      </div>
+      <div class="hero-stats">
+        <div>
+          <div class="h-stat-num">90<sup>+</sup></div>
+          <div class="h-stat-label">Products</div>
+        </div>
+        <div>
+          <div class="h-stat-num">90<sup>+</sup></div>
+          <div class="h-stat-label">Countries Shipped</div>
+        </div>
+        <div>
+          <div class="h-stat-num">4.9<sup>★</sup></div>
+          <div class="h-stat-label">Customer Rating</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="hero-img-wrap">
+        <div class="hero-img-bg">
+          <svg viewBox="0 0 200 200" fill="#D01020"><circle cx="100" cy="100" r="90" fill="none" stroke="#D01020" stroke-width="6"/><circle cx="100" cy="100" r="55" fill="none" stroke="#D01020" stroke-width="4"/><circle cx="100" cy="100" r="20"/></svg>
+        </div>
+        <div class="hero-product-display">
+          <div class="hero-tshirt">👕</div>
+        </div>
+        <div class="hero-badge-float">New Drop</div>
+        <div class="hero-badge-float2">
+          <div class="hbf2-label">Starting from</div>
+          <div class="hbf2-price">$24.99</div>
+          <div class="hbf2-sub">Free shipping over $75</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST BAR -->
+<div class="trust">
+  <div class="trust-inner">
+    <div class="trust-item">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div><strong>Free Shipping</strong> <span>over $75</span></div>
+    </div>
+    <div class="trust-item">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/></svg>
+      <div><strong>Secure Checkout</strong> <span>via Stripe</span></div>
+    </div>
+    <div class="trust-item">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" stroke="#fff" stroke-width="1.8"/><path d="M8 21h8M12 17v4" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <div><strong>Print on Demand</strong> <span>No minimums</span></div>
+    </div>
+    <div class="trust-item">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="#fff" stroke-width="1.8"/><path d="M12 8v4l3 3" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <div><strong>Ships in 3–7 Days</strong> <span>Worldwide</span></div>
+    </div>
+    <div class="trust-item">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/></svg>
+      <div><strong>Licensed Brand</strong> <span>Official merch</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- CATEGORY PILLS -->
+<div class="cats">
+  <div class="cats-inner">
+    <button class="cat-pill active">All <span class="cat-count">94</span></button>
+    <button class="cat-pill">T-Shirts <span class="cat-count">22</span></button>
+    <button class="cat-pill">Hoodies <span class="cat-count">14</span></button>
+    <button class="cat-pill">Polos <span class="cat-count">10</span></button>
+    <button class="cat-pill">Jackets <span class="cat-count">8</span></button>
+    <button class="cat-pill">Hats &amp; Caps <span class="cat-count">12</span></button>
+    <button class="cat-pill">Bags <span class="cat-count">16</span></button>
+    <button class="cat-pill">Drinkware <span class="cat-count">12</span></button>
+  </div>
+</div>
+
+<!-- PRODUCTS -->
+<div class="section">
+  <div class="sec-head">
+    <div>
+      <div class="sec-title">Featured <em>Drops</em></div>
+      <div class="sec-sub">Handpicked from the latest collection</div>
+    </div>
+    <a href="#" class="sec-link">View all products →</a>
+  </div>
+
+  <div class="product-grid">
+
+    <!-- 1 -->
+    <div class="pcard">
+      <div class="pcard-img" style="background:linear-gradient(135deg,#f5f5f5,#ebebeb)">
+        <span>👕</span>
+        <span class="pcard-badge badge-new">New</span>
+        <span class="pcard-wish">♡</span>
+      </div>
+      <div class="pcard-body">
+        <div class="pcard-name">Strike Force Tee</div>
+        <div class="pcard-desc">Premium 100% cotton · Front logo print · Unisex fit</div>
+        <div class="pcard-foot">
+          <div class="pcard-price">$28</div>
+          <div class="pcard-colors">
+            <div class="cdot" style="background:#111213"></div>
+            <div class="cdot" style="background:#D01020"></div>
+            <div class="cdot" style="background:#fff;border-color:#ccc"></div>
+          </div>
+        </div>
+        <button class="pcard-add">+ Add to Cart</button>
+      </div>
+    </div>
+
+    <!-- 2 -->
+    <div class="pcard">
+      <div class="pcard-img" style="background:linear-gradient(135deg,#f0f0f0,#e6e6e6)">
+        <span>🧥</span>
+        <span class="pcard-badge badge-sale">−20%</span>
+        <span class="pcard-wish">♡</span>
+      </div>
+      <div class="pcard-body">
+        <div class="pcard-name">Lane Legend Hoodie</div>
+        <div class="pcard-desc">Heavyweight fleece · Embroidered chest logo · Kangaroo pocket</div>
+        <div class="pcard-foot">
+          <div class="pcard-price">$52 <s>$65</s></div>
+          <div class="pcard-colors">
+            <div class="cdot" style="background:#1a1a2e"></div>
+            <div class="cdot" style="background:#D01020"></div>
+            <div class="cdot" style="background:#555"></div>
+          </div>
+        </div>
+        <button class="pcard-add">+ Add to Cart</button>
+      </div>
+    </div>
+
+    <!-- 3 -->
+    <div class="pcard">
+      <div class="pcard-img" style="background:linear-gradient(135deg,#f7f5f0,#efede6)">
+        <span>🧢</span>
+        <span class="pcard-badge badge-staff">Staff Pick</span>
+        <span class="pcard-wish">♡</span>
+      </div>
+      <div class="pcard-body">
+        <div class="pcard-name">AMF Pro Snapback</div>
+        <div class="pcard-desc">Structured 6-panel · Flat brim · Embroidered logo</div>
+        <div class="pcard-foot">
+          <div class="pcard-price">$35</div>
+          <div class="pcard-colors">
+            <div class="cdot" style="background:#111"></div>
+            <div class="cdot" style="background:#D01020"></div>
+            <div class="cdot" style="background:#8B0000"></div>
+          </div>
+        </div>
+        <button class="pcard-add">+ Add to Cart</button>
+      </div>
+    </div>
+
+    <!-- 4 -->
+    <div class="pcard">
+      <div class="pcard-img" style="background:linear-gradient(135deg,#f5f0f5,#ece6ec)">
+        <span>☕</span>
+        <span class="pcard-badge badge-new">New</span>
+        <span class="pcard-wish">♡</span>
+      </div>
+      <div class="pcard-body">
+        <div class="pcard-name">Pinspotter Mug</div>
+        <div class="pcard-desc">15oz ceramic · Glossy finish · Dishwasher safe</div>
+        <div class="pcard-foot">
+          <div class="pcard-price">$22</div>
+          <div class="pcard-colors">
+            <div class="cdot" style="background:#fff;border-color:#ccc"></div>
+            <div class="cdot" style="background:#111"></div>
+            <div class="cdot" style="background:#D01020"></div>
+          </div>
+        </div>
+        <button class="pcard-add">+ Add to Cart</button>
+      </div>
+    </div>
+
+    <!-- 5 -->
+    <div class="pcard">
+      <div class="pcard-img" style="background:linear-gradient(135deg,#f0f0f0,#e8e8e8)">
+        <span style="font-size:80px">🧥</span>
+        <span class="pcard-badge badge-limited">Limited</span>
+        <span class="pcard-wish">♡</span>
+      </div>
+      <div class="pcard-body">
+        <div class="pcard-name">EDGE Series Jacket</div>
+        <div class="pcard-desc">Lightweight softshell · Full-zip · Water-resistant</div>
+        <div class="pcard-foot">
+          <div class="pcard-price">$89</div>
+          <div class="pcard-colors">
+            <div class="cdot" style="background:#111"></div>
+            <div class="cdot" style="background:#2c3e50"></div>
+          </div>
+        </div>
+        <button class="pcard-add">+ Add to Cart</button>
+      </div>
+    </div>
+
+    <!-- 6 -->
+    <div class="pcard">
+      <div class="pcard-img" style="background:linear-gradient(135deg,#f5f5f0,#eeeee6)">
+        <span>🎒</span>
+        <span class="pcard-badge badge-new">New</span>
+        <span class="pcard-wish">♡</span>
+      </div>
+      <div class="pcard-body">
+        <div class="pcard-name">Pro Gear Backpack</div>
+        <div class="pcard-desc">30L capacity · Padded laptop sleeve · Screen-print logo</div>
+        <div class="pcard-foot">
+          <div class="pcard-price">$65</div>
+          <div class="pcard-colors">
+            <div class="cdot" style="background:#111"></div>
+            <div class="cdot" style="background:#D01020"></div>
+          </div>
+        </div>
+        <button class="pcard-add">+ Add to Cart</button>
+      </div>
+    </div>
+
+    <!-- 7 -->
+    <div class="pcard">
+      <div class="pcard-img" style="background:linear-gradient(135deg,#f0f5f0,#e6ece6)">
+        <span>👔</span>
+        <span class="pcard-badge badge-staff">Staff Pick</span>
+        <span class="pcard-wish">♡</span>
+      </div>
+      <div class="pcard-body">
+        <div class="pcard-name">Tournament Polo</div>
+        <div class="pcard-desc">Moisture-wicking · Embroidered chest logo · 3 colors</div>
+        <div class="pcard-foot">
+          <div class="pcard-price">$45</div>
+          <div class="pcard-colors">
+            <div class="cdot" style="background:#111"></div>
+            <div class="cdot" style="background:#D01020"></div>
+            <div class="cdot" style="background:#fff;border-color:#ccc"></div>
+          </div>
+        </div>
+        <button class="pcard-add">+ Add to Cart</button>
+      </div>
+    </div>
+
+    <!-- 8 -->
+    <div class="pcard">
+      <div class="pcard-img" style="background:linear-gradient(135deg,#f0f0f5,#e6e6ef)">
+        <span>🍶</span>
+        <span class="pcard-badge badge-sale">−15%</span>
+        <span class="pcard-wish">♡</span>
+      </div>
+      <div class="pcard-body">
+        <div class="pcard-name">Strike Water Bottle</div>
+        <div class="pcard-desc">32oz stainless steel · Double-wall insulated · Leak-proof</div>
+        <div class="pcard-foot">
+          <div class="pcard-price">$34 <s>$40</s></div>
+          <div class="pcard-colors">
+            <div class="cdot" style="background:#c0c0c0"></div>
+            <div class="cdot" style="background:#111"></div>
+            <div class="cdot" style="background:#D01020"></div>
+          </div>
+        </div>
+        <button class="pcard-add">+ Add to Cart</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- PERKS -->
+<div class="perks">
+  <div class="perks-inner">
+    <div class="perk">
+      <div class="perk-icon">🚚</div>
+      <div class="perk-name">Free Shipping</div>
+      <div class="perk-sub">On orders over $75</div>
+    </div>
+    <div class="perk">
+      <div class="perk-icon">🖨️</div>
+      <div class="perk-name">Print on Demand</div>
+      <div class="perk-sub">Zero waste, no inventory</div>
+    </div>
+    <div class="perk">
+      <div class="perk-icon">🔒</div>
+      <div class="perk-name">Stripe Payments</div>
+      <div class="perk-sub">Bank-level security</div>
+    </div>
+    <div class="perk">
+      <div class="perk-icon">🌍</div>
+      <div class="perk-name">Ships Worldwide</div>
+      <div class="perk-sub">3–7 business days</div>
+    </div>
+    <div class="perk">
+      <div class="perk-icon">🏆</div>
+      <div class="perk-name">Official Merch</div>
+      <div class="perk-sub">Licensed QubicaAMF brand</div>
+    </div>
+  </div>
+</div>
+
+<!-- BUNDLES -->
+<div class="section">
+  <div class="sec-head">
+    <div>
+      <div class="sec-title">Team &amp; <em>Center Bundles</em></div>
+      <div class="sec-sub">Outfit your staff — bulk discounts available on request</div>
+    </div>
+    <a href="#" class="sec-link">View all bundles →</a>
+  </div>
+
+  <div class="bundle-grid">
+    <div class="bcard bcard-1">
+      <div class="bcard-emoji">👕</div>
+      <div style="position:relative;z-index:1">
+        <div class="bcard-tag">⚡ Best Seller Bundle</div>
+        <div class="bcard-title">The Full<br>Strike Kit</div>
+        <div class="bcard-desc">Tee + Hoodie + Hat + Bottle — everything your team needs to represent QubicaAMF on and off the lanes.</div>
+        <div class="bcard-row">
+          <div class="bcard-price">$129 <s>$160</s></div>
+          <button class="btn-bundle">Shop Bundle →</button>
+        </div>
+      </div>
+    </div>
+    <div class="bcard bcard-2">
+      <div class="bcard-emoji">🏆</div>
+      <div style="position:relative;z-index:1">
+        <div class="bcard-tag">★ Exclusive Access</div>
+        <div class="bcard-title">Employee<br>Collection</div>
+        <div class="bcard-desc">Exclusive styles available only to QubicaAMF staff and certified partners worldwide.</div>
+        <button class="btn-bundle" style="width:fit-content">View Collection →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer-top">
+  <div class="footer-top-inner">
+    <div>
+      <div class="footer-logo">
+        <svg width="36" height="36" viewBox="0 0 44 44" fill="none">
+          <circle cx="22" cy="22" r="21" stroke="#D01020" stroke-width="2"/>
+          <circle cx="22" cy="22" r="6" fill="#D01020"/>
+        </svg>
+        <div>
+          <div class="logo-main" style="font-family:'Montserrat',sans-serif;font-weight:900;font-size:17px;letter-spacing:-.02em">Qubica<em style="color:#D01020;font-style:normal">AMF</em></div>
+          <div class="logo-sub" style="font-size:9px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:#767676">Official Merch Store</div>
+        </div>
+      </div>
+      <p class="footer-desc">Official merchandise for QubicaAMF employees, bowling centers, and fans. All products are print-on-demand via Printify. No inventory minimums required.</p>
+      <div class="footer-social">
+        <a class="fsoc" href="#">𝕏</a>
+        <a class="fsoc" href="#">in</a>
+        <a class="fsoc" href="#">📘</a>
+        <a class="fsoc" href="#">📸</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h5>Shop</h5>
+      <a href="#">T-Shirts</a>
+      <a href="#">Hoodies</a>
+      <a href="#">Hats &amp; Caps</a>
+      <a href="#">Drinkware</a>
+      <a href="#">Accessories</a>
+      <a href="#">Bundles</a>
+    </div>
+    <div class="footer-col">
+      <h5>Support</h5>
+      <a href="#">Track Your Order</a>
+      <a href="#">Returns &amp; Exchanges</a>
+      <a href="#">Sizing Guide</a>
+      <a href="#">FAQ</a>
+      <a href="#">Contact Us</a>
+    </div>
+    <div class="footer-col">
+      <h5>Company</h5>
+      <a href="#">About QubicaAMF</a>
+      <a href="#">Bulk &amp; Team Orders</a>
+      <a href="#">Careers</a>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+    </div>
+  </div>
+</div>
+<div class="footer-bot">
+  <div class="footer-bot-inner">
+    <p>© 2025 QubicaAMF Worldwide. All rights reserved. Fulfillment by Printify · Payments by Stripe.</p>
+    <div class="pay-badges">
+      <span style="font-size:11.5px;color:#999;margin-right:4px">Accepted:</span>
+      <span class="pay-badge">VISA</span>
+      <span class="pay-badge">MC</span>
+      <span class="pay-badge">AMEX</span>
+      <span class="pay-badge">Apple Pay</span>
+      <span class="pay-badge">Google Pay</span>
+    </div>
+  </div>
+</div>
+
+<script>
+// Category pill interactivity
+document.querySelectorAll('.cat-pill').forEach(p=>{
+  p.addEventListener('click',()=>{
+    document.querySelectorAll('.cat-pill').forEach(x=>x.classList.remove('active'));
+    p.classList.add('active');
+  });
+});
+// Add to cart hover polish
+document.querySelectorAll('.pcard-add').forEach(b=>{
+  b.addEventListener('click',function(){
+    const orig=this.textContent;
+    this.textContent='✓ Added!';
+    this.style.background='#16a34a';
+    this.style.borderColor='#16a34a';
+    this.style.color='#fff';
+    setTimeout(()=>{
+      this.textContent=orig;
+      this.style.background='';
+      this.style.borderColor='';
+      this.style.color='';
+    },1400);
+  });
+});
+</script>
+</body>
+</html>
