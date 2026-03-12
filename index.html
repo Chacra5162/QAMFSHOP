@@ -183,6 +183,42 @@ button{font-family:'Inter',sans-serif;cursor:pointer}
 .footer-bot p{font-size:12px;color:var(--muted)}
 .pay-badges{display:flex;gap:6px;align-items:center}
 .pay-badge{background:var(--white);border:1px solid var(--line);border-radius:5px;padding:4px 10px;font-size:11px;font-weight:700;color:var(--mid)}
+
+/* ─── LOADING STATE ─── */
+.loading-state{grid-column:1/-1;text-align:center;padding:80px 20px;font-size:14px;color:var(--muted)}
+
+/* ─── PRODUCT MODAL ─── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.modal-overlay.open{display:flex}
+.modal-card{background:var(--white);border-radius:20px;max-width:880px;width:100%;max-height:90vh;overflow-y:auto;position:relative;box-shadow:var(--shadow-lg)}
+.modal-close{position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--white);font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;color:var(--mid);transition:all .15s}
+.modal-close:hover{background:#f2f2f2;color:var(--dark)}
+.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.modal-img{aspect-ratio:1;background:linear-gradient(135deg,#f5f5f5,#ebebeb);display:flex;align-items:center;justify-content:center;font-size:140px;border-radius:20px 0 0 20px;overflow:hidden}
+.modal-img img{width:100%;height:100%;object-fit:cover}
+.modal-info{padding:36px;display:flex;flex-direction:column;gap:16px}
+.modal-category{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--red)}
+.modal-title{font-family:'Montserrat',sans-serif;font-weight:900;font-size:26px;letter-spacing:-.02em;color:var(--dark);line-height:1.1}
+.modal-desc{font-size:13.5px;color:var(--muted);line-height:1.65}
+.modal-price{font-family:'Montserrat',sans-serif;font-weight:900;font-size:24px;color:var(--dark)}
+.modal-option-group{display:flex;flex-direction:column;gap:8px}
+.modal-label{font-size:12px;font-weight:700;color:var(--dark);text-transform:uppercase;letter-spacing:.08em}
+.modal-colors{display:flex;gap:6px;flex-wrap:wrap}
+.modal-color-btn{width:32px;height:32px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:all .15s;position:relative}
+.modal-color-btn:hover{transform:scale(1.1)}
+.modal-color-btn.selected{border-color:var(--red);box-shadow:0 0 0 2px var(--red-light)}
+.modal-sizes{display:flex;gap:6px;flex-wrap:wrap}
+.modal-size-btn{padding:8px 16px;border-radius:8px;border:1.5px solid var(--line);background:transparent;font-size:12.5px;font-weight:600;color:var(--mid);cursor:pointer;transition:all .15s}
+.modal-size-btn:hover{border-color:var(--dark);color:var(--dark)}
+.modal-size-btn.selected{border-color:var(--red);background:var(--red-light);color:var(--red)}
+.modal-size-btn.unavailable{opacity:.35;cursor:not-allowed;text-decoration:line-through}
+.modal-variant-info{font-size:12px;color:var(--muted);min-height:18px}
+.modal-add-btn{width:100%;padding:14px;border-radius:10px;border:none;background:var(--red);color:#fff;font-size:14px;font-weight:700;letter-spacing:.02em;cursor:pointer;transition:all .2s;margin-top:8px}
+.modal-add-btn:hover{background:var(--red2);transform:translateY(-1px);box-shadow:0 6px 24px rgba(208,16,32,.3)}
+.modal-add-btn:disabled{background:#ccc;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* ─── PRODUCT IMAGE IN CARD ─── */
+.pcard-img img{width:100%;height:100%;object-fit:cover}
 </style>
 </head>
 <body>
@@ -319,7 +355,7 @@ button{font-family:'Inter',sans-serif;cursor:pointer}
   </div>
 </div>
 
-<!-- PRODUCTS -->
+<!-- PRODUCTS (dynamically loaded from products.json) -->
 <div class="section">
   <div class="sec-head">
     <div>
@@ -329,182 +365,39 @@ button{font-family:'Inter',sans-serif;cursor:pointer}
     <a href="#" class="sec-link">View all products →</a>
   </div>
 
-  <div class="product-grid">
+  <div class="product-grid" id="product-grid">
+    <!-- Products loaded dynamically from products.json -->
+    <div class="loading-state" id="loading-state">Loading products...</div>
+  </div>
+</div>
 
-    <!-- 1 -->
-    <div class="pcard">
-      <div class="pcard-img" style="background:linear-gradient(135deg,#f5f5f5,#ebebeb)">
-        <span>👕</span>
-        <span class="pcard-badge badge-new">New</span>
-        <span class="pcard-wish">♡</span>
-      </div>
-      <div class="pcard-body">
-        <div class="pcard-name">Strike Force Tee</div>
-        <div class="pcard-desc">Premium 100% cotton · Front logo print · Unisex fit</div>
-        <div class="pcard-foot">
-          <div class="pcard-price">$28</div>
-          <div class="pcard-colors">
-            <div class="cdot" style="background:#111213"></div>
-            <div class="cdot" style="background:#D01020"></div>
-            <div class="cdot" style="background:#fff;border-color:#ccc"></div>
-          </div>
+<!-- PRODUCT DETAIL MODAL -->
+<div class="modal-overlay" id="product-modal">
+  <div class="modal-card">
+    <button class="modal-close" id="modal-close">&times;</button>
+    <div class="modal-grid">
+      <div class="modal-img" id="modal-img"></div>
+      <div class="modal-info">
+        <div class="modal-category" id="modal-category"></div>
+        <h2 class="modal-title" id="modal-title"></h2>
+        <p class="modal-desc" id="modal-desc"></p>
+        <div class="modal-price" id="modal-price"></div>
+
+        <div class="modal-option-group" id="modal-colors-group">
+          <label class="modal-label">Color</label>
+          <div class="modal-colors" id="modal-colors"></div>
         </div>
-        <button class="pcard-add">+ Add to Cart</button>
+
+        <div class="modal-option-group" id="modal-sizes-group">
+          <label class="modal-label">Size</label>
+          <div class="modal-sizes" id="modal-sizes"></div>
+        </div>
+
+        <div class="modal-variant-info" id="modal-variant-info"></div>
+
+        <button class="modal-add-btn" id="modal-add-btn">+ Add to Cart</button>
       </div>
     </div>
-
-    <!-- 2 -->
-    <div class="pcard">
-      <div class="pcard-img" style="background:linear-gradient(135deg,#f0f0f0,#e6e6e6)">
-        <span>🧥</span>
-        <span class="pcard-badge badge-sale">−20%</span>
-        <span class="pcard-wish">♡</span>
-      </div>
-      <div class="pcard-body">
-        <div class="pcard-name">Lane Legend Hoodie</div>
-        <div class="pcard-desc">Heavyweight fleece · Embroidered chest logo · Kangaroo pocket</div>
-        <div class="pcard-foot">
-          <div class="pcard-price">$52 <s>$65</s></div>
-          <div class="pcard-colors">
-            <div class="cdot" style="background:#1a1a2e"></div>
-            <div class="cdot" style="background:#D01020"></div>
-            <div class="cdot" style="background:#555"></div>
-          </div>
-        </div>
-        <button class="pcard-add">+ Add to Cart</button>
-      </div>
-    </div>
-
-    <!-- 3 -->
-    <div class="pcard">
-      <div class="pcard-img" style="background:linear-gradient(135deg,#f7f5f0,#efede6)">
-        <span>🧢</span>
-        <span class="pcard-badge badge-staff">Staff Pick</span>
-        <span class="pcard-wish">♡</span>
-      </div>
-      <div class="pcard-body">
-        <div class="pcard-name">AMF Pro Snapback</div>
-        <div class="pcard-desc">Structured 6-panel · Flat brim · Embroidered logo</div>
-        <div class="pcard-foot">
-          <div class="pcard-price">$35</div>
-          <div class="pcard-colors">
-            <div class="cdot" style="background:#111"></div>
-            <div class="cdot" style="background:#D01020"></div>
-            <div class="cdot" style="background:#8B0000"></div>
-          </div>
-        </div>
-        <button class="pcard-add">+ Add to Cart</button>
-      </div>
-    </div>
-
-    <!-- 4 -->
-    <div class="pcard">
-      <div class="pcard-img" style="background:linear-gradient(135deg,#f5f0f5,#ece6ec)">
-        <span>☕</span>
-        <span class="pcard-badge badge-new">New</span>
-        <span class="pcard-wish">♡</span>
-      </div>
-      <div class="pcard-body">
-        <div class="pcard-name">Pinspotter Mug</div>
-        <div class="pcard-desc">15oz ceramic · Glossy finish · Dishwasher safe</div>
-        <div class="pcard-foot">
-          <div class="pcard-price">$22</div>
-          <div class="pcard-colors">
-            <div class="cdot" style="background:#fff;border-color:#ccc"></div>
-            <div class="cdot" style="background:#111"></div>
-            <div class="cdot" style="background:#D01020"></div>
-          </div>
-        </div>
-        <button class="pcard-add">+ Add to Cart</button>
-      </div>
-    </div>
-
-    <!-- 5 -->
-    <div class="pcard">
-      <div class="pcard-img" style="background:linear-gradient(135deg,#f0f0f0,#e8e8e8)">
-        <span style="font-size:80px">🧥</span>
-        <span class="pcard-badge badge-limited">Limited</span>
-        <span class="pcard-wish">♡</span>
-      </div>
-      <div class="pcard-body">
-        <div class="pcard-name">EDGE Series Jacket</div>
-        <div class="pcard-desc">Lightweight softshell · Full-zip · Water-resistant</div>
-        <div class="pcard-foot">
-          <div class="pcard-price">$89</div>
-          <div class="pcard-colors">
-            <div class="cdot" style="background:#111"></div>
-            <div class="cdot" style="background:#2c3e50"></div>
-          </div>
-        </div>
-        <button class="pcard-add">+ Add to Cart</button>
-      </div>
-    </div>
-
-    <!-- 6 -->
-    <div class="pcard">
-      <div class="pcard-img" style="background:linear-gradient(135deg,#f5f5f0,#eeeee6)">
-        <span>🎒</span>
-        <span class="pcard-badge badge-new">New</span>
-        <span class="pcard-wish">♡</span>
-      </div>
-      <div class="pcard-body">
-        <div class="pcard-name">Pro Gear Backpack</div>
-        <div class="pcard-desc">30L capacity · Padded laptop sleeve · Screen-print logo</div>
-        <div class="pcard-foot">
-          <div class="pcard-price">$65</div>
-          <div class="pcard-colors">
-            <div class="cdot" style="background:#111"></div>
-            <div class="cdot" style="background:#D01020"></div>
-          </div>
-        </div>
-        <button class="pcard-add">+ Add to Cart</button>
-      </div>
-    </div>
-
-    <!-- 7 -->
-    <div class="pcard">
-      <div class="pcard-img" style="background:linear-gradient(135deg,#f0f5f0,#e6ece6)">
-        <span>👔</span>
-        <span class="pcard-badge badge-staff">Staff Pick</span>
-        <span class="pcard-wish">♡</span>
-      </div>
-      <div class="pcard-body">
-        <div class="pcard-name">Tournament Polo</div>
-        <div class="pcard-desc">Moisture-wicking · Embroidered chest logo · 3 colors</div>
-        <div class="pcard-foot">
-          <div class="pcard-price">$45</div>
-          <div class="pcard-colors">
-            <div class="cdot" style="background:#111"></div>
-            <div class="cdot" style="background:#D01020"></div>
-            <div class="cdot" style="background:#fff;border-color:#ccc"></div>
-          </div>
-        </div>
-        <button class="pcard-add">+ Add to Cart</button>
-      </div>
-    </div>
-
-    <!-- 8 -->
-    <div class="pcard">
-      <div class="pcard-img" style="background:linear-gradient(135deg,#f0f0f5,#e6e6ef)">
-        <span>🍶</span>
-        <span class="pcard-badge badge-sale">−15%</span>
-        <span class="pcard-wish">♡</span>
-      </div>
-      <div class="pcard-body">
-        <div class="pcard-name">Strike Water Bottle</div>
-        <div class="pcard-desc">32oz stainless steel · Double-wall insulated · Leak-proof</div>
-        <div class="pcard-foot">
-          <div class="pcard-price">$34 <s>$40</s></div>
-          <div class="pcard-colors">
-            <div class="cdot" style="background:#c0c0c0"></div>
-            <div class="cdot" style="background:#111"></div>
-            <div class="cdot" style="background:#D01020"></div>
-          </div>
-        </div>
-        <button class="pcard-add">+ Add to Cart</button>
-      </div>
-    </div>
-
   </div>
 </div>
 
@@ -638,29 +531,291 @@ button{font-family:'Inter',sans-serif;cursor:pointer}
 </div>
 
 <script>
-// Category pill interactivity
-document.querySelectorAll('.cat-pill').forEach(p=>{
-  p.addEventListener('click',()=>{
-    document.querySelectorAll('.cat-pill').forEach(x=>x.classList.remove('active'));
-    p.classList.add('active');
+// ─── Color name to CSS color mapping ────────────────────────────────────────
+const COLOR_MAP = {
+  'black': '#111213', 'red': '#D01020', 'white': '#ffffff', 'navy': '#1a1a2e',
+  'charcoal': '#555555', 'dark red': '#8B0000', 'silver': '#c0c0c0', 'grey': '#999999',
+  'gray': '#999999', 'blue': '#2563eb', 'green': '#16a34a', 'yellow': '#eab308',
+  'orange': '#f97316', 'pink': '#ec4899', 'purple': '#9333ea', 'brown': '#92400e'
+};
+
+const CATEGORY_EMOJI = {
+  'T-Shirts': '👕', 'Hoodies': '🧥', 'Polos': '👔', 'Jackets': '🧥',
+  'Hats & Caps': '🧢', 'Bags': '🎒', 'Drinkware': '☕', 'Other': '📦'
+};
+
+const BADGE_MAP = {
+  'new': { class: 'badge-new', text: 'New' },
+  'staff': { class: 'badge-staff', text: 'Staff Pick' },
+  'limited': { class: 'badge-limited', text: 'Limited' },
+  'sale': { class: 'badge-sale', text: 'Sale' }
+};
+
+function getColorCSS(name) {
+  return COLOR_MAP[name.toLowerCase()] || '#999';
+}
+
+// ─── Store state ────────────────────────────────────────────────────────────
+let allProducts = [];
+let activeCategory = 'All';
+
+// ─── Render product card ────────────────────────────────────────────────────
+function renderProductCard(product) {
+  const emoji = CATEGORY_EMOJI[product.category] || '📦';
+  const hasImage = product.images && product.images[0] && product.images[0].src;
+  const imgContent = hasImage
+    ? `<img src="${product.images[0].src}" alt="${product.title}" loading="lazy">`
+    : `<span>${emoji}</span>`;
+
+  const badgeInfo = product.badge ? BADGE_MAP[product.badge] : null;
+  const badgeHTML = badgeInfo
+    ? `<span class="pcard-badge ${badgeInfo.class}">${badgeInfo.text}</span>`
+    : '';
+
+  const colorsHTML = product.colors.slice(0, 4).map(c =>
+    `<div class="cdot" style="background:${getColorCSS(c)}${c.toLowerCase() === 'white' ? ';border-color:#ccc' : ''}"></div>`
+  ).join('');
+
+  const sizesText = product.sizes.length > 1
+    ? `${product.sizes.length} sizes`
+    : product.sizes[0] || '';
+
+  const card = document.createElement('div');
+  card.className = 'pcard';
+  card.dataset.category = product.category;
+  card.dataset.productId = product.id;
+  card.innerHTML = `
+    <div class="pcard-img" style="background:linear-gradient(135deg,#f5f5f5,#ebebeb)">
+      ${imgContent}
+      ${badgeHTML}
+      <span class="pcard-wish">♡</span>
+    </div>
+    <div class="pcard-body">
+      <div class="pcard-name">${product.title}</div>
+      <div class="pcard-desc">${product.description}${sizesText ? ' · ' + sizesText : ''}</div>
+      <div class="pcard-foot">
+        <div class="pcard-price">${product.priceFormatted}</div>
+        <div class="pcard-colors">${colorsHTML}</div>
+      </div>
+      <button class="pcard-add">+ Add to Cart</button>
+    </div>
+  `;
+
+  // Click card to open modal
+  card.addEventListener('click', (e) => {
+    if (e.target.closest('.pcard-add') || e.target.closest('.pcard-wish')) return;
+    openProductModal(product);
   });
-});
-// Add to cart hover polish
-document.querySelectorAll('.pcard-add').forEach(b=>{
-  b.addEventListener('click',function(){
-    const orig=this.textContent;
-    this.textContent='✓ Added!';
-    this.style.background='#16a34a';
-    this.style.borderColor='#16a34a';
-    this.style.color='#fff';
-    setTimeout(()=>{
-      this.textContent=orig;
-      this.style.background='';
-      this.style.borderColor='';
-      this.style.color='';
-    },1400);
+
+  // Add to cart button
+  card.querySelector('.pcard-add').addEventListener('click', (e) => {
+    e.stopPropagation();
+    const btn = e.currentTarget;
+    const orig = btn.textContent;
+    btn.textContent = '✓ Added!';
+    btn.style.background = '#16a34a';
+    btn.style.borderColor = '#16a34a';
+    btn.style.color = '#fff';
+    setTimeout(() => {
+      btn.textContent = orig;
+      btn.style.background = '';
+      btn.style.borderColor = '';
+      btn.style.color = '';
+    }, 1400);
   });
+
+  return card;
+}
+
+// ─── Render all products ────────────────────────────────────────────────────
+function renderProducts(products, category) {
+  const grid = document.getElementById('product-grid');
+  const loading = document.getElementById('loading-state');
+  if (loading) loading.remove();
+
+  // Clear existing cards
+  grid.querySelectorAll('.pcard').forEach(c => c.remove());
+
+  const filtered = category === 'All'
+    ? products
+    : products.filter(p => p.category === category);
+
+  if (filtered.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'loading-state';
+    empty.textContent = 'No products in this category yet.';
+    grid.appendChild(empty);
+    return;
+  }
+
+  filtered.forEach(p => grid.appendChild(renderProductCard(p)));
+}
+
+// ─── Update category pills from product data ───────────────────────────────
+function updateCategoryPills(products) {
+  const catsInner = document.querySelector('.cats-inner');
+  catsInner.innerHTML = '';
+
+  const categories = { 'All': products.length };
+  products.forEach(p => {
+    categories[p.category] = (categories[p.category] || 0) + 1;
+  });
+
+  Object.entries(categories).forEach(([cat, count]) => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-pill' + (cat === 'All' ? ' active' : '');
+    btn.innerHTML = `${cat} <span class="cat-count">${count}</span>`;
+    btn.addEventListener('click', () => {
+      catsInner.querySelectorAll('.cat-pill').forEach(x => x.classList.remove('active'));
+      btn.classList.add('active');
+      activeCategory = cat;
+      renderProducts(allProducts, cat);
+    });
+    catsInner.appendChild(btn);
+  });
+}
+
+// ─── Product detail modal ───────────────────────────────────────────────────
+let modalProduct = null;
+let selectedColor = null;
+let selectedSize = null;
+
+function openProductModal(product) {
+  modalProduct = product;
+  selectedColor = product.colors[0] || null;
+  selectedSize = product.sizes[0] || null;
+
+  const modal = document.getElementById('product-modal');
+  const emoji = CATEGORY_EMOJI[product.category] || '📦';
+  const hasImage = product.images && product.images[0] && product.images[0].src;
+
+  document.getElementById('modal-img').innerHTML = hasImage
+    ? `<img src="${product.images[0].src}" alt="${product.title}">`
+    : `<span style="font-size:140px">${emoji}</span>`;
+  document.getElementById('modal-category').textContent = product.category;
+  document.getElementById('modal-title').textContent = product.title;
+  document.getElementById('modal-desc').textContent = product.description;
+  document.getElementById('modal-price').textContent = product.priceFormatted;
+
+  // Colors
+  const colorsGroup = document.getElementById('modal-colors-group');
+  const colorsEl = document.getElementById('modal-colors');
+  if (product.colors.length > 0) {
+    colorsGroup.style.display = '';
+    colorsEl.innerHTML = product.colors.map(c => `
+      <button class="modal-color-btn${c === selectedColor ? ' selected' : ''}"
+              data-color="${c}"
+              style="background:${getColorCSS(c)}${c.toLowerCase() === 'white' ? ';border:2px solid #ddd' : ''}"
+              title="${c}"></button>
+    `).join('');
+    colorsEl.querySelectorAll('.modal-color-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        selectedColor = btn.dataset.color;
+        colorsEl.querySelectorAll('.modal-color-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        updateModalVariant();
+      });
+    });
+  } else {
+    colorsGroup.style.display = 'none';
+  }
+
+  // Sizes
+  const sizesGroup = document.getElementById('modal-sizes-group');
+  const sizesEl = document.getElementById('modal-sizes');
+  if (product.sizes.length > 0 && !(product.sizes.length === 1 && product.sizes[0] === 'One Size')) {
+    sizesGroup.style.display = '';
+    sizesEl.innerHTML = product.sizes.map(s => {
+      const available = product.variants.some(v => v.size === s && v.is_available);
+      return `<button class="modal-size-btn${s === selectedSize ? ' selected' : ''}${!available ? ' unavailable' : ''}"
+                      data-size="${s}"${!available ? ' disabled' : ''}>${s}</button>`;
+    }).join('');
+    sizesEl.querySelectorAll('.modal-size-btn:not(.unavailable)').forEach(btn => {
+      btn.addEventListener('click', () => {
+        selectedSize = btn.dataset.size;
+        sizesEl.querySelectorAll('.modal-size-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        updateModalVariant();
+      });
+    });
+  } else {
+    sizesGroup.style.display = 'none';
+  }
+
+  updateModalVariant();
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function updateModalVariant() {
+  if (!modalProduct) return;
+  const variant = modalProduct.variants.find(v =>
+    (!selectedColor || v.color === selectedColor) &&
+    (!selectedSize || v.size === selectedSize)
+  );
+  const infoEl = document.getElementById('modal-variant-info');
+  const addBtn = document.getElementById('modal-add-btn');
+  const priceEl = document.getElementById('modal-price');
+
+  if (variant) {
+    infoEl.textContent = `SKU: ${variant.sku || variant.id} · ${variant.title}`;
+    priceEl.textContent = `$${variant.price.toFixed(2)}`;
+    addBtn.disabled = false;
+    addBtn.textContent = '+ Add to Cart';
+  } else {
+    infoEl.textContent = 'Select options above';
+    addBtn.disabled = true;
+    addBtn.textContent = 'Select Options';
+  }
+}
+
+function closeModal() {
+  document.getElementById('product-modal').classList.remove('open');
+  document.body.style.overflow = '';
+  modalProduct = null;
+}
+
+document.getElementById('modal-close').addEventListener('click', closeModal);
+document.getElementById('product-modal').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) closeModal();
 });
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeModal();
+});
+
+// Modal add to cart
+document.getElementById('modal-add-btn').addEventListener('click', function() {
+  if (this.disabled) return;
+  const orig = this.textContent;
+  this.textContent = '✓ Added!';
+  this.style.background = '#16a34a';
+  setTimeout(() => {
+    this.textContent = orig;
+    this.style.background = '';
+  }, 1400);
+});
+
+// ─── Load products from products.json ───────────────────────────────────────
+async function loadProducts() {
+  try {
+    const resp = await fetch('products.json');
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const data = await resp.json();
+    allProducts = data.products || [];
+    updateCategoryPills(allProducts);
+    renderProducts(allProducts, 'All');
+    // Update hero stats
+    const statNums = document.querySelectorAll('.h-stat-num');
+    if (statNums[0]) statNums[0].innerHTML = `${allProducts.length}<sup>+</sup>`;
+  } catch (err) {
+    console.warn('Could not load products.json:', err.message);
+    console.log('Run "npm run sync:demo" or "npm run sync" to generate product data.');
+    document.getElementById('loading-state').innerHTML =
+      'No products synced yet.<br><small style="color:#999">Run <code>npm run sync:demo</code> to generate demo data, or <code>npm run sync</code> with your Printify API key.</small>';
+  }
+}
+
+loadProducts();
 </script>
 </body>
 </html>
