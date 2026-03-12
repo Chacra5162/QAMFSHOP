@@ -174,6 +174,46 @@ nav{position:sticky;top:0;z-index:99;background:rgba(255,255,255,.96);backdrop-f
 .plan-physical{display:inline-flex;align-items:center;gap:5px;background:var(--gold-pale);color:var(--gold);font-size:11px;font-weight:700;padding:3px 9px;border-radius:6px;margin-bottom:6px}
 .plan.featured .plan-physical{background:rgba(201,146,42,.2);color:#f9c86a}
 
+/* ── VIRTUAL MARKETING MANAGER ── */
+.vmm{background:linear-gradient(135deg,#0f0f10 0%,#1a0508 60%,#1e0306 100%);padding:96px 40px;position:relative;overflow:hidden}
+.vmm::before{content:'';position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:900px;height:900px;background:radial-gradient(circle,rgba(208,16,32,.12) 0%,transparent 60%);pointer-events:none}
+.vmm-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1}
+.vmm-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;margin-top:56px}
+.vmm-content{}
+.vmm-tag{display:inline-flex;align-items:center;gap:7px;background:rgba(208,16,32,.15);border:1px solid rgba(208,16,32,.3);border-radius:100px;padding:5px 14px 5px 8px;font-size:11px;font-weight:700;color:var(--red);letter-spacing:.08em;text-transform:uppercase;margin-bottom:20px}
+.vmm-tag-icon{font-size:14px}
+.vmm-title{font-family:'DM Serif Display',serif;font-size:42px;color:#fff;line-height:1.08;letter-spacing:-.02em;margin-bottom:14px}
+.vmm-title em{color:var(--red);font-style:italic}
+.vmm-desc{font-size:15.5px;color:rgba(255,255,255,.55);line-height:1.65;margin-bottom:32px;max-width:460px}
+.vmm-features{display:flex;flex-direction:column;gap:12px;margin-bottom:36px}
+.vmm-feat{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:rgba(255,255,255,.8)}
+.vmm-feat-icon{font-size:18px;flex-shrink:0;margin-top:-1px}
+.vmm-feat strong{color:#fff}
+.vmm-price-row{display:flex;align-items:baseline;gap:10px;margin-bottom:8px}
+.vmm-price{font-family:'DM Serif Display',serif;font-size:56px;color:#fff;line-height:1}
+.vmm-price span{font-family:'DM Sans',sans-serif;font-size:18px;color:rgba(255,255,255,.4);font-weight:400}
+.vmm-price-note{font-size:13px;color:rgba(255,255,255,.4);margin-bottom:28px}
+.vmm-cta-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+
+.vmm-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:32px;display:flex;flex-direction:column;gap:14px}
+.vmm-card-header{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.vmm-card-icon{width:44px;height:44px;border-radius:12px;background:rgba(208,16,32,.15);display:flex;align-items:center;justify-content:center;font-size:20px}
+.vmm-card-label{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.4)}
+.vmm-asset{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:14px 16px;transition:all .2s}
+.vmm-asset:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.14)}
+.vmm-asset-icon{font-size:20px;flex-shrink:0}
+.vmm-asset-info{flex:1}
+.vmm-asset-name{font-size:13.5px;font-weight:600;color:#fff}
+.vmm-asset-detail{font-size:11.5px;color:rgba(255,255,255,.4);margin-top:1px}
+.vmm-asset-badge{font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:rgba(208,16,32,.2);color:#ff7a85;padding:3px 8px;border-radius:4px}
+.vmm-card-footer{display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid rgba(255,255,255,.07);margin-top:4px}
+.vmm-card-stat{font-size:12px;color:rgba(255,255,255,.35)}
+.vmm-card-stat strong{color:rgba(255,255,255,.7)}
+
+@media(max-width:860px){
+  .vmm-grid{grid-template-columns:1fr;gap:40px}
+}
+
 /* ── TIMELINE / WHAT YOU GET EACH MONTH ── */
 .monthly{background:var(--white);padding:96px 40px}
 .monthly-inner{max-width:1200px;margin:0 auto}
@@ -231,6 +271,7 @@ footer{background:var(--ink2);padding:48px 40px;border-top:1px solid rgba(255,25
     <a href="#whats-inside">What's Inside</a>
     <a href="#how">How It Works</a>
     <a href="#pricing">Pricing</a>
+    <a href="#virtual-marketing-manager">Digital Pack</a>
   </div>
   <div class="nav-cta">
     <button class="btn btn-ghost">Sign In</button>
@@ -508,6 +549,102 @@ footer{background:var(--ink2);padding:48px 40px;border-top:1px solid rgba(255,25
           <div class="pf"><span class="pf-check">✓</span> Bulk center discount available</div>
         </div>
         <button class="btn btn-ghost" style="width:100%;padding:12px;border-radius:9px;font-size:14px;font-weight:700">Contact Sales</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VIRTUAL MARKETING MANAGER -->
+<section class="vmm" id="virtual-marketing-manager">
+  <div class="vmm-inner">
+    <div class="reveal" style="text-align:center">
+      <div class="sec-eyebrow" style="text-align:center;color:#ff7a85">Digital-Only Subscription</div>
+      <div class="sec-title" style="text-align:center;color:#fff">Virtual Marketing <em>Manager</em></div>
+      <div class="sec-sub" style="text-align:center;margin:0 auto;color:rgba(255,255,255,.5)">The full digital marketing pack — every asset, template, and tool your center needs — without the printed materials. Pure digital firepower.</div>
+    </div>
+    <div class="vmm-grid">
+      <div class="vmm-content reveal">
+        <div class="vmm-tag"><span class="vmm-tag-icon">⚡</span> Full Digital Pack</div>
+        <div class="vmm-title">Everything digital,<br><em>nothing shipped.</em></div>
+        <div class="vmm-desc">Get the complete digital marketing toolkit delivered to your dashboard every month — social graphics, email templates, ad creatives, signage files, video content, and more.</div>
+        <div class="vmm-features">
+          <div class="vmm-feat"><span class="vmm-feat-icon">📱</span> <strong>20 social media graphics</strong> — IG, FB, Stories, Reels</div>
+          <div class="vmm-feat"><span class="vmm-feat-icon">📧</span> <strong>4 email newsletter templates</strong> — Mailchimp, Klaviyo, CC</div>
+          <div class="vmm-feat"><span class="vmm-feat-icon">🖥️</span> <strong>Animated digital signage</strong> — MP4 + static for all screens</div>
+          <div class="vmm-feat"><span class="vmm-feat-icon">🎯</span> <strong>Google & Facebook ad templates</strong> — all standard sizes</div>
+          <div class="vmm-feat"><span class="vmm-feat-icon">🎬</span> <strong>Video promo templates</strong> — short-form clips for social</div>
+          <div class="vmm-feat"><span class="vmm-feat-icon">🎨</span> <strong>Canva source files</strong> — fully editable with your branding</div>
+          <div class="vmm-feat"><span class="vmm-feat-icon">📅</span> <strong>30-day content calendar</strong> — post schedule & promo timing</div>
+          <div class="vmm-feat"><span class="vmm-feat-icon">🌐</span> <strong>Website banner kit</strong> — homepage, event pages, booking CTAs</div>
+        </div>
+        <div class="vmm-price-row">
+          <div class="vmm-price">$39<span>/mo</span></div>
+        </div>
+        <div class="vmm-price-note">Billed monthly · No shipping costs · Cancel anytime</div>
+        <div class="vmm-cta-row">
+          <button class="btn btn-red btn-lg">Start Digital Pack</button>
+          <button class="btn-outline-white">Compare Plans</button>
+        </div>
+      </div>
+      <div class="vmm-card reveal">
+        <div class="vmm-card-header">
+          <div class="vmm-card-icon">📂</div>
+          <div>
+            <div class="vmm-card-label">Monthly Asset Library</div>
+          </div>
+        </div>
+        <div class="vmm-asset">
+          <span class="vmm-asset-icon">📱</span>
+          <div class="vmm-asset-info">
+            <div class="vmm-asset-name">Social Media Pack</div>
+            <div class="vmm-asset-detail">20 graphics · IG, FB, Stories, Reels covers</div>
+          </div>
+          <span class="vmm-asset-badge">New</span>
+        </div>
+        <div class="vmm-asset">
+          <span class="vmm-asset-icon">📧</span>
+          <div class="vmm-asset-info">
+            <div class="vmm-asset-name">Email Templates</div>
+            <div class="vmm-asset-detail">4 responsive HTML templates</div>
+          </div>
+          <span class="vmm-asset-badge">New</span>
+        </div>
+        <div class="vmm-asset">
+          <span class="vmm-asset-icon">🎯</span>
+          <div class="vmm-asset-info">
+            <div class="vmm-asset-name">Ad Creative Pack</div>
+            <div class="vmm-asset-detail">Google Display + Facebook Ads</div>
+          </div>
+          <span class="vmm-asset-badge">New</span>
+        </div>
+        <div class="vmm-asset">
+          <span class="vmm-asset-icon">🎬</span>
+          <div class="vmm-asset-info">
+            <div class="vmm-asset-name">Video Templates</div>
+            <div class="vmm-asset-detail">Short-form promo clips · Canva editable</div>
+          </div>
+          <span class="vmm-asset-badge">New</span>
+        </div>
+        <div class="vmm-asset">
+          <span class="vmm-asset-icon">🖥️</span>
+          <div class="vmm-asset-info">
+            <div class="vmm-asset-name">Digital Signage</div>
+            <div class="vmm-asset-detail">16:9 + 9:16 · Animated MP4 + static</div>
+          </div>
+          <span class="vmm-asset-badge">New</span>
+        </div>
+        <div class="vmm-asset">
+          <span class="vmm-asset-icon">🌐</span>
+          <div class="vmm-asset-info">
+            <div class="vmm-asset-name">Website Banners</div>
+            <div class="vmm-asset-detail">Homepage, events, booking CTAs</div>
+          </div>
+          <span class="vmm-asset-badge">New</span>
+        </div>
+        <div class="vmm-card-footer">
+          <span class="vmm-card-stat"><strong>50+ assets</strong> delivered monthly</span>
+          <span class="vmm-card-stat">Instant download</span>
+        </div>
       </div>
     </div>
   </div>
