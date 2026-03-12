@@ -5,29 +5,41 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>QubicaAMF — Official Merch Store</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@700;800;900&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --red:#D01020;
-  --red2:#E8192C;
-  --red-light:#fff0f1;
-  --dark:#111213;
-  --mid:#3a3b3c;
-  --muted:#767676;
-  --line:#e4e4e4;
-  --bg:#f8f8f8;
-  --white:#ffffff;
-  --card:#ffffff;
-  --shadow:0 2px 16px rgba(0,0,0,.08);
-  --shadow-lg:0 8px 40px rgba(0,0,0,.13);
+  --red:#D01020;--red2:#E8192C;--red-light:#fff0f1;
+  --dark:#111213;--mid:#3a3b3c;--muted:#767676;
+  --line:#e4e4e4;--bg:#f8f8f8;--white:#ffffff;
+  --card:#ffffff;--shadow:0 2px 16px rgba(0,0,0,.08);--shadow-lg:0 8px 40px rgba(0,0,0,.13);
+  --purple:#7c3aed;--green:#16a34a;
+  --red-pale:#fff5f5;--red-mid:#fde0e2;
+  --ink:#0f0f10;--ink2:#2e2e30;--pale:#f7f7f8;
+  --gold:#c9922a;--gold-pale:#fdf6e8;
 }
 html{scroll-behavior:smooth}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--dark);font-size:15px;line-height:1.5}
 img{display:block;max-width:100%}
 a{color:inherit;text-decoration:none}
-button{font-family:'Inter',sans-serif;cursor:pointer}
-
+.page{display:none}.page.active{display:block}
+body.view-store{font-family:'Inter',sans-serif;background:var(--bg);color:var(--dark);font-size:15px;line-height:1.5}
+body.view-store button{font-family:'Inter',sans-serif;cursor:pointer}
+body.view-marketing{font-family:'DM Sans',sans-serif;background:var(--white);color:var(--ink);line-height:1.55}
+body.view-marketing button,body.view-marketing input{font-family:'DM Sans',sans-serif}
+body.view-admin{font-family:'Inter',sans-serif;background:#f5f5f7;color:var(--dark);font-size:14px;line-height:1.5}
+body.view-admin button,body.view-admin input,body.view-admin select,body.view-admin textarea{font-family:'Inter',sans-serif}
+.login-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:9999;align-items:center;justify-content:center;display:none}
+.login-overlay.open{display:flex}
+.login-card{background:#fff;border-radius:16px;padding:40px;max-width:400px;width:90%;text-align:center}
+.login-card h2{font-family:'Montserrat',sans-serif;font-weight:900;font-size:24px;margin-bottom:8px}
+.login-card p{color:var(--muted);font-size:14px;margin-bottom:24px}
+.login-card input{width:100%;padding:12px;border:1.5px solid var(--line);border-radius:8px;font-size:15px;margin-bottom:16px;outline:none;font-family:'Inter',sans-serif}
+.login-card input:focus{border-color:var(--red)}
+.login-card .login-btn{width:100%;padding:12px;border:none;border-radius:8px;background:var(--red);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif}
+.login-card .login-btn:hover{background:var(--red2)}
+.login-error{color:var(--red);font-size:13px;margin-top:12px;display:none}
+/* ═══ STORE CSS ═══ */
+#page-store {
 /* ─── TOP ANNOUNCEMENT BAR ─── */
 .announce{background:var(--red);color:#fff;text-align:center;font-size:12.5px;font-weight:500;letter-spacing:.04em;padding:9px 16px}
 .announce span{opacity:.75;margin:0 10px}
@@ -271,10 +283,416 @@ button{font-family:'Inter',sans-serif;cursor:pointer}
 
 /* ─── PRODUCT IMAGE IN CARD ─── */
 .pcard-img img{width:100%;height:100%;object-fit:cover}
+}
+/* ═══ MARKETING CSS ═══ */
+#page-marketing {
+/* ── ANNOUNCE ── */
+.announce{background:var(--ink);color:#fff;text-align:center;padding:10px;font-size:12.5px;font-weight:500;letter-spacing:.03em}
+.announce em{color:#f9b233;font-style:normal;font-weight:700}
+
+/* ── NAV ── */
+& nav{position:sticky;top:0;z-index:99;background:rgba(255,255,255,.96);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:66px}
+.nav-logo{display:flex;align-items:center;gap:11px}
+.nav-logomark{width:38px;height:38px}
+.nav-brand{font-family:'DM Serif Display',serif;font-size:18px;color:var(--ink)}
+.nav-brand span{color:var(--red)}
+.nav-sub{font-size:9.5px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--mid)}
+.nav-links{display:flex;gap:28px}
+.nav-links a{font-size:13.5px;font-weight:500;color:var(--mid);transition:color .15s}
+.nav-links a:hover{color:var(--ink)}
+.nav-cta{display:flex;gap:10px;align-items:center}
+.btn{padding:10px 20px;border-radius:8px;font-size:13.5px;font-weight:600;border:none;cursor:pointer;transition:all .2s}
+.btn-ghost{background:transparent;border:1.5px solid var(--line);color:var(--ink2)}
+.btn-ghost:hover{border-color:var(--ink);color:var(--ink)}
+.btn-red{background:var(--red);color:#fff}
+.btn-red:hover{background:var(--red2);transform:translateY(-1px);box-shadow:0 6px 20px rgba(208,16,32,.28)}
+.btn-lg{padding:14px 32px;font-size:15px;border-radius:10px}
+.btn-dark{background:var(--ink);color:#fff}
+.btn-dark:hover{background:#222;transform:translateY(-1px)}
+.btn-outline-white{background:transparent;border:1.5px solid rgba(255,255,255,.35);color:#fff;padding:12px 26px;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-outline-white:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.6)}
+
+/* ── HERO ── */
+.hero{background:var(--ink);color:#fff;overflow:hidden;position:relative;padding:100px 40px 0}
+.hero-noise{position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;opacity:.6}
+.hero-glow{position:absolute;top:-160px;right:-120px;width:700px;height:700px;background:radial-gradient(circle,rgba(208,16,32,.18) 0%,transparent 68%);pointer-events:none}
+.hero-glow2{position:absolute;bottom:-80px;left:-100px;width:500px;height:500px;background:radial-gradient(circle,rgba(201,146,42,.1) 0%,transparent 68%);pointer-events:none}
+.hero-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:end;position:relative;z-index:1}
+.hero-copy{padding-bottom:80px}
+.hero-tag{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:100px;padding:5px 14px 5px 8px;font-size:11.5px;font-weight:600;color:rgba(255,255,255,.75);letter-spacing:.06em;text-transform:uppercase;margin-bottom:26px}
+.hero-tag-dot{width:7px;height:7px;border-radius:50%;background:var(--red);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.85)}}
+.hero h1{font-family:'DM Serif Display',serif;font-size:58px;line-height:1.07;letter-spacing:-.02em;margin-bottom:20px;color:#fff}
+.hero h1 em{color:var(--red);font-style:italic}
+.hero-sub{font-size:16.5px;color:rgba(255,255,255,.62);line-height:1.65;margin-bottom:36px;max-width:430px}
+.hero-actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:48px}
+.hero-social-proof{display:flex;align-items:center;gap:14px}
+.proof-avatars{display:flex}
+.proof-avatar{width:32px;height:32px;border-radius:50%;border:2px solid var(--ink);background:linear-gradient(135deg,#555,#888);display:flex;align-items:center;justify-content:center;font-size:12px;margin-left:-8px}
+.proof-avatar:first-child{margin-left:0}
+.proof-text{font-size:12.5px;color:rgba(255,255,255,.5)}
+.proof-text strong{color:rgba(255,255,255,.9)}
+
+/* ── HERO VISUAL: 3D BOX MOCKUP ── */
+.hero-visual{padding-bottom:0;display:flex;align-items:flex-end;justify-content:center}
+.kit-mockup{position:relative;width:380px;height:420px}
+.kit-box{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:300px}
+.box-face-top{
+  width:300px;height:60px;
+  background:linear-gradient(135deg,#D01020,#8b0007);
+  border-radius:8px 8px 0 0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'DM Serif Display',serif;font-size:14px;color:#fff;letter-spacing:.1em;
+  text-transform:uppercase;border:1px solid rgba(255,255,255,.15);
+  position:relative;
+}
+.box-face-front{
+  width:300px;
+  background:linear-gradient(160deg,#1a1a1c,#111);
+  border:1px solid rgba(255,255,255,.1);border-top:none;
+  padding:22px;
+  border-radius:0 0 8px 8px;
+}
+.box-label{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--red);margin-bottom:6px}
+.box-title{font-family:'DM Serif Display',serif;font-size:24px;color:#fff;margin-bottom:10px;line-height:1.1}
+.box-items{display:flex;flex-direction:column;gap:5px;margin-bottom:16px}
+.box-item{display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(255,255,255,.55)}
+.box-item::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--red);flex-shrink:0}
+.box-seal{display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid rgba(255,255,255,.08)}
+.seal-badge{background:var(--red);color:#fff;font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:4px 9px;border-radius:4px}
+.seal-price{font-family:'DM Serif Display',serif;font-size:22px;color:#fff}
+.seal-price span{font-family:'DM Sans',sans-serif;font-size:11px;color:rgba(255,255,255,.4);font-weight:400}
+
+/* Floating items above box */
+.float-item{position:absolute;background:var(--white);border-radius:12px;padding:10px 14px;box-shadow:0 16px 48px rgba(0,0,0,.4);display:flex;align-items:center;gap:9px;animation:float 3.5s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.float-1{top:20px;left:0;animation-delay:0s}
+.float-2{top:90px;right:0;animation-delay:1.2s}
+.float-3{top:190px;left:-20px;animation-delay:.6s}
+.float-icon{font-size:22px}
+.float-label{font-size:11px;font-weight:700;color:var(--ink);white-space:nowrap}
+.float-sub{font-size:10px;color:var(--mid)}
+
+/* ── WHAT'S INSIDE SECTION ── */
+.inside{background:var(--pale);padding:96px 40px}
+.inside-inner{max-width:1200px;margin:0 auto}
+.sec-eyebrow{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--red);margin-bottom:12px}
+.sec-title{font-family:'DM Serif Display',serif;font-size:44px;letter-spacing:-.02em;color:var(--ink);line-height:1.1;margin-bottom:14px}
+.sec-title em{color:var(--red);font-style:italic}
+.sec-sub{font-size:16px;color:var(--mid);max-width:520px;line-height:1.65;margin-bottom:56px}
+
+.inside-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.inside-card{background:var(--white);border-radius:18px;padding:30px;border:1px solid var(--line);transition:all .25s;position:relative;overflow:hidden}
+.inside-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--red),transparent);opacity:0;transition:opacity .25s}
+.inside-card:hover{transform:translateY(-4px);box-shadow:0 20px 48px rgba(0,0,0,.09);border-color:#d4d4d8}
+.inside-card:hover::before{opacity:1}
+.ic-icon{width:48px;height:48px;border-radius:12px;background:var(--red-pale);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:18px}
+.ic-title{font-weight:700;font-size:16px;color:var(--ink);margin-bottom:8px}
+.ic-desc{font-size:13.5px;color:var(--mid);line-height:1.6;margin-bottom:16px}
+.ic-tags{display:flex;flex-wrap:wrap;gap:6px}
+.ic-tag{background:var(--red-pale);color:var(--red);font-size:11px;font-weight:600;padding:3px 9px;border-radius:100px}
+.ic-physical{background:var(--gold-pale);color:var(--gold)}
+
+/* ── HOW IT WORKS ── */
+.how{padding:96px 40px;background:var(--white)}
+.how-inner{max-width:1200px;margin:0 auto}
+.how-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;margin-top:56px}
+.how-steps{display:flex;flex-direction:column;gap:0}
+.step{display:flex;gap:22px;padding:28px 0;border-bottom:1px solid var(--line);position:relative}
+.step:last-child{border-bottom:none}
+.step-num{width:40px;height:40px;border-radius:50%;background:var(--red);color:#fff;font-family:'DM Serif Display',serif;font-size:17px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.step-body{}
+.step-title{font-weight:700;font-size:16px;color:var(--ink);margin-bottom:5px}
+.step-desc{font-size:13.5px;color:var(--mid);line-height:1.6}
+.how-visual{background:linear-gradient(135deg,var(--ink) 0%,#1e1e22 100%);border-radius:24px;padding:40px;display:flex;flex-direction:column;gap:16px}
+.hw-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:18px;display:flex;align-items:center;gap:14px;transition:all .2s}
+.hw-card:hover{background:rgba(255,255,255,.09)}
+.hw-icon{font-size:26px}
+.hw-label{font-size:14px;font-weight:600;color:#fff}
+.hw-sub{font-size:12px;color:rgba(255,255,255,.45);margin-top:2px}
+.hw-arrow{margin-left:auto;font-size:18px;color:rgba(255,255,255,.2)}
+.hw-month{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-top:1px solid rgba(255,255,255,.08);margin-top:8px}
+.hw-month-label{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.35)}
+.hw-month-badge{background:var(--red);color:#fff;font-size:10px;font-weight:800;padding:3px 10px;border-radius:100px;letter-spacing:.06em;text-transform:uppercase}
+
+/* ── PRICING ── */
+.pricing{background:var(--pale);padding:96px 40px}
+.pricing-inner{max-width:1200px;margin:0 auto}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:56px}
+.plan{background:var(--white);border-radius:20px;padding:36px;border:1.5px solid var(--line);position:relative;transition:all .25s}
+.plan:hover{transform:translateY(-4px);box-shadow:0 24px 56px rgba(0,0,0,.1)}
+.plan.featured{background:var(--ink);border-color:var(--ink);color:#fff}
+.plan-badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--red);color:#fff;font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:5px 16px;border-radius:100px;white-space:nowrap}
+.plan-name{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--mid);margin-bottom:6px}
+.plan.featured .plan-name{color:rgba(255,255,255,.5)}
+.plan-price{font-family:'DM Serif Display',serif;font-size:52px;letter-spacing:-.03em;color:var(--ink);line-height:1;margin-bottom:4px}
+.plan.featured .plan-price{color:#fff}
+.plan-price span{font-family:'DM Sans',sans-serif;font-size:16px;font-weight:500;color:var(--mid);letter-spacing:0}
+.plan.featured .plan-price span{color:rgba(255,255,255,.5)}
+.plan-cadence{font-size:13px;color:var(--mid);margin-bottom:28px}
+.plan.featured .plan-cadence{color:rgba(255,255,255,.45)}
+.plan-divider{height:1px;background:var(--line);margin-bottom:24px}
+.plan.featured .plan-divider{background:rgba(255,255,255,.1)}
+.plan-features{display:flex;flex-direction:column;gap:11px;margin-bottom:32px}
+.pf{display:flex;align-items:flex-start;gap:9px;font-size:13.5px;color:var(--ink2)}
+.plan.featured .pf{color:rgba(255,255,255,.8)}
+.pf-check{color:var(--red);font-weight:700;flex-shrink:0;margin-top:1px}
+.plan.featured .pf-check{color:#ff7a85}
+.plan-physical{display:inline-flex;align-items:center;gap:5px;background:var(--gold-pale);color:var(--gold);font-size:11px;font-weight:700;padding:3px 9px;border-radius:6px;margin-bottom:6px}
+.plan.featured .plan-physical{background:rgba(201,146,42,.2);color:#f9c86a}
+
+/* ── VIRTUAL MARKETING MANAGER ── */
+.vmm{background:linear-gradient(135deg,#0f0f10 0%,#1a0508 60%,#1e0306 100%);padding:96px 40px;position:relative;overflow:hidden}
+.vmm::before{content:'';position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:900px;height:900px;background:radial-gradient(circle,rgba(208,16,32,.12) 0%,transparent 60%);pointer-events:none}
+.vmm-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1}
+.vmm-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;margin-top:56px}
+.vmm-content{}
+.vmm-tag{display:inline-flex;align-items:center;gap:7px;background:rgba(208,16,32,.15);border:1px solid rgba(208,16,32,.3);border-radius:100px;padding:5px 14px 5px 8px;font-size:11px;font-weight:700;color:var(--red);letter-spacing:.08em;text-transform:uppercase;margin-bottom:20px}
+.vmm-tag-icon{font-size:14px}
+.vmm-title{font-family:'DM Serif Display',serif;font-size:42px;color:#fff;line-height:1.08;letter-spacing:-.02em;margin-bottom:14px}
+.vmm-title em{color:var(--red);font-style:italic}
+.vmm-desc{font-size:15.5px;color:rgba(255,255,255,.55);line-height:1.65;margin-bottom:32px;max-width:460px}
+.vmm-features{display:flex;flex-direction:column;gap:12px;margin-bottom:36px}
+.vmm-feat{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:rgba(255,255,255,.8)}
+.vmm-feat-icon{font-size:18px;flex-shrink:0;margin-top:-1px}
+.vmm-feat strong{color:#fff}
+.vmm-price-row{display:flex;align-items:baseline;gap:10px;margin-bottom:8px}
+.vmm-price{font-family:'DM Serif Display',serif;font-size:56px;color:#fff;line-height:1}
+.vmm-price span{font-family:'DM Sans',sans-serif;font-size:18px;color:rgba(255,255,255,.4);font-weight:400}
+.vmm-price-note{font-size:13px;color:rgba(255,255,255,.4);margin-bottom:28px}
+.vmm-cta-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+
+.vmm-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:32px;display:flex;flex-direction:column;gap:14px}
+.vmm-card-header{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.vmm-card-icon{width:44px;height:44px;border-radius:12px;background:rgba(208,16,32,.15);display:flex;align-items:center;justify-content:center;font-size:20px}
+.vmm-card-label{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.4)}
+.vmm-asset{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:14px 16px;transition:all .2s}
+.vmm-asset:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.14)}
+.vmm-asset-icon{font-size:20px;flex-shrink:0}
+.vmm-asset-info{flex:1}
+.vmm-asset-name{font-size:13.5px;font-weight:600;color:#fff}
+.vmm-asset-detail{font-size:11.5px;color:rgba(255,255,255,.4);margin-top:1px}
+.vmm-asset-badge{font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:rgba(208,16,32,.2);color:#ff7a85;padding:3px 8px;border-radius:4px}
+.vmm-card-footer{display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid rgba(255,255,255,.07);margin-top:4px}
+.vmm-card-stat{font-size:12px;color:rgba(255,255,255,.35)}
+.vmm-card-stat strong{color:rgba(255,255,255,.7)}
+
+@media(max-width:860px){
+  .vmm-grid{grid-template-columns:1fr;gap:40px}
+}
+
+/* ── TIMELINE / WHAT YOU GET EACH MONTH ── */
+.monthly{background:var(--white);padding:96px 40px}
+.monthly-inner{max-width:1200px;margin:0 auto}
+.monthly-row{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:56px;position:relative}
+.monthly-row::before{content:'';position:absolute;top:28px;left:14%;right:14%;height:2px;background:linear-gradient(90deg,var(--red),var(--red-mid),transparent);z-index:0}
+.month-col{text-align:center;padding:0 12px;position:relative;z-index:1}
+.month-dot{width:56px;height:56px;border-radius:50%;background:var(--white);border:2px solid var(--red);display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 16px;box-shadow:0 0 0 6px rgba(208,16,32,.08)}
+.month-label{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--red);margin-bottom:8px}
+.month-title{font-weight:700;font-size:14px;color:var(--ink);margin-bottom:8px}
+.month-desc{font-size:12.5px;color:var(--mid);line-height:1.55}
+
+/* ── BLOG FEED ── */
+.blog-feed{background:var(--pale);padding:96px 40px}
+.blog-feed-inner{max-width:1200px;margin:0 auto}
+.blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:56px}
+.blog-card{background:var(--white);border-radius:16px;overflow:hidden;border:1px solid var(--line);transition:all .25s;display:flex;flex-direction:column}
+.blog-card:hover{transform:translateY(-4px);box-shadow:0 20px 48px rgba(0,0,0,.09)}
+.blog-card-img{width:100%;height:200px;object-fit:cover;background:var(--line)}
+.blog-card-body{padding:24px;flex:1;display:flex;flex-direction:column}
+.blog-card-date{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--mid);margin-bottom:8px}
+.blog-card-title{font-family:'DM Serif Display',serif;font-size:20px;color:var(--ink);line-height:1.2;margin-bottom:10px}
+.blog-card-excerpt{font-size:13.5px;color:var(--mid);line-height:1.6;flex:1;margin-bottom:16px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.blog-card-link{font-size:13px;font-weight:700;color:var(--red);transition:color .15s;display:inline-flex;align-items:center;gap:4px}
+.blog-card-link:hover{color:var(--red2)}
+.blog-loading{text-align:center;padding:60px 0;color:var(--mid);font-size:14px}
+.blog-all{display:flex;justify-content:center;margin-top:40px}
+@media(max-width:860px){.blog-grid{grid-template-columns:1fr}}
+
+/* ── CTA BAND ── */
+.cta-band{background:linear-gradient(120deg,var(--ink) 0%,#1e0306 100%);padding:96px 40px;position:relative;overflow:hidden}
+.cta-band::before{content:'';position:absolute;top:-200px;right:-200px;width:700px;height:700px;background:radial-gradient(circle,rgba(208,16,32,.2) 0%,transparent 68%);pointer-events:none}
+.cta-band-inner{max-width:900px;margin:0 auto;text-align:center;position:relative;z-index:1}
+.cta-band h2{font-family:'DM Serif Display',serif;font-size:52px;color:#fff;letter-spacing:-.03em;line-height:1.08;margin-bottom:16px}
+.cta-band h2 em{color:var(--red);font-style:italic}
+.cta-band p{font-size:17px;color:rgba(255,255,255,.55);margin-bottom:40px;line-height:1.6}
+.cta-band-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+/* ── FOOTER ── */
+& footer{background:var(--ink2);padding:48px 40px;border-top:1px solid rgba(255,255,255,.06)}
+.footer-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px}
+.footer-brand{font-family:'DM Serif Display',serif;font-size:16px;color:rgba(255,255,255,.7)}
+.footer-brand span{color:var(--red)}
+.footer-links{display:flex;gap:24px}
+.footer-links a{font-size:13px;color:rgba(255,255,255,.4);transition:color .15s}
+.footer-links a:hover{color:rgba(255,255,255,.8)}
+.footer-copy{font-size:12px;color:rgba(255,255,255,.25)}
+
+/* ── SCROLL REVEAL ── */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:none}
+}
+/* ═══ ADMIN CSS ═══ */
+#page-admin {
+/* ─── ADMIN LAYOUT ─── */
+.admin-header{background:var(--dark);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:56px;position:sticky;top:0;z-index:100}
+.admin-logo{display:flex;align-items:center;gap:10px}
+.admin-logo svg{width:28px;height:28px}
+.admin-logo-text{font-family:'Montserrat',sans-serif;font-weight:800;font-size:15px;letter-spacing:-.02em}
+.admin-logo-text em{color:var(--red);font-style:normal}
+.admin-badge{background:var(--red);color:#fff;font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:4px;margin-left:8px}
+.admin-nav{display:flex;gap:4px}
+.admin-nav a{color:rgba(255,255,255,.5);font-size:12.5px;font-weight:600;padding:6px 14px;border-radius:6px;transition:all .15s}
+.admin-nav a:hover{color:#fff;background:rgba(255,255,255,.08)}
+.admin-nav a.active{color:#fff;background:rgba(255,255,255,.12)}
+.admin-links{display:flex;gap:12px;align-items:center}
+.admin-links a{font-size:12px;color:rgba(255,255,255,.4);transition:color .15s}
+.admin-links a:hover{color:#fff}
+
+.admin-body{max-width:1280px;margin:0 auto;padding:32px}
+
+/* ─── TABS ─── */
+.tabs{display:flex;gap:4px;margin-bottom:28px;background:var(--white);border-radius:10px;padding:4px;border:1px solid var(--line);width:fit-content}
+.tab{padding:8px 20px;border-radius:7px;font-size:13px;font-weight:600;color:var(--muted);border:none;background:none;cursor:pointer;transition:all .15s}
+.tab:hover{color:var(--dark)}
+.tab.active{background:var(--dark);color:#fff}
+
+/* ─── PANEL ─── */
+.panel{display:none}
+.panel.active{display:block}
+
+/* ─── STATS BAR ─── */
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.stat-card{background:var(--white);border-radius:12px;padding:20px 24px;border:1px solid var(--line)}
+.stat-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.stat-value{font-family:'Montserrat',sans-serif;font-weight:900;font-size:28px;color:var(--dark)}
+.stat-value.red{color:var(--red)}
+.stat-sub{font-size:11.5px;color:var(--muted);margin-top:2px}
+
+/* ─── TOOLBAR ─── */
+.toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:12px;flex-wrap:wrap}
+.toolbar-left{display:flex;gap:8px;align-items:center}
+.toolbar-search{display:flex;align-items:center;gap:8px;background:var(--white);border:1.5px solid var(--line);border-radius:8px;padding:8px 14px;width:280px}
+.toolbar-search input{border:none;outline:none;font-size:13px;flex:1;background:none}
+.toolbar-search svg{flex-shrink:0;color:var(--muted)}
+.toolbar-right{display:flex;gap:8px}
+
+/* ─── BUTTONS ─── */
+.btn{padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;border:none;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--red);color:#fff}
+.btn-primary:hover{background:var(--red2);transform:translateY(-1px)}
+.btn-secondary{background:var(--white);color:var(--dark);border:1.5px solid var(--line)}
+.btn-secondary:hover{border-color:#aaa}
+.btn-success{background:var(--green);color:#fff}
+.btn-success:hover{background:#15803d}
+.btn-danger{background:#fee2e2;color:#dc2626;border:1px solid #fecaca}
+.btn-danger:hover{background:#fecaca}
+.btn-sm{padding:6px 12px;font-size:12px;border-radius:6px}
+.btn-icon{width:34px;height:34px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:8px;border:1.5px solid var(--line);background:var(--white);cursor:pointer;transition:all .15s}
+.btn-icon:hover{border-color:#aaa;background:#f9f9f9}
+
+/* ─── PRODUCT TABLE ─── */
+.product-table{background:var(--white);border-radius:14px;border:1px solid var(--line);overflow:hidden}
+.pt-header{display:grid;grid-template-columns:40px 2.5fr 1fr 1fr 1fr 1fr 120px;padding:12px 20px;background:#fafafa;border-bottom:1px solid var(--line);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.pt-row{display:grid;grid-template-columns:40px 2.5fr 1fr 1fr 1fr 1fr 120px;padding:14px 20px;border-bottom:1px solid #f2f2f2;align-items:center;transition:background .1s}
+.pt-row:last-child{border-bottom:none}
+.pt-row:hover{background:#fafbfc}
+.pt-check{display:flex;align-items:center}
+.pt-check input[type="checkbox"]{width:16px;height:16px;accent-color:var(--red);cursor:pointer}
+.pt-product{display:flex;align-items:center;gap:12px}
+.pt-thumb{width:40px;height:40px;border-radius:8px;background:linear-gradient(135deg,#f5f5f5,#ebebeb);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;overflow:hidden}
+.pt-thumb img{width:100%;height:100%;object-fit:cover}
+.pt-name{font-weight:600;font-size:13.5px;color:var(--dark)}
+.pt-id{font-size:11px;color:var(--muted);margin-top:1px}
+.pt-category{font-size:12.5px;color:var(--mid)}
+.pt-price{font-weight:700;font-size:13px;color:var(--dark)}
+.pt-variants{font-size:12.5px;color:var(--mid)}
+.pt-fulfillment{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:100px}
+.pt-fulfillment.printify{background:#ecfdf5;color:#059669}
+.pt-fulfillment.custom{background:#f3e8ff;color:var(--purple)}
+.pt-actions{display:flex;gap:6px}
+
+/* ─── EMPTY STATE ─── */
+.empty-state{text-align:center;padding:60px 40px;color:var(--muted)}
+.empty-state-icon{font-size:48px;margin-bottom:12px}
+.empty-state h4{font-family:'Montserrat',sans-serif;font-weight:800;font-size:18px;color:var(--dark);margin-bottom:6px}
+.empty-state p{font-size:13px;margin-bottom:20px}
+
+/* ─── MODAL / DRAWER ─── */
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);backdrop-filter:blur(4px);z-index:200;opacity:0;pointer-events:none;transition:opacity .2s}
+.drawer-overlay.open{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:640px;max-width:95vw;background:var(--white);z-index:201;transform:translateX(100%);transition:transform .3s ease;overflow-y:auto;box-shadow:-10px 0 40px rgba(0,0,0,.15)}
+.drawer.open{transform:translateX(0)}
+.drawer-header{display:flex;align-items:center;justify-content:space-between;padding:24px 28px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--white);z-index:1}
+.drawer-title{font-family:'Montserrat',sans-serif;font-weight:800;font-size:18px}
+.drawer-close{width:32px;height:32px;border-radius:8px;border:none;background:#f2f2f2;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.drawer-close:hover{background:#e5e5e5}
+.drawer-body{padding:28px}
+.drawer-footer{padding:20px 28px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end;position:sticky;bottom:0;background:var(--white)}
+
+/* ─── FORM FIELDS ─── */
+.form-group{margin-bottom:20px}
+.form-group label{display:block;font-size:12px;font-weight:700;color:var(--mid);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}
+.form-group label .req{color:var(--red)}
+.form-input{width:100%;padding:10px 14px;border:1.5px solid var(--line);border-radius:8px;font-size:14px;outline:none;transition:border-color .15s}
+.form-input:focus{border-color:var(--red)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-hint{font-size:11px;color:var(--muted);margin-top:4px}
+select.form-input{cursor:pointer;appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23767676' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 12px center}
+textarea.form-input{resize:vertical;min-height:80px}
+
+/* ─── VARIANT TABLE ─── */
+.variant-section{margin-top:8px}
+.variant-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.variant-header h4{font-size:13px;font-weight:700;color:var(--dark)}
+.variant-list{border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.variant-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 40px;gap:8px;padding:10px 14px;border-bottom:1px solid #f2f2f2;align-items:center}
+.variant-row:last-child{border-bottom:none}
+.variant-row.header{background:#fafafa;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:8px 14px}
+.variant-row input{padding:7px 10px;border:1px solid var(--line);border-radius:6px;font-size:12.5px;width:100%;outline:none}
+.variant-row input:focus{border-color:var(--red)}
+.variant-del{width:28px;height:28px;border-radius:6px;border:none;background:none;cursor:pointer;color:var(--muted);font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.variant-del:hover{background:#fee2e2;color:#dc2626}
+
+/* ─── SETTINGS PANEL ─── */
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.settings-card{background:var(--white);border-radius:14px;padding:28px;border:1px solid var(--line)}
+.settings-card h4{font-family:'Montserrat',sans-serif;font-weight:800;font-size:15px;color:var(--dark);margin-bottom:4px}
+.settings-card p{font-size:12.5px;color:var(--muted);margin-bottom:20px}
+.settings-card.full{grid-column:1/-1}
+
+/* ─── JSON PREVIEW ─── */
+.json-preview{background:#1e1e2e;border-radius:10px;padding:20px;font-family:'SF Mono','Fira Code',monospace;font-size:12px;color:#cdd6f4;max-height:400px;overflow:auto;white-space:pre-wrap;word-break:break-word;line-height:1.6}
+
+/* ─── TOAST ─── */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--dark);color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;z-index:300;transform:translateY(80px);opacity:0;transition:all .3s ease}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{background:var(--green)}
+.toast.error{background:#dc2626}
+
+@media(max-width:860px){
+  .stats-bar{grid-template-columns:1fr 1fr}
+  .pt-header,.pt-row{grid-template-columns:40px 2fr 1fr 100px}
+  .pt-header>:nth-child(4),.pt-header>:nth-child(5),.pt-header>:nth-child(6),
+  .pt-row>:nth-child(4),.pt-row>:nth-child(5),.pt-row>:nth-child(6){display:none}
+  .settings-grid{grid-template-columns:1fr}
+}
+}
 </style>
 </head>
-<body>
-
+<body class="view-store">
+<!-- Login Overlay -->
+<div class="login-overlay" id="login-overlay">
+  <div class="login-card">
+    <h2>Admin Login</h2>
+    <p>Enter the admin password to continue</p>
+    <input type="password" id="login-pw" placeholder="Password" onkeydown="if(event.key==='Enter')attemptLogin()"/>
+    <button class="login-btn" onclick="attemptLogin()">Sign In</button>
+    <p class="login-error" id="login-error">Incorrect password</p>
+  </div>
+</div>
+<!-- ═══ STORE PAGE ═══ -->
+<div id="page-store" class="page active">
 <!-- ANNOUNCEMENT BAR -->
 <div class="announce">🎳 Free shipping on all orders over $75 — Official QubicaAMF Merchandise <span>|</span> Powered by Printify &amp; Stripe</div>
 
@@ -304,8 +722,9 @@ button{font-family:'Inter',sans-serif;cursor:pointer}
       <a href="#">Drinkware</a>
       <a href="#">Bundles</a>
       <a href="#">New Arrivals</a>
-      <a href="subscription.html" style="color:var(--red)">Marketing Suite</a>
+      <a href="#marketing" style="color:var(--red)">Marketing Suite</a>
       <a href="https://besxtras.com/" target="_blank">Blog</a>
+      <a href="#admin" style="color:var(--muted);font-size:12px">Admin</a>
     </nav>
 
     <div class="header-right">
@@ -645,7 +1064,780 @@ button{font-family:'Inter',sans-serif;cursor:pointer}
   </div>
 </div>
 
+</div>
+<!-- ═══ MARKETING PAGE ═══ -->
+<div id="page-marketing" class="page">
+
+<div class="announce">🎳 Introducing the QubicaAMF Marketing Suite — <em>Launching Q1 2026</em> — Reserve your spot today</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <svg class="nav-logomark" viewBox="0 0 38 38" fill="none">
+      <circle cx="19" cy="19" r="18" stroke="#D01020" stroke-width="2"/>
+      <circle cx="19" cy="19" r="11" stroke="#D01020" stroke-width="1.4" opacity=".35"/>
+      <circle cx="19" cy="19" r="5.5" fill="#D01020"/>
+    </svg>
+    <div>
+      <div class="nav-brand">Qubica<span>AMF</span></div>
+      <div class="nav-sub">Marketing Suite</div>
+    </div>
+  </div>
+  <div class="nav-links">
+    <a href="#store" style="color:var(--red)">Merch Store</a>
+    <a href="javascript:void(0)" onclick="document.getElementById('whats-inside').scrollIntoView({behavior:'smooth'})">What's Inside</a>
+    <a href="javascript:void(0)" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">How It Works</a>
+    <a href="javascript:void(0)" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">Pricing</a>
+    <a href="javascript:void(0)" onclick="document.getElementById('virtual-marketing-manager').scrollIntoView({behavior:'smooth'})">Digital Pack</a>
+    <a href="javascript:void(0)" onclick="document.getElementById('blog').scrollIntoView({behavior:'smooth'})">Blog</a>
+  </div>
+  <div class="nav-cta">
+    <button class="btn btn-ghost">Sign In</button>
+    <button class="btn btn-red" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">Start Subscription</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-noise"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+  <div class="hero-inner">
+    <div class="hero-copy reveal">
+      <div class="hero-tag"><span class="hero-tag-dot"></span> New — Physical + Digital Bundle</div>
+      <h1>Your Center's<br>Marketing,<br><em>Delivered.</em></h1>
+      <p class="hero-sub">A monthly subscription box packed with professionally designed print materials and digital assets — ready to use, zero design skills needed.</p>
+      <div class="hero-actions">
+        <button class="btn btn-red btn-lg" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">Choose Your Plan →</button>
+        <button class="btn-outline-white" onclick="document.getElementById('whats-inside').scrollIntoView({behavior:'smooth'})">See What's Inside</button>
+      </div>
+      <div class="hero-social-proof">
+        <div class="proof-avatars">
+          <div class="proof-avatar">🎳</div>
+          <div class="proof-avatar">🏆</div>
+          <div class="proof-avatar">⭐</div>
+          <div class="proof-avatar">🎯</div>
+        </div>
+        <div class="proof-text">Designed for <strong>QubicaAMF centers</strong> in 90+ countries</div>
+      </div>
+    </div>
+
+    <div class="hero-visual reveal">
+      <div class="kit-mockup">
+        <!-- Floating items -->
+        <div class="float-item float-1">
+          <span class="float-icon">📦</span>
+          <div><div class="float-label">Monthly Box</div><div class="float-sub">Ships 1st of each month</div></div>
+        </div>
+        <div class="float-item float-2">
+          <span class="float-icon">🖨️</span>
+          <div><div class="float-label">Print-Ready Files</div><div class="float-sub">Instant download</div></div>
+        </div>
+        <div class="float-item float-3">
+          <span class="float-icon">✅</span>
+          <div><div class="float-label">Pro Design</div><div class="float-sub">QubicaAMF brand approved</div></div>
+        </div>
+        <!-- Box -->
+        <div class="kit-box">
+          <div class="box-face-top">📦 &nbsp; QubicaAMF Marketing Kit</div>
+          <div class="box-face-front">
+            <div class="box-label">This month includes</div>
+            <div class="box-title">Summer<br>Strike Season</div>
+            <div class="box-items">
+              <div class="box-item">4 printed A2 posters (Printify fulfilled)</div>
+              <div class="box-item">12 social media graphics (IG, FB, Stories)</div>
+              <div class="box-item">2 email newsletter templates</div>
+              <div class="box-item">Digital signage pack (16:9 + 9:16)</div>
+              <div class="box-item">Editable Canva source files</div>
+            </div>
+            <div class="box-seal">
+              <span class="seal-badge">Pro Plan</span>
+              <div class="seal-price">$59<span>/mo</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT'S INSIDE -->
+<section class="inside" id="whats-inside">
+  <div class="inside-inner">
+    <div class="reveal">
+      <div class="sec-eyebrow">What's Inside Every Box</div>
+      <div class="sec-title">Print materials <em>and</em><br>digital assets. Together.</div>
+      <div class="sec-sub">Every month you receive a cohesive, campaign-ready kit — physically printed and digitally delivered — built around a seasonal bowling theme.</div>
+    </div>
+    <div class="inside-grid">
+      <div class="inside-card reveal">
+        <div class="ic-icon">🖼️</div>
+        <div class="ic-title">Printed Posters & Signage</div>
+        <div class="ic-desc">Professional-quality prints fulfilled through Printify and shipped directly to your center. Hang them immediately — no trips to the printer.</div>
+        <div class="ic-tags">
+          <span class="ic-tag ic-physical">📦 Physical</span>
+          <span class="ic-tag">A2 Poster</span>
+          <span class="ic-tag">Banner</span>
+          <span class="ic-tag">Table Card</span>
+        </div>
+      </div>
+      <div class="inside-card reveal">
+        <div class="ic-icon">📱</div>
+        <div class="ic-title">Social Media Graphics</div>
+        <div class="ic-desc">Pre-sized for Instagram, Facebook, and Stories. Branded, seasonal, and ready to post. Includes caption copy suggestions.</div>
+        <div class="ic-tags">
+          <span class="ic-tag">Instagram</span>
+          <span class="ic-tag">Facebook</span>
+          <span class="ic-tag">Stories</span>
+          <span class="ic-tag">Reels Cover</span>
+        </div>
+      </div>
+      <div class="inside-card reveal">
+        <div class="ic-icon">📧</div>
+        <div class="ic-title">Email Newsletter Templates</div>
+        <div class="ic-desc">Plug-and-play HTML templates compatible with Mailchimp, Constant Contact, and Klaviyo. Just swap your offers and send.</div>
+        <div class="ic-tags">
+          <span class="ic-tag">Mailchimp</span>
+          <span class="ic-tag">Constant Contact</span>
+          <span class="ic-tag">Klaviyo</span>
+        </div>
+      </div>
+      <div class="inside-card reveal">
+        <div class="ic-icon">🖥️</div>
+        <div class="ic-title">Digital Signage Pack</div>
+        <div class="ic-desc">Animated and static graphics for your in-center displays. 16:9 and vertical formats included for lobby screens, pin deck displays, and scoring monitors.</div>
+        <div class="ic-tags">
+          <span class="ic-tag">16:9 Landscape</span>
+          <span class="ic-tag">9:16 Vertical</span>
+          <span class="ic-tag">MP4 + PNG</span>
+        </div>
+      </div>
+      <div class="inside-card reveal">
+        <div class="ic-icon">🎨</div>
+        <div class="ic-title">Editable Canva Templates</div>
+        <div class="ic-desc">Every design delivered as a shareable Canva link. Swap your logo, center name, and event details in minutes — no Adobe required.</div>
+        <div class="ic-tags">
+          <span class="ic-tag">Canva Pro</span>
+          <span class="ic-tag">Fully Editable</span>
+          <span class="ic-tag">Your Branding</span>
+        </div>
+      </div>
+      <div class="inside-card reveal">
+        <div class="ic-icon">📅</div>
+        <div class="ic-title">Seasonal Campaign Calendar</div>
+        <div class="ic-desc">A 30-day content calendar that tells you exactly when to post, what to send, and how to time your promotions for maximum impact.</div>
+        <div class="ic-tags">
+          <span class="ic-tag">30-Day Plan</span>
+          <span class="ic-tag">Post Schedule</span>
+          <span class="ic-tag">Promo Timing</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div class="how-inner">
+    <div class="reveal">
+      <div class="sec-eyebrow">Simple Process</div>
+      <div class="sec-title">How it <em>works</em></div>
+    </div>
+    <div class="how-grid">
+      <div class="how-steps">
+        <div class="step reveal">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">Subscribe & Set Up</div>
+            <div class="step-desc">Choose your plan, connect via WooCommerce, and enter your center's shipping address. Your first kit ships within 3 business days.</div>
+          </div>
+        </div>
+        <div class="step reveal">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">Receive Your Monthly Kit</div>
+            <div class="step-desc">On the 1st of each month, Stripe charges your card. Printify ships your printed materials and your digital downloads unlock automatically.</div>
+          </div>
+        </div>
+        <div class="step reveal">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">Hang, Post & Send</div>
+            <div class="step-desc">Put up the posters. Schedule the social posts. Send the email blast. Your center looks professionally marketed in under an hour.</div>
+          </div>
+        </div>
+        <div class="step reveal">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <div class="step-title">Repeat — Fresh Every Month</div>
+            <div class="step-desc">Each month brings a new seasonal theme. Summer leagues, holiday specials, back-to-school promos — always relevant, always ready.</div>
+          </div>
+        </div>
+      </div>
+      <div class="how-visual reveal">
+        <div class="hw-card">
+          <span class="hw-icon">📦</span>
+          <div><div class="hw-label">Printify Fulfillment</div><div class="hw-sub">Posters & signage shipped to your center</div></div>
+          <span class="hw-arrow">→</span>
+        </div>
+        <div class="hw-card">
+          <span class="hw-icon">☁️</span>
+          <div><div class="hw-label">Digital Downloads</div><div class="hw-sub">Canva, social, email — instant access</div></div>
+          <span class="hw-arrow">→</span>
+        </div>
+        <div class="hw-card">
+          <span class="hw-icon">💳</span>
+          <div><div class="hw-label">Stripe Billing</div><div class="hw-sub">Auto-renews monthly, cancel anytime</div></div>
+          <span class="hw-arrow">→</span>
+        </div>
+        <div class="hw-card">
+          <span class="hw-icon">🔒</span>
+          <div><div class="hw-label">Member Dashboard</div><div class="hw-sub">All assets in one protected library</div></div>
+          <span class="hw-arrow">→</span>
+        </div>
+        <div class="hw-month">
+          <span class="hw-month-label">Current Theme</span>
+          <span class="hw-month-badge">🎳 Summer Strike Season</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="pricing-inner">
+    <div class="reveal" style="text-align:center">
+      <div class="sec-eyebrow" style="text-align:center">Simple, Transparent Pricing</div>
+      <div class="sec-title" style="text-align:center">Pick your <em>plan</em></div>
+      <div class="sec-sub" style="text-align:center;margin:0 auto">Cancel or pause anytime. Annual plans save 20%.</div>
+    </div>
+    <div class="pricing-grid">
+
+      <!-- Starter -->
+      <div class="plan reveal">
+        <div class="plan-name">Starter</div>
+        <div class="plan-price">$29<span>/mo</span></div>
+        <div class="plan-cadence">Billed monthly · Cancel anytime</div>
+        <div class="plan-divider"></div>
+        <div class="plan-features">
+          <div class="pf"><span class="pf-check">✓</span> 8 social media graphics</div>
+          <div class="pf"><span class="pf-check">✓</span> 2 email newsletter templates</div>
+          <div class="pf"><span class="pf-check">✓</span> Digital signage pack (static)</div>
+          <div class="pf"><span class="pf-check">✓</span> 30-day content calendar</div>
+          <div class="pf"><span class="pf-check">✓</span> Canva editable files</div>
+        </div>
+        <button class="btn btn-ghost" style="width:100%;padding:12px;border-radius:9px;font-size:14px;font-weight:700">Get Started</button>
+      </div>
+
+      <!-- Pro (Featured) -->
+      <div class="plan featured reveal">
+        <div class="plan-badge">Most Popular</div>
+        <div class="plan-physical">📦 Includes Printed Materials</div>
+        <div class="plan-name">Pro</div>
+        <div class="plan-price" style="color:#fff">$59<span>/mo</span></div>
+        <div class="plan-cadence">Billed monthly · Cancel anytime</div>
+        <div class="plan-divider"></div>
+        <div class="plan-features">
+          <div class="pf"><span class="pf-check">✓</span> Everything in Starter</div>
+          <div class="pf"><span class="pf-check">✓</span> <strong>4 printed A2 posters</strong> (shipped)</div>
+          <div class="pf"><span class="pf-check">✓</span> <strong>2 printed banner designs</strong> (shipped)</div>
+          <div class="pf"><span class="pf-check">✓</span> Animated digital signage (MP4)</div>
+          <div class="pf"><span class="pf-check">✓</span> 12 social media graphics</div>
+          <div class="pf"><span class="pf-check">✓</span> 4 email templates</div>
+          <div class="pf"><span class="pf-check">✓</span> Priority email support</div>
+        </div>
+        <button class="btn btn-red" style="width:100%;padding:12px;border-radius:9px;font-size:14px;font-weight:700">Start Pro Plan</button>
+      </div>
+
+      <!-- Center Pack -->
+      <div class="plan reveal">
+        <div class="plan-name">Center Pack</div>
+        <div class="plan-physical" style="margin-bottom:6px">📦 Full Print Suite</div>
+        <div class="plan-price">$99<span>/mo</span></div>
+        <div class="plan-cadence">Billed monthly · Best for large centers</div>
+        <div class="plan-divider"></div>
+        <div class="plan-features">
+          <div class="pf"><span class="pf-check">✓</span> Everything in Pro</div>
+          <div class="pf"><span class="pf-check">✓</span> <strong>8 printed posters</strong> (various sizes)</div>
+          <div class="pf"><span class="pf-check">✓</span> <strong>Table card prints</strong> (set of 20)</div>
+          <div class="pf"><span class="pf-check">✓</span> Custom center name on all prints</div>
+          <div class="pf"><span class="pf-check">✓</span> 20 social media graphics</div>
+          <div class="pf"><span class="pf-check">✓</span> Dedicated account manager</div>
+          <div class="pf"><span class="pf-check">✓</span> Bulk center discount available</div>
+        </div>
+        <button class="btn btn-ghost" style="width:100%;padding:12px;border-radius:9px;font-size:14px;font-weight:700">Contact Sales</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VIRTUAL MARKETING MANAGER -->
+<section class="vmm" id="virtual-marketing-manager">
+  <div class="vmm-inner">
+    <div class="reveal" style="text-align:center">
+      <div class="sec-eyebrow" style="text-align:center;color:#ff7a85">Digital-Only Subscription</div>
+      <div class="sec-title" style="text-align:center;color:#fff">Virtual Marketing <em>Manager</em></div>
+      <div class="sec-sub" style="text-align:center;margin:0 auto;color:rgba(255,255,255,.5)">The full digital marketing pack — every asset, template, and tool your center needs — without the printed materials. Pure digital firepower.</div>
+    </div>
+    <div class="vmm-grid">
+      <div class="vmm-content reveal">
+        <div class="vmm-tag"><span class="vmm-tag-icon">⚡</span> Full Digital Pack</div>
+        <div class="vmm-title">Everything digital,<br><em>nothing shipped.</em></div>
+        <div class="vmm-desc">Get the complete digital marketing toolkit delivered to your dashboard every month — social graphics, email templates, ad creatives, signage files, video content, and more.</div>
+        <div class="vmm-features">
+          <div class="vmm-feat"><span class="vmm-feat-icon">📱</span> <strong>20 social media graphics</strong> — IG, FB, Stories, Reels</div>
+          <div class="vmm-feat"><span class="vmm-feat-icon">📧</span> <strong>4 email newsletter templates</strong> — Mailchimp, Klaviyo, CC</div>
+          <div class="vmm-feat"><span class="vmm-feat-icon">🖥️</span> <strong>Animated digital signage</strong> — MP4 + static for all screens</div>
+          <div class="vmm-feat"><span class="vmm-feat-icon">🎯</span> <strong>Google & Facebook ad templates</strong> — all standard sizes</div>
+          <div class="vmm-feat"><span class="vmm-feat-icon">🎬</span> <strong>Video promo templates</strong> — short-form clips for social</div>
+          <div class="vmm-feat"><span class="vmm-feat-icon">🎨</span> <strong>Canva source files</strong> — fully editable with your branding</div>
+          <div class="vmm-feat"><span class="vmm-feat-icon">📅</span> <strong>30-day content calendar</strong> — post schedule & promo timing</div>
+          <div class="vmm-feat"><span class="vmm-feat-icon">🌐</span> <strong>Website banner kit</strong> — homepage, event pages, booking CTAs</div>
+        </div>
+        <div class="vmm-price-row">
+          <div class="vmm-price">$39<span>/mo</span></div>
+        </div>
+        <div class="vmm-price-note">Billed monthly · No shipping costs · Cancel anytime</div>
+        <div class="vmm-cta-row">
+          <button class="btn btn-red btn-lg">Start Digital Pack</button>
+          <button class="btn-outline-white">Compare Plans</button>
+        </div>
+      </div>
+      <div class="vmm-card reveal">
+        <div class="vmm-card-header">
+          <div class="vmm-card-icon">📂</div>
+          <div>
+            <div class="vmm-card-label">Monthly Asset Library</div>
+          </div>
+        </div>
+        <div class="vmm-asset">
+          <span class="vmm-asset-icon">📱</span>
+          <div class="vmm-asset-info">
+            <div class="vmm-asset-name">Social Media Pack</div>
+            <div class="vmm-asset-detail">20 graphics · IG, FB, Stories, Reels covers</div>
+          </div>
+          <span class="vmm-asset-badge">New</span>
+        </div>
+        <div class="vmm-asset">
+          <span class="vmm-asset-icon">📧</span>
+          <div class="vmm-asset-info">
+            <div class="vmm-asset-name">Email Templates</div>
+            <div class="vmm-asset-detail">4 responsive HTML templates</div>
+          </div>
+          <span class="vmm-asset-badge">New</span>
+        </div>
+        <div class="vmm-asset">
+          <span class="vmm-asset-icon">🎯</span>
+          <div class="vmm-asset-info">
+            <div class="vmm-asset-name">Ad Creative Pack</div>
+            <div class="vmm-asset-detail">Google Display + Facebook Ads</div>
+          </div>
+          <span class="vmm-asset-badge">New</span>
+        </div>
+        <div class="vmm-asset">
+          <span class="vmm-asset-icon">🎬</span>
+          <div class="vmm-asset-info">
+            <div class="vmm-asset-name">Video Templates</div>
+            <div class="vmm-asset-detail">Short-form promo clips · Canva editable</div>
+          </div>
+          <span class="vmm-asset-badge">New</span>
+        </div>
+        <div class="vmm-asset">
+          <span class="vmm-asset-icon">🖥️</span>
+          <div class="vmm-asset-info">
+            <div class="vmm-asset-name">Digital Signage</div>
+            <div class="vmm-asset-detail">16:9 + 9:16 · Animated MP4 + static</div>
+          </div>
+          <span class="vmm-asset-badge">New</span>
+        </div>
+        <div class="vmm-asset">
+          <span class="vmm-asset-icon">🌐</span>
+          <div class="vmm-asset-info">
+            <div class="vmm-asset-name">Website Banners</div>
+            <div class="vmm-asset-detail">Homepage, events, booking CTAs</div>
+          </div>
+          <span class="vmm-asset-badge">New</span>
+        </div>
+        <div class="vmm-card-footer">
+          <span class="vmm-card-stat"><strong>50+ assets</strong> delivered monthly</span>
+          <span class="vmm-card-stat">Instant download</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MONTHLY THEMES -->
+<section class="monthly">
+  <div class="monthly-inner">
+    <div class="reveal" style="text-align:center">
+      <div class="sec-eyebrow" style="text-align:center">Always Fresh</div>
+      <div class="sec-title" style="text-align:center">New theme, <em>every month</em></div>
+      <div class="sec-sub" style="text-align:center;margin:0 auto 0">Each kit is built around a seasonal bowling campaign — so your marketing always feels timely and relevant.</div>
+    </div>
+    <div class="monthly-row">
+      <div class="month-col reveal">
+        <div class="month-dot">🌞</div>
+        <div class="month-label">Summer</div>
+        <div class="month-title">Strike Season</div>
+        <div class="month-desc">Family deals, league promos, summer specials and outdoor-themed graphics</div>
+      </div>
+      <div class="month-col reveal">
+        <div class="month-dot">🍂</div>
+        <div class="month-label">Fall</div>
+        <div class="month-title">League Kickoff</div>
+        <div class="month-desc">New season registration, team formation, early-bird league pricing campaigns</div>
+      </div>
+      <div class="month-col reveal">
+        <div class="month-dot">❄️</div>
+        <div class="month-label">Winter</div>
+        <div class="month-title">Holiday Strikes</div>
+        <div class="month-desc">Gift cards, Christmas parties, New Year's events, holiday group bookings</div>
+      </div>
+      <div class="month-col reveal">
+        <div class="month-dot">🌸</div>
+        <div class="month-label">Spring</div>
+        <div class="month-title">Birthday Bonanza</div>
+        <div class="month-desc">Birthday party packages, spring break specials, youth bowling campaigns</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BLOG FEED -->
+<section class="blog-feed" id="blog">
+  <div class="blog-feed-inner">
+    <div class="reveal" style="text-align:center">
+      <div class="sec-eyebrow" style="text-align:center">From the Blog</div>
+      <div class="sec-title" style="text-align:center">Latest from <em>BesXtras</em></div>
+      <div class="sec-sub" style="text-align:center;margin:0 auto">Tips, trends, and insights to help your bowling center thrive.</div>
+    </div>
+    <div class="blog-grid" id="marketing-blog-grid">
+      <div class="blog-loading">Loading posts...</div>
+    </div>
+    <div class="blog-all">
+      <a href="https://besxtras.com/" target="_blank" class="btn btn-ghost" style="padding:12px 28px;border-radius:9px;font-size:14px;font-weight:700">View All Posts on BesXtras.com &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BAND -->
+<section class="cta-band">
+  <div class="cta-band-inner reveal">
+    <h2>Ready to market<br>like a <em>pro?</em></h2>
+    <p>Join QubicaAMF centers worldwide getting professionally designed marketing materials delivered to their door every month.</p>
+    <div class="cta-band-actions">
+      <button class="btn btn-red btn-lg" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">Start Your Subscription</button>
+      <button class="btn-outline-white">Schedule a Demo</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">Qubica<span>AMF</span> Marketing Suite</div>
+    <div class="footer-links">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+      <a href="#">Contact</a>
+      <a href="#">Main Store</a>
+    </div>
+    <div class="footer-copy">© 2025 QubicaAMF Worldwide. Powered by Stripe & Printify.</div>
+  </div>
+</footer>
+
+</div>
+<!-- ═══ ADMIN PAGE ═══ -->
+<div id="page-admin" class="page">
+
+<!-- ADMIN HEADER -->
+<header class="admin-header">
+  <div class="admin-logo">
+    <svg viewBox="0 0 38 38" fill="none">
+      <circle cx="19" cy="19" r="18" stroke="#D01020" stroke-width="2"/>
+      <circle cx="19" cy="19" r="5.5" fill="#D01020"/>
+    </svg>
+    <span class="admin-logo-text">Qubica<em>AMF</em></span>
+    <span class="admin-badge">Admin</span>
+  </div>
+  <div class="admin-nav">
+    <a href="#store">Store</a>
+    <a href="#marketing">Marketing Suite</a>
+  </div>
+  <div class="admin-links">
+    <a href="#store">View Live Store &rarr;</a>
+  </div>
+</header>
+
+<!-- ADMIN BODY -->
+<div class="admin-body">
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" data-panel="products">Products</button>
+    <button class="tab" data-panel="settings">Settings</button>
+    <button class="tab" data-panel="export">Export / Import</button>
+  </div>
+
+  <!-- ═══════════ PRODUCTS PANEL ═══════════ -->
+  <div class="panel active" id="panel-products">
+
+    <!-- Stats -->
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="stat-label">Total Products</div>
+        <div class="stat-value" id="stat-total">0</div>
+        <div class="stat-sub">Across all sources</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Printify Products</div>
+        <div class="stat-value" id="stat-printify">0</div>
+        <div class="stat-sub">Auto-fulfilled via Printify</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Custom Products</div>
+        <div class="stat-value red" id="stat-custom">0</div>
+        <div class="stat-sub">Manually fulfilled</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Variants</div>
+        <div class="stat-value" id="stat-variants">0</div>
+        <div class="stat-sub">Sizes, colors, options</div>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <div class="toolbar-search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" placeholder="Search products..." id="admin-search-input">
+        </div>
+        <select class="form-input" id="admin-filter-fulfillment" style="width:auto;padding:8px 32px 8px 12px;font-size:12.5px;font-weight:600">
+          <option value="all">All Sources</option>
+          <option value="printify">Printify Only</option>
+          <option value="custom">Custom Only</option>
+        </select>
+      </div>
+      <div class="toolbar-right">
+        <button class="btn btn-secondary" onclick="syncPrintifyProducts()">Sync Printify</button>
+        <button class="btn btn-primary" onclick="openDrawer()">+ Add Custom Product</button>
+      </div>
+    </div>
+
+    <!-- Product Table -->
+    <div class="product-table" id="product-table">
+      <div class="pt-header">
+        <div class="pt-check"><input type="checkbox" id="check-all"></div>
+        <div>Product</div>
+        <div>Category</div>
+        <div>Price</div>
+        <div>Variants</div>
+        <div>Fulfillment</div>
+        <div>Actions</div>
+      </div>
+      <div id="product-rows">
+        <div class="empty-state">
+          <div class="empty-state-icon">📦</div>
+          <h4>No products yet</h4>
+          <p>Add a custom product or sync from Printify to get started.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ SETTINGS PANEL ═══════════ -->
+  <div class="panel" id="panel-settings">
+    <div class="settings-grid">
+      <div class="settings-card">
+        <h4>Notification Email</h4>
+        <p>Email address for custom order notifications</p>
+        <div class="form-group" style="margin-bottom:12px">
+          <input type="email" class="form-input" id="setting-email" placeholder="orders@qubicaamf.com">
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="saveSettings()">Save</button>
+      </div>
+      <div class="settings-card">
+        <h4>Store Categories</h4>
+        <p>Categories available for custom products</p>
+        <div id="category-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px"></div>
+        <div style="display:flex;gap:8px">
+          <input type="text" class="form-input" id="new-category" placeholder="New category name" style="flex:1">
+          <button class="btn btn-secondary btn-sm" onclick="addCategory()">Add</button>
+        </div>
+      </div>
+      <div class="settings-card">
+        <h4>Printify Sync</h4>
+        <p>Configure your Printify API connection</p>
+        <div class="form-group" style="margin-bottom:12px">
+          <label>API Token</label>
+          <input type="password" class="form-input" id="setting-printify-token" placeholder="Enter your Printify API token">
+        </div>
+        <div class="form-group" style="margin-bottom:12px">
+          <label>Shop ID</label>
+          <input type="text" class="form-input" id="setting-printify-shop" placeholder="Enter your Printify shop ID">
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="saveSettings()">Save</button>
+      </div>
+      <div class="settings-card">
+        <h4>Store Appearance</h4>
+        <p>Customize your store branding</p>
+        <div class="form-group" style="margin-bottom:12px">
+          <label>Store Name</label>
+          <input type="text" class="form-input" id="setting-store-name" placeholder="QubicaAMF Official Merch Store">
+        </div>
+        <div class="form-group" style="margin-bottom:12px">
+          <label>Announcement Bar Text</label>
+          <input type="text" class="form-input" id="setting-announce" placeholder="Free shipping on orders over $75">
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="saveSettings()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ EXPORT / IMPORT PANEL ═══════════ -->
+  <div class="panel" id="panel-export">
+    <div class="settings-grid">
+      <div class="settings-card">
+        <h4>Export Custom Products</h4>
+        <p>Download your custom-products.json file for deployment</p>
+        <button class="btn btn-primary" onclick="exportJSON()" style="margin-bottom:16px">Download custom-products.json</button>
+        <div class="form-hint">Copy this file into your repo to deploy changes. The GitHub Actions workflow will include it automatically.</div>
+      </div>
+      <div class="settings-card">
+        <h4>Import Products</h4>
+        <p>Upload a custom-products.json file to load products</p>
+        <input type="file" id="import-file" accept=".json" style="margin-bottom:12px">
+        <button class="btn btn-secondary" onclick="importJSON()">Import File</button>
+      </div>
+      <div class="settings-card full">
+        <h4>JSON Preview</h4>
+        <p>Current custom-products.json content</p>
+        <div class="json-preview" id="json-preview">Loading...</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- PRODUCT DRAWER (Add/Edit) -->
+<div class="drawer-overlay" id="drawer-overlay"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <div class="drawer-title" id="drawer-title">Add Custom Product</div>
+    <button class="drawer-close" onclick="closeDrawer()">&times;</button>
+  </div>
+  <div class="drawer-body">
+    <form id="product-form">
+      <div class="form-group">
+        <label>Product Name <span class="req">*</span></label>
+        <input type="text" class="form-input" id="pf-title" required placeholder="e.g. QubicaAMF Pro Bowling Ball">
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea class="form-input" id="pf-description" placeholder="Product description..."></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Category <span class="req">*</span></label>
+          <select class="form-input" id="pf-category" required>
+            <option value="">Select category</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Image URL</label>
+          <input type="url" class="form-input" id="pf-image" placeholder="https://...">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Tags</label>
+        <input type="text" class="form-input" id="pf-tags" placeholder="Comma separated: bowling, equipment, pro">
+        <div class="form-hint">Separate tags with commas</div>
+      </div>
+
+      <!-- Variants Section -->
+      <div class="variant-section">
+        <div class="variant-header">
+          <h4>Variants</h4>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="addVariantRow()">+ Add Variant</button>
+        </div>
+        <div class="variant-list" id="variant-list">
+          <div class="variant-row header">
+            <div>Title</div>
+            <div>SKU</div>
+            <div>Price ($)</div>
+            <div>Color / Size</div>
+            <div></div>
+          </div>
+        </div>
+        <div class="form-hint" style="margin-top:8px">Each variant is a buyable option (e.g. "Red / Large", "Blue / 14lb")</div>
+      </div>
+    </form>
+  </div>
+  <div class="drawer-footer">
+    <button class="btn btn-secondary" onclick="closeDrawer()">Cancel</button>
+    <button class="btn btn-primary" onclick="saveProduct()">Save Product</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+</div>
 <script>
+// ═══════════════════════════════════════════════════════════════
+// SPA ROUTER
+// ═══════════════════════════════════════════════════════════════
+function navigateTo(page) { window.location.hash = page; }
+
+function handleRoute() {
+  var hash = window.location.hash.slice(1) || 'store';
+  var validPages = ['store', 'marketing', 'admin'];
+  var page = validPages.includes(hash) ? hash : 'store';
+
+  if (page === 'admin' && sessionStorage.getItem('qamf_admin') !== 'true') {
+    document.getElementById('login-overlay').classList.add('open');
+    return;
+  }
+  document.getElementById('login-overlay').classList.remove('open');
+
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+  var target = document.getElementById('page-' + page);
+  if (target) target.classList.add('active');
+  document.body.className = 'view-' + page;
+
+  var titles = { store:'QubicaAMF — Official Merch Store', marketing:'QubicaAMF Marketing Suite', admin:'QubicaAMF Admin Console' };
+  document.title = titles[page] || titles.store;
+  window.scrollTo(0, 0);
+
+  if (page === 'admin' && !window._adminInitialized) {
+    window._adminInitialized = true;
+    initAdmin();
+  }
+  if (page === 'marketing') {
+    setTimeout(function() {
+      document.querySelectorAll('#page-marketing .reveal').forEach(function(el) { marketingObs.observe(el); });
+    }, 100);
+  }
+}
+
+function attemptLogin() {
+  if (document.getElementById('login-pw').value === 'qamf2026') {
+    sessionStorage.setItem('qamf_admin', 'true');
+    document.getElementById('login-overlay').classList.remove('open');
+    document.getElementById('login-pw').value = '';
+    handleRoute();
+  } else {
+    document.getElementById('login-error').style.display = 'block';
+  }
+}
+
+window.addEventListener('hashchange', handleRoute);
+
+// ═══════════════════════════════════════════════════════════════
+// STORE JAVASCRIPT
+// ═══════════════════════════════════════════════════════════════
 // ─── Color name to CSS color mapping ────────────────────────────────────────
 const COLOR_MAP = {
   'black': '#111213', 'red': '#D01020', 'white': '#ffffff', 'navy': '#1a1a2e',
@@ -1056,10 +2248,17 @@ async function loadProducts() {
       printifyProducts = (data.products || []).map(p => ({ ...p, fulfillment: 'printify' }));
     }
 
-    if (customResp.status === 'fulfilled' && customResp.value.ok) {
+    // Check localStorage first (admin-modified products)
+    const savedCustomProds = localStorage.getItem('qamf_custom_products');
+    if (savedCustomProds) {
+      try {
+        customProducts = JSON.parse(savedCustomProds).map(p => ({...p, fulfillment: 'custom'}));
+        const ss = localStorage.getItem('qamf_admin_settings');
+        if (ss) { try { window._customOrderEmail = JSON.parse(ss).notification_email || ''; } catch(e) {} }
+      } catch(e) {}
+    } else if (customResp.status === 'fulfilled' && customResp.value.ok) {
       const data = await customResp.value.json();
       customProducts = (data.products || []).map(p => ({ ...p, fulfillment: 'custom' }));
-      // Store notification email for order forms
       window._customOrderEmail = data.notification_email || '';
     }
 
@@ -1116,6 +2315,522 @@ loadProducts();
     grid.innerHTML = '<div class="blog-loading">Could not load blog posts. <a href="https://besxtras.com/" target="_blank" style="color:var(--red);font-weight:600">Visit BesXtras.com &rarr;</a></div>';
   }
 })();
+
+// ═══════════════════════════════════════════════════════════════
+// MARKETING JAVASCRIPT
+// ═══════════════════════════════════════════════════════════════
+// Scroll reveal
+const marketingObs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible')}});
+},{threshold:.12});
+document.querySelectorAll('#page-marketing .reveal').forEach(el=>marketingObs.observe(el));
+
+// Nav link active state
+document.querySelectorAll('#page-marketing .nav-links a').forEach(a=>{
+  a.addEventListener('click',function(e){
+    document.querySelectorAll('.nav-links a').forEach(x=>x.style.color='');
+    this.style.color='var(--ink)';
+  });
+});
+
+// Blog feed from WordPress
+(async function loadBlog(){
+  const grid = document.getElementById('marketing-blog-grid');
+  try {
+    const resp = await fetch('https://besxtras.com/wp-json/wp/v2/posts?per_page=3&_embed');
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const posts = await resp.json();
+    grid.innerHTML = posts.map(post => {
+      const img = post.jetpack_featured_media_url || (post._embedded && post._embedded['wp:featuredmedia'] && post._embedded['wp:featuredmedia'][0] && post._embedded['wp:featuredmedia'][0].source_url) || '';
+      const date = new Date(post.date).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+      const excerpt = post.excerpt.rendered.replace(/<[^>]+>/g,'').slice(0,160) + '...';
+      return `<a href="${post.link}" target="_blank" class="blog-card reveal">
+        ${img ? `<img class="blog-card-img" src="${img}" alt="" loading="lazy"/>` : '<div class="blog-card-img"></div>'}
+        <div class="blog-card-body">
+          <div class="blog-card-date">${date}</div>
+          <div class="blog-card-title">${post.title.rendered}</div>
+          <div class="blog-card-excerpt">${excerpt}</div>
+          <span class="blog-card-link">Read More &rarr;</span>
+        </div>
+      </a>`;
+    }).join('');
+    // Observe new reveal elements
+    grid.querySelectorAll('.reveal').forEach(el=>marketingObs.observe(el));
+  } catch(err) {
+    grid.innerHTML = '<div class="blog-loading">Could not load blog posts. <a href="https://besxtras.com/" target="_blank" style="color:var(--red);font-weight:600">Visit BesXtras.com &rarr;</a></div>';
+  }
+})();
+
+// ═══════════════════════════════════════════════════════════════
+// ADMIN JAVASCRIPT
+// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════════════════
+let customProducts = [];
+let printifyProducts = [];
+let settings = {
+  notification_email: 'orders@qubicaamf.com',
+  categories: ['T-Shirts','Hoodies','Polos','Jackets','Hats & Caps','Bags','Drinkware','Equipment','Awards'],
+  printify_token: '',
+  printify_shop: '',
+  store_name: '',
+  announce_text: ''
+};
+let editingId = null; // null = add mode, string = editing existing
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════════════
+async function initAdmin() {
+  // Load saved settings from localStorage
+  const saved = localStorage.getItem('qamf_admin_settings');
+  if (saved) {
+    try { Object.assign(settings, JSON.parse(saved)); } catch(e) {}
+  }
+
+  // Load custom products from localStorage, fallback to custom-products.json
+  const savedProducts = localStorage.getItem('qamf_custom_products');
+  if (savedProducts) {
+    try { customProducts = JSON.parse(savedProducts); } catch(e) {}
+  } else {
+    try {
+      const resp = await fetch('custom-products.json');
+      if (resp.ok) {
+        const data = await resp.json();
+        customProducts = data.products || [];
+        if (data.notification_email) settings.notification_email = data.notification_email;
+      }
+    } catch(e) {}
+  }
+
+  // Load printify products
+  try {
+    const resp = await fetch('products.json');
+    if (resp.ok) {
+      const data = await resp.json();
+      printifyProducts = data.products || [];
+    }
+  } catch(e) {}
+
+  renderAll();
+  loadSettings();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════════════════════════════════
+document.querySelectorAll('#page-admin .tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('#page-admin .panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-' + tab.dataset.panel).classList.add('active');
+    if (tab.dataset.panel === 'export') updateJSONPreview();
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════════════════════
+function renderAll() {
+  renderStats();
+  adminRenderProducts();
+  renderCategories();
+}
+
+function renderStats() {
+  const allProducts = [...printifyProducts, ...customProducts];
+  const totalVariants = allProducts.reduce((sum, p) => sum + (p.variants ? p.variants.length : 0), 0);
+  document.getElementById('stat-total').textContent = allProducts.length;
+  document.getElementById('stat-printify').textContent = printifyProducts.length;
+  document.getElementById('stat-custom').textContent = customProducts.length;
+  document.getElementById('stat-variants').textContent = totalVariants;
+}
+
+function adminRenderProducts() {
+  const container = document.getElementById('product-rows');
+  const search = (document.getElementById('admin-search-input').value || '').toLowerCase();
+  const filter = document.getElementById('admin-filter-fulfillment').value;
+
+  let allProducts = [
+    ...printifyProducts.map(p => ({ ...p, fulfillment: 'printify' })),
+    ...customProducts.map(p => ({ ...p, fulfillment: 'custom' }))
+  ];
+
+  // Filter
+  if (filter !== 'all') {
+    allProducts = allProducts.filter(p => p.fulfillment === filter);
+  }
+  if (search) {
+    allProducts = allProducts.filter(p =>
+      p.title.toLowerCase().includes(search) ||
+      (p.category || '').toLowerCase().includes(search) ||
+      p.id.toLowerCase().includes(search)
+    );
+  }
+
+  if (allProducts.length === 0) {
+    container.innerHTML = `<div class="empty-state">
+      <div class="empty-state-icon">🔍</div>
+      <h4>No products found</h4>
+      <p>${search ? 'Try a different search term.' : 'Add a custom product or sync from Printify.'}</p>
+    </div>`;
+    return;
+  }
+
+  const CATEGORY_EMOJI = {
+    'T-Shirts':'👕','Hoodies':'🧥','Polos':'👔','Jackets':'🧥',
+    'Hats & Caps':'🧢','Bags':'🎒','Drinkware':'☕','Equipment':'🎳','Awards':'🏆','Other':'📦'
+  };
+
+  container.innerHTML = allProducts.map(p => {
+    const emoji = CATEGORY_EMOJI[p.category] || '📦';
+    const hasImage = p.images && p.images[0] && p.images[0].src;
+    const thumb = hasImage
+      ? `<img src="${p.images[0].src}" alt="">`
+      : emoji;
+    const priceRange = p.price_range
+      ? (p.price_range.min === p.price_range.max ? `$${p.price_range.min}` : `$${p.price_range.min}–$${p.price_range.max}`)
+      : (p.priceFormatted || '—');
+    const variantCount = p.variants ? p.variants.length : 0;
+    const fulfillmentClass = p.fulfillment === 'custom' ? 'custom' : 'printify';
+    const fulfillmentLabel = p.fulfillment === 'custom' ? 'Custom' : 'Printify';
+
+    const actions = p.fulfillment === 'custom'
+      ? `<button class="btn-icon" title="Edit" onclick="editProduct('${p.id}')">✏️</button>
+         <button class="btn-icon" title="Duplicate" onclick="duplicateProduct('${p.id}')">📋</button>
+         <button class="btn-icon" title="Delete" onclick="deleteProduct('${p.id}')">🗑️</button>`
+      : `<span style="font-size:11px;color:var(--muted)">Read-only</span>`;
+
+    return `<div class="pt-row" data-id="${p.id}">
+      <div class="pt-check"><input type="checkbox" data-id="${p.id}"></div>
+      <div class="pt-product">
+        <div class="pt-thumb">${thumb}</div>
+        <div>
+          <div class="pt-name">${p.title}</div>
+          <div class="pt-id">${p.id}</div>
+        </div>
+      </div>
+      <div class="pt-category">${p.category || '—'}</div>
+      <div class="pt-price">${priceRange}</div>
+      <div class="pt-variants">${variantCount} variant${variantCount !== 1 ? 's' : ''}</div>
+      <div><span class="pt-fulfillment ${fulfillmentClass}">${fulfillmentLabel}</span></div>
+      <div class="pt-actions">${actions}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderCategories() {
+  const list = document.getElementById('category-list');
+  list.innerHTML = settings.categories.map(cat =>
+    `<span style="display:inline-flex;align-items:center;gap:4px;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:4px 10px;font-size:12px;font-weight:600">${cat}
+      <button onclick="removeCategory('${cat}')" style="border:none;background:none;cursor:pointer;color:var(--muted);font-size:14px;margin-left:2px">&times;</button>
+    </span>`
+  ).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PRODUCT CRUD
+// ═══════════════════════════════════════════════════════════════════════════
+function openDrawer(id) {
+  editingId = id || null;
+  document.getElementById('drawer-title').textContent = id ? 'Edit Product' : 'Add Custom Product';
+
+  // Populate category select
+  const catSelect = document.getElementById('pf-category');
+  catSelect.innerHTML = '<option value="">Select category</option>' +
+    settings.categories.map(c => `<option value="${c}">${c}</option>`).join('');
+
+  // Clear or populate form
+  if (id) {
+    const product = customProducts.find(p => p.id === id);
+    if (!product) return;
+    document.getElementById('pf-title').value = product.title;
+    document.getElementById('pf-description').value = product.description || '';
+    document.getElementById('pf-category').value = product.category || '';
+    document.getElementById('pf-image').value = (product.images && product.images[0] && product.images[0].src) || '';
+    document.getElementById('pf-tags').value = (product.tags || []).join(', ');
+    // Populate variants
+    const vList = document.getElementById('variant-list');
+    vList.innerHTML = `<div class="variant-row header"><div>Title</div><div>SKU</div><div>Price ($)</div><div>Color / Size</div><div></div></div>`;
+    (product.variants || []).forEach(v => addVariantRow(v));
+  } else {
+    document.getElementById('product-form').reset();
+    const vList = document.getElementById('variant-list');
+    vList.innerHTML = `<div class="variant-row header"><div>Title</div><div>SKU</div><div>Price ($)</div><div>Color / Size</div><div></div></div>`;
+    addVariantRow(); // start with one empty row
+  }
+
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawer-overlay').classList.add('open');
+}
+
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawer-overlay').classList.remove('open');
+  editingId = null;
+}
+document.getElementById('drawer-overlay').addEventListener('click', closeDrawer);
+
+function addVariantRow(data) {
+  const row = document.createElement('div');
+  row.className = 'variant-row';
+  row.innerHTML = `
+    <input type="text" placeholder="Red / Large" value="${data ? data.title : ''}">
+    <input type="text" placeholder="SKU-001" value="${data ? data.sku : ''}">
+    <input type="number" step="0.01" placeholder="29.99" value="${data ? data.price : ''}">
+    <input type="text" placeholder="Red / L" value="${data ? (data.color ? data.color + (data.size ? ' / ' + data.size : '') : '') : ''}">
+    <button type="button" class="variant-del" onclick="this.parentElement.remove()">&times;</button>
+  `;
+  document.getElementById('variant-list').appendChild(row);
+}
+
+function saveProduct() {
+  const title = document.getElementById('pf-title').value.trim();
+  const category = document.getElementById('pf-category').value;
+  if (!title || !category) {
+    showToast('Please fill in product name and category', 'error');
+    return;
+  }
+
+  const description = document.getElementById('pf-description').value.trim();
+  const image = document.getElementById('pf-image').value.trim();
+  const tags = document.getElementById('pf-tags').value.split(',').map(t => t.trim()).filter(Boolean);
+
+  // Collect variants
+  const variantRows = document.querySelectorAll('#variant-list .variant-row:not(.header)');
+  const variants = [];
+  const colors = new Set();
+  const sizes = new Set();
+  let minPrice = Infinity, maxPrice = 0;
+
+  variantRows.forEach((row, i) => {
+    const inputs = row.querySelectorAll('input');
+    const vTitle = inputs[0].value.trim();
+    const vSku = inputs[1].value.trim();
+    const vPrice = parseFloat(inputs[2].value) || 0;
+    const vColorSize = inputs[3].value.trim();
+
+    if (!vTitle && !vSku && !vPrice) return;
+
+    let color = '', size = '';
+    if (vColorSize.includes('/')) {
+      const parts = vColorSize.split('/').map(s => s.trim());
+      color = parts[0] || '';
+      size = parts[1] || '';
+    } else {
+      color = vColorSize;
+    }
+
+    if (color) colors.add(color);
+    if (size) sizes.add(size);
+    if (vPrice < minPrice) minPrice = vPrice;
+    if (vPrice > maxPrice) maxPrice = vPrice;
+
+    variants.push({
+      id: editingId ? `${editingId}-v${i+1}` : `custom-new-v${i+1}`,
+      title: vTitle || `${color}${size ? ' / ' + size : ''}`,
+      price: vPrice,
+      sku: vSku,
+      color: color,
+      size: size,
+      is_available: true
+    });
+  });
+
+  if (variants.length === 0) {
+    showToast('Add at least one variant', 'error');
+    return;
+  }
+
+  const product = {
+    id: editingId || 'custom-' + String(Date.now()).slice(-6),
+    title,
+    description,
+    tags,
+    category,
+    fulfillment: 'custom',
+    images: [{ src: image, variant_ids: [], is_default: true }],
+    sizes: [...sizes],
+    colors: [...colors],
+    price_range: { min: minPrice === Infinity ? 0 : minPrice, max: maxPrice },
+    variants
+  };
+
+  // Update variant IDs with proper product ID
+  product.variants.forEach((v, i) => { v.id = `${product.id}-v${i+1}`; });
+
+  if (editingId) {
+    const idx = customProducts.findIndex(p => p.id === editingId);
+    if (idx >= 0) customProducts[idx] = product;
+  } else {
+    customProducts.push(product);
+  }
+
+  saveCustomProducts();
+  closeDrawer();
+  renderAll();
+  showToast(editingId ? 'Product updated!' : 'Product added!', 'success');
+}
+
+function editProduct(id) {
+  openDrawer(id);
+}
+
+function duplicateProduct(id) {
+  const product = customProducts.find(p => p.id === id);
+  if (!product) return;
+  const clone = JSON.parse(JSON.stringify(product));
+  clone.id = 'custom-' + String(Date.now()).slice(-6);
+  clone.title = clone.title + ' (Copy)';
+  clone.variants.forEach((v, i) => { v.id = `${clone.id}-v${i+1}`; });
+  customProducts.push(clone);
+  saveCustomProducts();
+  renderAll();
+  showToast('Product duplicated!', 'success');
+}
+
+function deleteProduct(id) {
+  if (!confirm('Delete this product? This cannot be undone.')) return;
+  customProducts = customProducts.filter(p => p.id !== id);
+  saveCustomProducts();
+  renderAll();
+  showToast('Product deleted', 'success');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════════════════════════════════
+function loadSettings() {
+  document.getElementById('setting-email').value = settings.notification_email || '';
+  document.getElementById('setting-printify-token').value = settings.printify_token || '';
+  document.getElementById('setting-printify-shop').value = settings.printify_shop || '';
+  document.getElementById('setting-store-name').value = settings.store_name || '';
+  document.getElementById('setting-announce').value = settings.announce_text || '';
+}
+
+function saveSettings() {
+  settings.notification_email = document.getElementById('setting-email').value.trim();
+  settings.printify_token = document.getElementById('setting-printify-token').value.trim();
+  settings.printify_shop = document.getElementById('setting-printify-shop').value.trim();
+  settings.store_name = document.getElementById('setting-store-name').value.trim();
+  settings.announce_text = document.getElementById('setting-announce').value.trim();
+  localStorage.setItem('qamf_admin_settings', JSON.stringify(settings));
+  showToast('Settings saved!', 'success');
+}
+
+function addCategory() {
+  const input = document.getElementById('new-category');
+  const name = input.value.trim();
+  if (!name) return;
+  if (settings.categories.includes(name)) {
+    showToast('Category already exists', 'error');
+    return;
+  }
+  settings.categories.push(name);
+  localStorage.setItem('qamf_admin_settings', JSON.stringify(settings));
+  renderCategories();
+  input.value = '';
+  showToast('Category added!', 'success');
+}
+
+function removeCategory(name) {
+  settings.categories = settings.categories.filter(c => c !== name);
+  localStorage.setItem('qamf_admin_settings', JSON.stringify(settings));
+  renderCategories();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PERSISTENCE
+// ═══════════════════════════════════════════════════════════════════════════
+function saveCustomProducts() {
+  localStorage.setItem('qamf_custom_products', JSON.stringify(customProducts));
+}
+
+function buildExportJSON() {
+  return JSON.stringify({
+    updated_at: new Date().toISOString(),
+    source: 'custom',
+    notification_email: settings.notification_email,
+    products: customProducts
+  }, null, 2);
+}
+
+function exportJSON() {
+  const json = buildExportJSON();
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'custom-products.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('JSON exported!', 'success');
+}
+
+function importJSON() {
+  const fileInput = document.getElementById('import-file');
+  const file = fileInput.files[0];
+  if (!file) {
+    showToast('Select a file first', 'error');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      customProducts = data.products || [];
+      if (data.notification_email) settings.notification_email = data.notification_email;
+      saveCustomProducts();
+      localStorage.setItem('qamf_admin_settings', JSON.stringify(settings));
+      renderAll();
+      loadSettings();
+      showToast(`Imported ${customProducts.length} products!`, 'success');
+    } catch(err) {
+      showToast('Invalid JSON file', 'error');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function updateJSONPreview() {
+  document.getElementById('json-preview').textContent = buildExportJSON();
+}
+
+function syncPrintifyProducts() {
+  showToast('Run "npm run sync" in your terminal to sync Printify products, then reload this page.', 'success');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SEARCH & FILTER
+// ═══════════════════════════════════════════════════════════════════════════
+document.getElementById('admin-search-input').addEventListener('input', adminRenderProducts);
+document.getElementById('admin-filter-fulfillment').addEventListener('change', adminRenderProducts);
+document.getElementById('check-all').addEventListener('change', function() {
+  document.querySelectorAll('.pt-row input[type="checkbox"]').forEach(cb => cb.checked = this.checked);
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════════════════════
+function showToast(message, type) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.className = 'toast ' + (type || '') + ' show';
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => { toast.classList.remove('show'); }, 3500);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// KEYBOARD SHORTCUTS
+// ═══════════════════════════════════════════════════════════════════════════
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeDrawer();
+});
+
+// ─── INIT SPA ──────────────────────────────────────────────────
+handleRoute();
 </script>
 </body>
 </html>
