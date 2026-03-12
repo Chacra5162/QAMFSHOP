@@ -167,6 +167,38 @@ button{font-family:'Inter',sans-serif;cursor:pointer}
 .bcard-2 .btn-bundle{background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.35);color:#fff}
 .bcard-2 .btn-bundle:hover{background:rgba(255,255,255,.25)}
 
+/* ─── CUSTOM FULFILLMENT BADGE ─── */
+.pcard-custom-badge{position:absolute;top:10px;left:10px;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;font-size:9.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:6px;z-index:2;display:flex;align-items:center;gap:4px}
+.modal-custom-badge{display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;font-size:11px;font-weight:700;padding:4px 12px;border-radius:6px;margin-bottom:8px}
+
+/* ─── ORDER FORM MODAL ─── */
+.order-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);z-index:1001;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.order-overlay.open{opacity:1;pointer-events:auto}
+.order-card{background:var(--white);border-radius:18px;max-width:520px;width:90%;max-height:90vh;overflow-y:auto;padding:36px;position:relative;transform:translateY(20px);transition:transform .3s}
+.order-overlay.open .order-card{transform:translateY(0)}
+.order-card h3{font-family:'Montserrat',sans-serif;font-weight:900;font-size:22px;color:var(--dark);margin-bottom:4px}
+.order-card .order-subtitle{font-size:13px;color:var(--muted);margin-bottom:24px}
+.order-card .order-item-summary{background:var(--bg);border-radius:10px;padding:14px 16px;margin-bottom:24px;display:flex;align-items:center;gap:14px}
+.order-item-emoji{font-size:32px}
+.order-item-details{flex:1}
+.order-item-name{font-weight:700;font-size:14px;color:var(--dark)}
+.order-item-variant{font-size:12px;color:var(--muted);margin-top:2px}
+.order-item-price{font-family:'Montserrat',sans-serif;font-weight:900;font-size:18px;color:var(--dark)}
+.order-form-group{margin-bottom:16px}
+.order-form-group label{display:block;font-size:12px;font-weight:700;color:var(--mid);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}
+.order-form-group input,.order-form-group textarea{width:100%;padding:10px 14px;border:1.5px solid var(--line);border-radius:8px;font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:border-color .15s}
+.order-form-group input:focus,.order-form-group textarea:focus{border-color:var(--red)}
+.order-form-group textarea{resize:vertical;min-height:70px}
+.order-form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.order-submit{width:100%;padding:14px;border:none;border-radius:10px;background:var(--red);color:#fff;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;margin-top:8px}
+.order-submit:hover{background:var(--red2);transform:translateY(-1px)}
+.order-close{position:absolute;top:16px;right:16px;background:none;border:none;font-size:22px;color:var(--muted);cursor:pointer;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.order-close:hover{background:var(--bg)}
+.order-success{text-align:center;padding:20px 0}
+.order-success-icon{font-size:48px;margin-bottom:12px}
+.order-success h4{font-family:'Montserrat',sans-serif;font-weight:900;font-size:20px;color:var(--dark);margin-bottom:8px}
+.order-success p{font-size:14px;color:var(--muted);line-height:1.6}
+
 /* ─── BLOG FEED ─── */
 .blog-section{background:var(--bg);padding:64px 40px 80px}
 .blog-section-inner{max-width:1320px;margin:0 auto}
@@ -565,6 +597,54 @@ button{font-family:'Inter',sans-serif;cursor:pointer}
   </div>
 </div>
 
+<!-- ORDER FORM MODAL (custom fulfillment items) -->
+<div class="order-overlay" id="order-overlay">
+  <div class="order-card" id="order-card">
+    <button class="order-close" id="order-close">&times;</button>
+    <div id="order-form-content">
+      <h3>Place Your Order</h3>
+      <div class="order-subtitle">This item ships directly from QubicaAMF. We'll confirm your order via email.</div>
+      <div class="order-item-summary" id="order-item-summary">
+        <span class="order-item-emoji" id="order-item-emoji"></span>
+        <div class="order-item-details">
+          <div class="order-item-name" id="order-item-name"></div>
+          <div class="order-item-variant" id="order-item-variant"></div>
+        </div>
+        <div class="order-item-price" id="order-item-price"></div>
+      </div>
+      <form id="order-form">
+        <div class="order-form-row">
+          <div class="order-form-group">
+            <label for="order-fname">First Name</label>
+            <input type="text" id="order-fname" required placeholder="John">
+          </div>
+          <div class="order-form-group">
+            <label for="order-lname">Last Name</label>
+            <input type="text" id="order-lname" required placeholder="Smith">
+          </div>
+        </div>
+        <div class="order-form-group">
+          <label for="order-email">Email Address</label>
+          <input type="email" id="order-email" required placeholder="john@example.com">
+        </div>
+        <div class="order-form-group">
+          <label for="order-phone">Phone Number</label>
+          <input type="tel" id="order-phone" placeholder="(555) 123-4567">
+        </div>
+        <div class="order-form-group">
+          <label for="order-address">Shipping Address</label>
+          <textarea id="order-address" required placeholder="Street address, city, state, zip"></textarea>
+        </div>
+        <div class="order-form-group">
+          <label for="order-notes">Notes (optional)</label>
+          <textarea id="order-notes" placeholder="Custom engraving, special requests, center name..."></textarea>
+        </div>
+        <button type="submit" class="order-submit">Submit Order Request</button>
+      </form>
+    </div>
+  </div>
+</div>
+
 <script>
 // ─── Color name to CSS color mapping ────────────────────────────────────────
 const COLOR_MAP = {
@@ -576,7 +656,8 @@ const COLOR_MAP = {
 
 const CATEGORY_EMOJI = {
   'T-Shirts': '👕', 'Hoodies': '🧥', 'Polos': '👔', 'Jackets': '🧥',
-  'Hats & Caps': '🧢', 'Bags': '🎒', 'Drinkware': '☕', 'Other': '📦'
+  'Hats & Caps': '🧢', 'Bags': '🎒', 'Drinkware': '☕',
+  'Equipment': '🎳', 'Awards': '🏆', 'Other': '📦'
 };
 
 const BADGE_MAP = {
@@ -606,6 +687,9 @@ function renderProductCard(product) {
   const badgeHTML = badgeInfo
     ? `<span class="pcard-badge ${badgeInfo.class}">${badgeInfo.text}</span>`
     : '';
+  const customBadge = product.fulfillment === 'custom'
+    ? '<span class="pcard-custom-badge">⭐ Exclusive</span>'
+    : '';
 
   const colorsHTML = product.colors.slice(0, 4).map(c =>
     `<div class="cdot" style="background:${getColorCSS(c)}${c.toLowerCase() === 'white' ? ';border-color:#ccc' : ''}"></div>`
@@ -623,6 +707,7 @@ function renderProductCard(product) {
     <div class="pcard-img" style="background:linear-gradient(135deg,#f5f5f5,#ebebeb)">
       ${imgContent}
       ${badgeHTML}
+      ${customBadge}
       <span class="pcard-wish">♡</span>
     </div>
     <div class="pcard-body">
@@ -642,9 +727,22 @@ function renderProductCard(product) {
     openProductModal(product);
   });
 
+  // Custom items get "Order Now" button style
+  const addBtn = card.querySelector('.pcard-add');
+  if (product.fulfillment === 'custom') {
+    addBtn.textContent = 'Order Now';
+    addBtn.style.background = '#7c3aed';
+    addBtn.style.borderColor = '#7c3aed';
+    addBtn.style.color = '#fff';
+  }
+
   // Add to cart button
-  card.querySelector('.pcard-add').addEventListener('click', (e) => {
+  addBtn.addEventListener('click', (e) => {
     e.stopPropagation();
+    if (product.fulfillment === 'custom') {
+      openOrderForm(product, product.variants[0]);
+      return;
+    }
     const btn = e.currentTarget;
     const orig = btn.textContent;
     btn.textContent = '✓ Added!';
@@ -727,7 +825,18 @@ function openProductModal(product) {
   document.getElementById('modal-img').innerHTML = hasImage
     ? `<img src="${product.images[0].src}" alt="${product.title}">`
     : `<span style="font-size:140px">${emoji}</span>`;
-  document.getElementById('modal-category').textContent = product.category;
+  const catEl = document.getElementById('modal-category');
+  catEl.textContent = product.category;
+  // Show/hide custom badge in modal
+  let modalCustomBadge = document.getElementById('modal-custom-badge');
+  if (!modalCustomBadge) {
+    modalCustomBadge = document.createElement('div');
+    modalCustomBadge.id = 'modal-custom-badge';
+    modalCustomBadge.className = 'modal-custom-badge';
+    modalCustomBadge.innerHTML = '⭐ Ships directly from QubicaAMF';
+    catEl.parentNode.insertBefore(modalCustomBadge, catEl.nextSibling);
+  }
+  modalCustomBadge.style.display = product.fulfillment === 'custom' ? '' : 'none';
   document.getElementById('modal-title').textContent = product.title;
   document.getElementById('modal-desc').textContent = product.description;
   document.getElementById('modal-price').textContent = product.priceFormatted;
@@ -792,15 +901,18 @@ function updateModalVariant() {
   const addBtn = document.getElementById('modal-add-btn');
   const priceEl = document.getElementById('modal-price');
 
+  const isCustom = modalProduct.fulfillment === 'custom';
   if (variant) {
     infoEl.textContent = `SKU: ${variant.sku || variant.id} · ${variant.title}`;
     priceEl.textContent = `$${variant.price.toFixed(2)}`;
     addBtn.disabled = false;
-    addBtn.textContent = '+ Add to Cart';
+    addBtn.textContent = isCustom ? 'Order Now' : '+ Add to Cart';
+    addBtn.style.background = isCustom ? '#7c3aed' : '';
   } else {
     infoEl.textContent = 'Select options above';
     addBtn.disabled = true;
     addBtn.textContent = 'Select Options';
+    addBtn.style.background = '';
   }
 }
 
@@ -821,6 +933,16 @@ document.addEventListener('keydown', (e) => {
 // Modal add to cart
 document.getElementById('modal-add-btn').addEventListener('click', function() {
   if (this.disabled) return;
+  // Custom fulfillment: open order form instead
+  if (modalProduct && modalProduct.fulfillment === 'custom') {
+    const variant = modalProduct.variants.find(v =>
+      (!selectedColor || v.color === selectedColor) &&
+      (!selectedSize || v.size === selectedSize)
+    );
+    openOrderForm(modalProduct, variant || modalProduct.variants[0]);
+    closeModal();
+    return;
+  }
   const orig = this.textContent;
   this.textContent = '✓ Added!';
   this.style.background = '#16a34a';
@@ -830,20 +952,137 @@ document.getElementById('modal-add-btn').addEventListener('click', function() {
   }, 1400);
 });
 
-// ─── Load products from products.json ───────────────────────────────────────
+// ─── Custom order form ──────────────────────────────────────────────────────
+function openOrderForm(product, variant) {
+  const overlay = document.getElementById('order-overlay');
+  const emoji = CATEGORY_EMOJI[product.category] || '📦';
+  document.getElementById('order-item-emoji').textContent = emoji;
+  document.getElementById('order-item-name').textContent = product.title;
+  document.getElementById('order-item-variant').textContent = variant ? variant.title : '';
+  document.getElementById('order-item-price').textContent = variant ? `$${variant.price.toFixed(2)}` : product.priceFormatted;
+  // Store product/variant info for submission
+  overlay.dataset.productTitle = product.title;
+  overlay.dataset.variantTitle = variant ? variant.title : '';
+  overlay.dataset.variantSku = variant ? variant.sku : '';
+  overlay.dataset.variantPrice = variant ? variant.price : '';
+  // Reset form if it exists, or restore form HTML if showing success state
+  const existingForm = document.getElementById('order-form');
+  if (existingForm) {
+    existingForm.reset();
+  } else {
+    // Restore the form (was replaced by success message)
+    location.reload();
+    return;
+  }
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeOrderForm() {
+  document.getElementById('order-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('order-close').addEventListener('click', closeOrderForm);
+document.getElementById('order-overlay').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) closeOrderForm();
+});
+
+// Handle order form submission via event delegation
+document.getElementById('order-overlay').addEventListener('submit', function(e) {
+  if (e.target.id !== 'order-form') return;
+  e.preventDefault();
+  const overlay = document.getElementById('order-overlay');
+  const formData = {
+    name: document.getElementById('order-fname').value + ' ' + document.getElementById('order-lname').value,
+    email: document.getElementById('order-email').value,
+    phone: document.getElementById('order-phone').value,
+    address: document.getElementById('order-address').value,
+    notes: document.getElementById('order-notes').value,
+    product: overlay.dataset.productTitle,
+    variant: overlay.dataset.variantTitle,
+    sku: overlay.dataset.variantSku,
+    price: overlay.dataset.variantPrice
+  };
+
+  // Build mailto link as notification to store owner
+  const notifyEmail = window._customOrderEmail || 'orders@qubicaamf.com';
+  const subject = encodeURIComponent(`New Order: ${formData.product} - ${formData.variant}`);
+  const body = encodeURIComponent(
+    `NEW CUSTOM ORDER\n` +
+    `────────────────────────\n` +
+    `Product: ${formData.product}\n` +
+    `Variant: ${formData.variant}\n` +
+    `SKU: ${formData.sku}\n` +
+    `Price: $${formData.price}\n\n` +
+    `CUSTOMER DETAILS\n` +
+    `────────────────────────\n` +
+    `Name: ${formData.name}\n` +
+    `Email: ${formData.email}\n` +
+    `Phone: ${formData.phone}\n` +
+    `Shipping Address:\n${formData.address}\n\n` +
+    `Notes: ${formData.notes || 'None'}\n`
+  );
+
+  // Open mailto
+  window.location.href = `mailto:${notifyEmail}?subject=${subject}&body=${body}`;
+
+  // Show success state
+  document.getElementById('order-form-content').innerHTML = `
+    <div class="order-success">
+      <div class="order-success-icon">✅</div>
+      <h4>Order Request Submitted!</h4>
+      <p>Your email client should open with the order details pre-filled. Send it to complete your order.<br><br>
+      If your email client didn't open, please email <strong>${notifyEmail}</strong> with your order details.</p>
+      <button class="order-submit" style="margin-top:20px" onclick="closeOrderForm()">Close</button>
+    </div>
+  `;
+});
+
+// ─── Load products from products.json + custom-products.json ────────────────
 async function loadProducts() {
   try {
-    const resp = await fetch('products.json');
-    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    const data = await resp.json();
-    allProducts = data.products || [];
+    // Load both sources in parallel
+    const [printifyResp, customResp] = await Promise.allSettled([
+      fetch('products.json'),
+      fetch('custom-products.json')
+    ]);
+
+    let printifyProducts = [];
+    let customProducts = [];
+
+    if (printifyResp.status === 'fulfilled' && printifyResp.value.ok) {
+      const data = await printifyResp.value.json();
+      printifyProducts = (data.products || []).map(p => ({ ...p, fulfillment: 'printify' }));
+    }
+
+    if (customResp.status === 'fulfilled' && customResp.value.ok) {
+      const data = await customResp.value.json();
+      customProducts = (data.products || []).map(p => ({ ...p, fulfillment: 'custom' }));
+      // Store notification email for order forms
+      window._customOrderEmail = data.notification_email || '';
+    }
+
+    allProducts = [...printifyProducts, ...customProducts];
+
+    // Add priceFormatted to custom products if missing
+    allProducts.forEach(p => {
+      if (!p.priceFormatted && p.price_range) {
+        p.priceFormatted = p.price_range.min === p.price_range.max
+          ? `$${p.price_range.min.toFixed(2)}`
+          : `$${p.price_range.min.toFixed(2)} – $${p.price_range.max.toFixed(2)}`;
+      }
+    });
+
+    if (allProducts.length === 0) throw new Error('No products loaded');
+
     updateCategoryPills(allProducts);
     renderProducts(allProducts, 'All');
     // Update hero stats
     const statNums = document.querySelectorAll('.h-stat-num');
     if (statNums[0]) statNums[0].innerHTML = `${allProducts.length}<sup>+</sup>`;
   } catch (err) {
-    console.warn('Could not load products.json:', err.message);
+    console.warn('Could not load products:', err.message);
     console.log('Run "npm run sync:demo" or "npm run sync" to generate product data.');
     document.getElementById('loading-state').innerHTML =
       'No products synced yet.<br><small style="color:#999">Run <code>npm run sync:demo</code> to generate demo data, or <code>npm run sync</code> with your Printify API key.</small>';

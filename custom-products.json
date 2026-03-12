@@ -1,0 +1,58 @@
+{
+  "updated_at": "2026-03-12T00:00:00.000Z",
+  "source": "custom",
+  "notification_email": "orders@qubicaamf.com",
+  "products": [
+    {
+      "id": "custom-001",
+      "title": "QubicaAMF Pro Bowling Ball",
+      "description": "Official QubicaAMF branded reactive bowling ball. USBC approved. Available in 12lb, 14lb, and 16lb.",
+      "tags": ["bowling ball", "pro gear", "equipment", "exclusive"],
+      "category": "Equipment",
+      "fulfillment": "custom",
+      "images": [{ "src": "", "variant_ids": [], "is_default": true }],
+      "sizes": ["12lb", "14lb", "16lb"],
+      "colors": ["Red/Black", "Blue/Silver"],
+      "price_range": { "min": 149, "max": 179 },
+      "variants": [
+        { "id": "cb-v1", "title": "Red/Black / 12lb", "price": 149, "sku": "QAMF-BALL-RB-12", "color": "Red/Black", "size": "12lb", "is_available": true },
+        { "id": "cb-v2", "title": "Red/Black / 14lb", "price": 159, "sku": "QAMF-BALL-RB-14", "color": "Red/Black", "size": "14lb", "is_available": true },
+        { "id": "cb-v3", "title": "Red/Black / 16lb", "price": 179, "sku": "QAMF-BALL-RB-16", "color": "Red/Black", "size": "16lb", "is_available": true },
+        { "id": "cb-v4", "title": "Blue/Silver / 12lb", "price": 149, "sku": "QAMF-BALL-BS-12", "color": "Blue/Silver", "size": "12lb", "is_available": true },
+        { "id": "cb-v5", "title": "Blue/Silver / 14lb", "price": 159, "sku": "QAMF-BALL-BS-14", "color": "Blue/Silver", "size": "14lb", "is_available": true },
+        { "id": "cb-v6", "title": "Blue/Silver / 16lb", "price": 179, "sku": "QAMF-BALL-BS-16", "color": "Blue/Silver", "size": "16lb", "is_available": true }
+      ]
+    },
+    {
+      "id": "custom-002",
+      "title": "Center Manager Trophy Kit",
+      "description": "Custom engraved trophy set for league champions. Includes 1st, 2nd, 3rd place trophies with QubicaAMF branding and your center name.",
+      "tags": ["trophy", "league", "awards", "custom"],
+      "category": "Awards",
+      "fulfillment": "custom",
+      "images": [{ "src": "", "variant_ids": [], "is_default": true }],
+      "sizes": [],
+      "colors": ["Gold", "Silver"],
+      "price_range": { "min": 89, "max": 129 },
+      "variants": [
+        { "id": "ct-v1", "title": "Gold Trophy Set", "price": 129, "sku": "QAMF-TROPHY-GOLD", "color": "Gold", "size": "", "is_available": true },
+        { "id": "ct-v2", "title": "Silver Trophy Set", "price": 89, "sku": "QAMF-TROPHY-SILVER", "color": "Silver", "size": "", "is_available": true }
+      ]
+    },
+    {
+      "id": "custom-003",
+      "title": "Lane-Side Digital Menu Board",
+      "description": "Pre-loaded 32\" digital display with QubicaAMF branded menu templates, promo rotations, and scoring overlays. Plug-and-play setup.",
+      "tags": ["digital signage", "display", "equipment", "technology"],
+      "category": "Equipment",
+      "fulfillment": "custom",
+      "images": [{ "src": "", "variant_ids": [], "is_default": true }],
+      "sizes": [],
+      "colors": [],
+      "price_range": { "min": 499, "max": 499 },
+      "variants": [
+        { "id": "dm-v1", "title": "Digital Menu Board", "price": 499, "sku": "QAMF-DMB-32", "color": "", "size": "", "is_available": true }
+      ]
+    }
+  ]
+}
