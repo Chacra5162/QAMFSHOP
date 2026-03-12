@@ -167,6 +167,26 @@ button{font-family:'Inter',sans-serif;cursor:pointer}
 .bcard-2 .btn-bundle{background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.35);color:#fff}
 .bcard-2 .btn-bundle:hover{background:rgba(255,255,255,.25)}
 
+/* ─── BLOG FEED ─── */
+.blog-section{background:var(--bg);padding:64px 40px 80px}
+.blog-section-inner{max-width:1320px;margin:0 auto}
+.blog-sec-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:36px}
+.blog-sec-title{font-family:'Montserrat',sans-serif;font-weight:900;font-size:28px;letter-spacing:-.02em;color:var(--dark)}
+.blog-sec-title em{color:var(--red);font-style:normal}
+.blog-sec-link{font-size:13.5px;font-weight:600;color:var(--red);transition:color .15s}
+.blog-sec-link:hover{color:var(--red2)}
+.blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.blog-card{background:var(--card);border-radius:14px;overflow:hidden;border:1px solid var(--line);transition:all .25s;display:flex;flex-direction:column;text-decoration:none;color:inherit}
+.blog-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+.blog-card-img{width:100%;height:190px;object-fit:cover;background:var(--line)}
+.blog-card-body{padding:22px;flex:1;display:flex;flex-direction:column}
+.blog-card-date{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.blog-card-title{font-family:'Montserrat',sans-serif;font-weight:800;font-size:17px;color:var(--dark);line-height:1.2;margin-bottom:10px}
+.blog-card-excerpt{font-size:13px;color:var(--muted);line-height:1.6;flex:1;margin-bottom:14px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.blog-card-link{font-size:13px;font-weight:700;color:var(--red);display:inline-flex;align-items:center;gap:4px}
+.blog-loading{text-align:center;padding:48px 0;color:var(--muted);font-size:14px}
+@media(max-width:860px){.blog-grid{grid-template-columns:1fr}}
+
 /* ─── FOOTER ─── */
 .footer-top{background:var(--white);border-top:1px solid var(--line);padding:60px 40px 48px}
 .footer-top-inner{max-width:1320px;margin:0 auto;display:grid;grid-template-columns:2.2fr 1fr 1fr 1fr;gap:56px}
@@ -253,6 +273,7 @@ button{font-family:'Inter',sans-serif;cursor:pointer}
       <a href="#">Bundles</a>
       <a href="#">New Arrivals</a>
       <a href="subscription.html" style="color:var(--red)">Marketing Suite</a>
+      <a href="https://besxtras.com/" target="_blank">Blog</a>
     </nav>
 
     <div class="header-right">
@@ -464,6 +485,19 @@ button{font-family:'Inter',sans-serif;cursor:pointer}
         <div class="bcard-desc">Exclusive styles available only to QubicaAMF staff and certified partners worldwide.</div>
         <button class="btn-bundle" style="width:fit-content">View Collection →</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- BLOG FEED -->
+<div class="blog-section">
+  <div class="blog-section-inner">
+    <div class="blog-sec-head">
+      <div class="blog-sec-title">Latest from <em>BesXtras</em></div>
+      <a href="https://besxtras.com/" target="_blank" class="blog-sec-link">View all posts &rarr;</a>
+    </div>
+    <div class="blog-grid" id="blog-grid">
+      <div class="blog-loading">Loading posts...</div>
     </div>
   </div>
 </div>
@@ -817,6 +851,32 @@ async function loadProducts() {
 }
 
 loadProducts();
+
+// Blog feed from WordPress
+(async function loadBlog(){
+  const grid = document.getElementById('blog-grid');
+  try {
+    const resp = await fetch('https://besxtras.com/wp-json/wp/v2/posts?per_page=3&_embed');
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const posts = await resp.json();
+    grid.innerHTML = posts.map(post => {
+      const img = post.jetpack_featured_media_url || (post._embedded && post._embedded['wp:featuredmedia'] && post._embedded['wp:featuredmedia'][0] && post._embedded['wp:featuredmedia'][0].source_url) || '';
+      const date = new Date(post.date).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+      const excerpt = post.excerpt.rendered.replace(/<[^>]+>/g,'').slice(0,160) + '...';
+      return `<a href="${post.link}" target="_blank" class="blog-card">
+        ${img ? `<img class="blog-card-img" src="${img}" alt="" loading="lazy"/>` : '<div class="blog-card-img"></div>'}
+        <div class="blog-card-body">
+          <div class="blog-card-date">${date}</div>
+          <div class="blog-card-title">${post.title.rendered}</div>
+          <div class="blog-card-excerpt">${excerpt}</div>
+          <span class="blog-card-link">Read More &rarr;</span>
+        </div>
+      </a>`;
+    }).join('');
+  } catch(err) {
+    grid.innerHTML = '<div class="blog-loading">Could not load blog posts. <a href="https://besxtras.com/" target="_blank" style="color:var(--red);font-weight:600">Visit BesXtras.com &rarr;</a></div>';
+  }
+})();
 </script>
 </body>
 </html>

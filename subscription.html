@@ -225,6 +225,23 @@ nav{position:sticky;top:0;z-index:99;background:rgba(255,255,255,.96);backdrop-f
 .month-title{font-weight:700;font-size:14px;color:var(--ink);margin-bottom:8px}
 .month-desc{font-size:12.5px;color:var(--mid);line-height:1.55}
 
+/* ── BLOG FEED ── */
+.blog-feed{background:var(--pale);padding:96px 40px}
+.blog-feed-inner{max-width:1200px;margin:0 auto}
+.blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:56px}
+.blog-card{background:var(--white);border-radius:16px;overflow:hidden;border:1px solid var(--line);transition:all .25s;display:flex;flex-direction:column}
+.blog-card:hover{transform:translateY(-4px);box-shadow:0 20px 48px rgba(0,0,0,.09)}
+.blog-card-img{width:100%;height:200px;object-fit:cover;background:var(--line)}
+.blog-card-body{padding:24px;flex:1;display:flex;flex-direction:column}
+.blog-card-date{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--mid);margin-bottom:8px}
+.blog-card-title{font-family:'DM Serif Display',serif;font-size:20px;color:var(--ink);line-height:1.2;margin-bottom:10px}
+.blog-card-excerpt{font-size:13.5px;color:var(--mid);line-height:1.6;flex:1;margin-bottom:16px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.blog-card-link{font-size:13px;font-weight:700;color:var(--red);transition:color .15s;display:inline-flex;align-items:center;gap:4px}
+.blog-card-link:hover{color:var(--red2)}
+.blog-loading{text-align:center;padding:60px 0;color:var(--mid);font-size:14px}
+.blog-all{display:flex;justify-content:center;margin-top:40px}
+@media(max-width:860px){.blog-grid{grid-template-columns:1fr}}
+
 /* ── CTA BAND ── */
 .cta-band{background:linear-gradient(120deg,var(--ink) 0%,#1e0306 100%);padding:96px 40px;position:relative;overflow:hidden}
 .cta-band::before{content:'';position:absolute;top:-200px;right:-200px;width:700px;height:700px;background:radial-gradient(circle,rgba(208,16,32,.2) 0%,transparent 68%);pointer-events:none}
@@ -272,6 +289,7 @@ footer{background:var(--ink2);padding:48px 40px;border-top:1px solid rgba(255,25
     <a href="#how">How It Works</a>
     <a href="#pricing">Pricing</a>
     <a href="#virtual-marketing-manager">Digital Pack</a>
+    <a href="#blog">Blog</a>
   </div>
   <div class="nav-cta">
     <button class="btn btn-ghost">Sign In</button>
@@ -687,6 +705,23 @@ footer{background:var(--ink2);padding:48px 40px;border-top:1px solid rgba(255,25
   </div>
 </section>
 
+<!-- BLOG FEED -->
+<section class="blog-feed" id="blog">
+  <div class="blog-feed-inner">
+    <div class="reveal" style="text-align:center">
+      <div class="sec-eyebrow" style="text-align:center">From the Blog</div>
+      <div class="sec-title" style="text-align:center">Latest from <em>BesXtras</em></div>
+      <div class="sec-sub" style="text-align:center;margin:0 auto">Tips, trends, and insights to help your bowling center thrive.</div>
+    </div>
+    <div class="blog-grid" id="blog-grid">
+      <div class="blog-loading">Loading posts...</div>
+    </div>
+    <div class="blog-all">
+      <a href="https://besxtras.com/" target="_blank" class="btn btn-ghost" style="padding:12px 28px;border-radius:9px;font-size:14px;font-weight:700">View All Posts on BesXtras.com &rarr;</a>
+    </div>
+  </div>
+</section>
+
 <!-- CTA BAND -->
 <section class="cta-band">
   <div class="cta-band-inner reveal">
@@ -727,6 +762,34 @@ document.querySelectorAll('.nav-links a').forEach(a=>{
     this.style.color='var(--ink)';
   });
 });
+
+// Blog feed from WordPress
+(async function loadBlog(){
+  const grid = document.getElementById('blog-grid');
+  try {
+    const resp = await fetch('https://besxtras.com/wp-json/wp/v2/posts?per_page=3&_embed');
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const posts = await resp.json();
+    grid.innerHTML = posts.map(post => {
+      const img = post.jetpack_featured_media_url || (post._embedded && post._embedded['wp:featuredmedia'] && post._embedded['wp:featuredmedia'][0] && post._embedded['wp:featuredmedia'][0].source_url) || '';
+      const date = new Date(post.date).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+      const excerpt = post.excerpt.rendered.replace(/<[^>]+>/g,'').slice(0,160) + '...';
+      return `<a href="${post.link}" target="_blank" class="blog-card reveal">
+        ${img ? `<img class="blog-card-img" src="${img}" alt="" loading="lazy"/>` : '<div class="blog-card-img"></div>'}
+        <div class="blog-card-body">
+          <div class="blog-card-date">${date}</div>
+          <div class="blog-card-title">${post.title.rendered}</div>
+          <div class="blog-card-excerpt">${excerpt}</div>
+          <span class="blog-card-link">Read More &rarr;</span>
+        </div>
+      </a>`;
+    }).join('');
+    // Observe new reveal elements
+    grid.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+  } catch(err) {
+    grid.innerHTML = '<div class="blog-loading">Could not load blog posts. <a href="https://besxtras.com/" target="_blank" style="color:var(--red);font-weight:600">Visit BesXtras.com &rarr;</a></div>';
+  }
+})();
 </script>
 </body>
 </html>
