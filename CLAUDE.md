@@ -20,6 +20,7 @@ Single-page e-commerce storefront for QubicaAMF bowling merchandise. Static HTML
 | `products.json` | Auto-generated product catalog from Printify API |
 | `custom-products.json` | Manually maintained custom fulfillment products |
 | `sync-printify.js` | Node.js script to fetch products from Printify API |
+| `wordpress/plugins/qamf-custom-orders/` | WooCommerce plugin: daily batch email for custom fulfillment orders |
 | `.github/workflows/deploy-pages.yml` | Auto-deploy to GitHub Pages on push to main |
 | `.github/workflows/sync-printify.yml` | Daily Printify product sync at midnight UTC |
 
@@ -27,15 +28,37 @@ Single-page e-commerce storefront for QubicaAMF bowling merchandise. Static HTML
 
 ```bash
 npm install              # Install dotenv dependency
-npm run sync:demo        # Generate demo product data
+npm run sync:demo        # Generate demo data (auto-switches to live if credentials exist)
 npm run sync             # Sync from live Printify API (requires .env)
+npm run sync:force-demo  # Force demo data even with API credentials present
 ```
+
+## WordPress / WooCommerce Migration (Planned)
+
+The site is moving to WordPress + WooCommerce hosting:
+
+- **Payments**: WooCommerce Stripe Gateway plugin
+- **Printify fulfillment**: Printify WooCommerce plugin auto-syncs products and auto-fulfills orders on purchase
+- **Custom fulfillment**: Orders with custom items are batched and emailed to admin daily at 8 AM EST via `qamf-custom-orders` plugin
+- **Custom items**: Added manually in WooCommerce with "Custom Fulfillment" checkbox enabled
+
+### WordPress Plugin
+
+| File | Purpose |
+|------|---------|
+| `wordpress/plugins/qamf-custom-orders/qamf-custom-orders.php` | Batches custom fulfillment orders and emails admin daily at 8 AM EST |
+
+### WooCommerce Plugins Needed
+
+1. **Printify for WooCommerce** — auto-syncs Printify catalog, auto-creates orders on purchase
+2. **WooCommerce Stripe Gateway** — payment processing
+3. **QAMF Custom Order Batch Emailer** — custom plugin (included in this repo)
 
 ## External Services
 
-- **Printify**: Print-on-demand fulfillment (API token + shop ID in .env)
-- **Stripe**: Payment processing (planned, not yet integrated)
-- **GitHub Pages**: Static hosting (auto-deploys from main)
+- **Printify**: Print-on-demand fulfillment (WooCommerce plugin handles sync + order creation)
+- **Stripe**: Payment processing (WooCommerce Stripe Gateway)
+- **WordPress**: Production hosting (replacing GitHub Pages)
 - **BesXtras.com**: WordPress blog feed (fetched client-side via WP REST API)
 
 ## Important Rules
