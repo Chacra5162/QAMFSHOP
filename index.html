@@ -356,6 +356,29 @@ body.view-admin button,body.view-admin input,body.view-admin select,body.view-ad
 .pcard-wish{cursor:pointer;transition:all .2s}
 .pcard-wish.active{color:var(--red);opacity:1 !important}
 
+/* ─── LOOKBOOK ─── */
+.lookbook-section{padding:48px 0}
+.lookbook-inner{max-width:1320px;margin:0 auto;padding:0 40px}
+.lookbook-header{text-align:center;margin-bottom:32px}
+.lookbook-header h2{font-family:var(--font-display);font-size:28px;font-weight:800;letter-spacing:-.02em;margin-bottom:6px}
+.lookbook-header h2 em{color:var(--red);font-style:normal}
+.lookbook-header p{color:var(--muted);font-size:14px}
+.lookbook-grid{display:grid;gap:12px}
+.lookbook-grid.cols-2{grid-template-columns:1fr 1fr}
+.lookbook-grid.cols-3{grid-template-columns:1fr 1fr 1fr}
+.lookbook-grid.cols-mixed{grid-template-columns:1.2fr .8fr;grid-template-rows:auto auto}
+.lookbook-card{position:relative;border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;aspect-ratio:4/5;background:var(--bg)}
+.lookbook-card img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+.lookbook-card:hover img{transform:scale(1.04)}
+.lookbook-card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,10,11,.7) 0%,transparent 50%);display:flex;flex-direction:column;justify-content:flex-end;padding:24px}
+.lookbook-card-name{color:#fff;font-family:var(--font-display);font-size:16px;font-weight:700}
+.lookbook-card-price{color:rgba(255,255,255,.6);font-size:13px;margin-top:2px}
+.lookbook-card-placeholder{display:flex;align-items:center;justify-content:center;font-size:64px;background:linear-gradient(135deg,#f5f5f5,#ebebeb)}
+@media(max-width:768px){
+  .lookbook-grid.cols-2,.lookbook-grid.cols-3,.lookbook-grid.cols-mixed{grid-template-columns:1fr 1fr}
+  .lookbook-card{aspect-ratio:3/4}
+}
+
 /* ─── SIZE GUIDE MODAL ─── */
 .sizeguide-overlay{position:fixed;inset:0;background:rgba(10,10,11,.7);z-index:1200;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(16px)}
 .sizeguide-overlay.open{display:flex}
@@ -1162,6 +1185,17 @@ textarea.form-input{resize:vertical;min-height:80px}
   </div>
 </div>
 
+<!-- LOOKBOOK -->
+<div class="lookbook-section" id="lookbook-section" style="display:none">
+  <div class="lookbook-inner">
+    <div class="lookbook-header">
+      <h2 id="lookbook-title">The <em>Lookbook</em></h2>
+      <p id="lookbook-desc">Curated styles from the QubicaAMF collection</p>
+    </div>
+    <div class="lookbook-grid cols-mixed" id="lookbook-grid"></div>
+  </div>
+</div>
+
 <!-- BLOG FEED -->
 <div class="blog-section">
   <div class="blog-section-inner">
@@ -1958,6 +1992,7 @@ textarea.form-input{resize:vertical;min-height:80px}
   <div class="tabs">
     <button class="tab active" data-panel="products">Products</button>
     <button class="tab" data-panel="featured">Featured Drops</button>
+    <button class="tab" data-panel="lookbook">Lookbook</button>
     <button class="tab" data-panel="settings">Settings</button>
     <button class="tab" data-panel="export">Export / Import</button>
   </div>
@@ -2055,6 +2090,52 @@ textarea.form-input{resize:vertical;min-height:80px}
       </div>
     </div>
     <div id="featured-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">
+    </div>
+  </div>
+
+  <!-- ═══════════ LOOKBOOK PANEL ═══════════ -->
+  <div class="panel" id="panel-lookbook">
+    <div class="settings-grid">
+      <div class="settings-card">
+        <h4>Lookbook Settings</h4>
+        <p>Configure your storefront lookbook display</p>
+        <div class="form-group" style="margin-bottom:10px">
+          <label>Title</label>
+          <input type="text" class="form-input" id="lb-title" placeholder="The Lookbook" value="The Lookbook">
+        </div>
+        <div class="form-group" style="margin-bottom:10px">
+          <label>Subtitle</label>
+          <input type="text" class="form-input" id="lb-desc" placeholder="Curated styles from the QubicaAMF collection">
+        </div>
+        <div class="form-group" style="margin-bottom:10px">
+          <label>Layout</label>
+          <select class="form-input" id="lb-layout">
+            <option value="cols-mixed">Mixed (editorial)</option>
+            <option value="cols-2">2 Columns</option>
+            <option value="cols-3">3 Columns</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:12px">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <input type="checkbox" id="lb-visible" checked style="width:16px;height:16px;accent-color:var(--red)">
+            Show lookbook on storefront
+          </label>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="saveLookbook()">Save Lookbook</button>
+      </div>
+      <div class="settings-card" style="grid-column:1/-1">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div>
+            <h4>Select Products</h4>
+            <p>Click products to add or remove them from the lookbook. <span id="lb-count-label" style="font-weight:600;color:var(--dark)">0 selected</span></p>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="text" class="form-input" id="lb-search" placeholder="Search..." style="width:180px;padding:8px 12px;font-size:12px">
+            <button class="btn btn-secondary btn-sm" onclick="clearLookbook()">Clear</button>
+          </div>
+        </div>
+        <div id="lb-product-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px"></div>
+      </div>
     </div>
   </div>
 
@@ -2885,6 +2966,79 @@ document.getElementById('order-overlay').addEventListener('submit', function(e) 
   `;
 });
 
+// ─── Render lookbook on the storefront ────────────────────────────────────────
+function renderStoreLookbook(products) {
+  const section = document.getElementById('lookbook-section');
+  const grid = document.getElementById('lookbook-grid');
+  if (!section || !grid) return;
+
+  // Get lookbook settings
+  let lb = {};
+  try {
+    const ss = localStorage.getItem('qamf_admin_settings');
+    if (ss) lb = JSON.parse(ss).lookbook || {};
+  } catch(e) {}
+
+  const ids = lb.product_ids || [];
+  if (ids.length === 0 || lb.visible === false) {
+    section.style.display = 'none';
+    return;
+  }
+
+  // Show section
+  section.style.display = '';
+
+  // Set title/desc
+  const titleEl = document.getElementById('lookbook-title');
+  const descEl = document.getElementById('lookbook-desc');
+  if (titleEl) {
+    const t = lb.title || 'The Lookbook';
+    // Wrap last word in <em> for styling
+    const words = t.split(' ');
+    if (words.length > 1) {
+      titleEl.innerHTML = esc(words.slice(0, -1).join(' ')) + ' <em>' + esc(words[words.length - 1]) + '</em>';
+    } else {
+      titleEl.innerHTML = '<em>' + esc(t) + '</em>';
+    }
+  }
+  if (descEl) descEl.textContent = lb.desc || '';
+
+  // Set layout
+  grid.className = 'lookbook-grid ' + (lb.layout || 'cols-mixed');
+
+  // Render product cards
+  const EMOJI = {'T-Shirts':'👕','Hoodies':'🧥','Polos':'👔','Jackets':'🧥','Hats & Caps':'🧢','Bags':'🎒','Drinkware':'☕','Equipment':'🎳','Awards':'🏆','Other':'📦'};
+  const lbProducts = ids.map(id => products.find(p => p.id === id)).filter(Boolean);
+
+  grid.innerHTML = lbProducts.map(p => {
+    const hasImg = p.images && p.images[0] && p.images[0].src;
+    const emoji = EMOJI[p.category] || '📦';
+    if (hasImg) {
+      return '<div class="lookbook-card" data-product-id="' + esc(p.id) + '">'
+        + '<img src="' + esc(p.images[0].src) + '" alt="' + esc(p.title) + '" loading="lazy">'
+        + '<div class="lookbook-card-overlay">'
+        + '<div class="lookbook-card-name">' + esc(p.title) + '</div>'
+        + '<div class="lookbook-card-price">' + esc(p.priceFormatted || '') + '</div>'
+        + '</div></div>';
+    } else {
+      return '<div class="lookbook-card lookbook-card-placeholder" data-product-id="' + esc(p.id) + '">'
+        + emoji
+        + '<div class="lookbook-card-overlay">'
+        + '<div class="lookbook-card-name">' + esc(p.title) + '</div>'
+        + '<div class="lookbook-card-price">' + esc(p.priceFormatted || '') + '</div>'
+        + '</div></div>';
+    }
+  }).join('');
+
+  // Click lookbook card to open product modal
+  grid.querySelectorAll('.lookbook-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const product = products.find(p => p.id === card.dataset.productId);
+      if (product) openProductModal(product);
+    });
+  });
+}
+
 // ─── Load products from products.json + custom-products.json ────────────────
 async function loadProducts() {
   try {
@@ -2934,6 +3088,9 @@ async function loadProducts() {
     // Update hero stats
     const statNums = document.querySelectorAll('.h-stat-num');
     if (statNums[0]) statNums[0].innerHTML = `${allProducts.length}<sup>+</sup>`;
+
+    // Render lookbook on storefront
+    renderStoreLookbook(allProducts);
   } catch (err) {
     console.warn('Could not load products:', err.message);
     console.log('Run "npm run sync:demo" or "npm run sync" to generate product data.');
@@ -3048,7 +3205,8 @@ let settings = {
   social_instagram: 'https://www.instagram.com/qubicaamf',
   stripe_pk: '',
   woo_url: '',
-  featured_ids: []
+  featured_ids: [],
+  lookbook: { title: 'The Lookbook', desc: 'Curated styles from the QubicaAMF collection', layout: 'cols-mixed', visible: true, product_ids: [] }
 };
 let editingId = null; // null = add mode, string = editing existing
 
@@ -3102,6 +3260,7 @@ document.querySelectorAll('#page-admin .tab').forEach(tab => {
     document.getElementById('panel-' + tab.dataset.panel).classList.add('active');
     if (tab.dataset.panel === 'export') updateJSONPreview();
     if (tab.dataset.panel === 'featured') renderFeaturedGrid();
+    if (tab.dataset.panel === 'lookbook') renderLookbookAdmin();
   });
 });
 
@@ -3530,6 +3689,98 @@ document.getElementById('featured-search-input').addEventListener('input', funct
   _featuredSearchTimer = setTimeout(renderFeaturedGrid, 200);
 });
 document.getElementById('featured-filter-cat').addEventListener('change', renderFeaturedGrid);
+
+// ═══════════════════════════════════════════════════════════════════════════
+// LOOKBOOK
+// ═══════════════════════════════════════════════════════════════════════════
+let _lbSearchTimer = null;
+
+function renderLookbookAdmin() {
+  const grid = document.getElementById('lb-product-grid');
+  const search = (document.getElementById('lb-search').value || '').toLowerCase();
+  const lb = settings.lookbook || {};
+
+  // Load settings into form
+  document.getElementById('lb-title').value = lb.title || 'The Lookbook';
+  document.getElementById('lb-desc').value = lb.desc || '';
+  document.getElementById('lb-layout').value = lb.layout || 'cols-mixed';
+  document.getElementById('lb-visible').checked = lb.visible !== false;
+
+  let all = [
+    ...printifyProducts.map(p => ({ ...p, fulfillment: 'printify' })),
+    ...customProducts.map(p => ({ ...p, fulfillment: 'custom' }))
+  ];
+
+  if (search) {
+    all = all.filter(p =>
+      p.title.toLowerCase().includes(search) ||
+      (p.category || '').toLowerCase().includes(search)
+    );
+  }
+
+  const selectedIds = lb.product_ids || [];
+  // Sort selected first
+  all.sort((a, b) => {
+    const aS = selectedIds.includes(a.id) ? 0 : 1;
+    const bS = selectedIds.includes(b.id) ? 0 : 1;
+    if (aS !== bS) return aS - bS;
+    return a.title.localeCompare(b.title);
+  });
+
+  const EMOJI = {'T-Shirts':'👕','Hoodies':'🧥','Polos':'👔','Jackets':'🧥','Hats & Caps':'🧢','Bags':'🎒','Drinkware':'☕','Equipment':'🎳','Awards':'🏆','Other':'📦'};
+  grid.innerHTML = all.map(p => {
+    const isSelected = selectedIds.includes(p.id);
+    const hasImg = p.images && p.images[0] && p.images[0].src;
+    const emoji = EMOJI[p.category] || '📦';
+    const imgContent = hasImg
+      ? '<img src="' + esc(p.images[0].src) + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:8px">'
+      : '<span style="font-size:32px">' + emoji + '</span>';
+    return '<div class="feat-card' + (isSelected ? ' selected' : '') + '" data-id="' + esc(p.id) + '" style="padding:8px">'
+      + '<div class="feat-card-star" style="width:22px;height:22px;font-size:12px">' + (isSelected ? '★' : '☆') + '</div>'
+      + '<div style="width:100%;aspect-ratio:1;border-radius:8px;background:var(--bg);display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:6px">' + imgContent + '</div>'
+      + '<div class="feat-card-name" style="font-size:11px">' + esc(p.title) + '</div>'
+      + '</div>';
+  }).join('');
+
+  document.getElementById('lb-count-label').textContent = selectedIds.length + ' selected';
+}
+
+document.getElementById('lb-product-grid').addEventListener('click', function(e) {
+  const card = e.target.closest('.feat-card');
+  if (!card) return;
+  const id = card.dataset.id;
+  if (!settings.lookbook) settings.lookbook = { title: 'The Lookbook', desc: '', layout: 'cols-mixed', visible: true, product_ids: [] };
+  if (!settings.lookbook.product_ids) settings.lookbook.product_ids = [];
+  const idx = settings.lookbook.product_ids.indexOf(id);
+  if (idx >= 0) {
+    settings.lookbook.product_ids.splice(idx, 1);
+  } else {
+    settings.lookbook.product_ids.push(id);
+  }
+  renderLookbookAdmin();
+});
+
+function saveLookbook() {
+  if (!settings.lookbook) settings.lookbook = {};
+  settings.lookbook.title = document.getElementById('lb-title').value.trim() || 'The Lookbook';
+  settings.lookbook.desc = document.getElementById('lb-desc').value.trim();
+  settings.lookbook.layout = document.getElementById('lb-layout').value;
+  settings.lookbook.visible = document.getElementById('lb-visible').checked;
+  localStorage.setItem('qamf_admin_settings', JSON.stringify(settings));
+  showToast('Lookbook saved! ' + (settings.lookbook.product_ids || []).length + ' products.', 'success');
+}
+
+function clearLookbook() {
+  if (!confirm('Remove all products from the lookbook?')) return;
+  if (!settings.lookbook) settings.lookbook = {};
+  settings.lookbook.product_ids = [];
+  renderLookbookAdmin();
+}
+
+document.getElementById('lb-search').addEventListener('input', function() {
+  clearTimeout(_lbSearchTimer);
+  _lbSearchTimer = setTimeout(renderLookbookAdmin, 200);
+});
 
 // ═══════════════════════════════════════════════════════════════════════════
 // PERSISTENCE
