@@ -2030,12 +2030,9 @@ textarea.form-input{resize:vertical;min-height:80px}
       </div>
       <div class="settings-card">
         <h4>Store Categories</h4>
-        <p>Categories sync automatically from Printify. Custom categories below are for manually-added products only.</p>
+        <p>Categories are synced automatically from your Printify product catalog and cannot be edited here.</p>
         <div id="category-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px"></div>
-        <div style="display:flex;gap:8px">
-          <input type="text" class="form-input" id="new-category" placeholder="New category name" style="flex:1">
-          <button class="btn btn-secondary btn-sm" onclick="addCategory()">Add</button>
-        </div>
+        <div style="font-size:12px;color:var(--muted)">To change categories, update your product types in Printify and re-sync.</div>
       </div>
       <div class="settings-card">
         <h4>Printify Sync</h4>
@@ -3131,11 +3128,18 @@ function adminRenderProducts() {
 }
 
 function renderCategories() {
+  // Build categories from actual Printify + custom product data
+  const catSet = new Set();
+  printifyProducts.forEach(p => { if (p.category) catSet.add(p.category); });
+  customProducts.forEach(p => { if (p.category) catSet.add(p.category); });
+  settings.categories = [...catSet].sort();
   const list = document.getElementById('category-list');
+  if (settings.categories.length === 0) {
+    list.innerHTML = '<span style="font-size:12px;color:var(--muted)">No categories found. Sync products from Printify to populate.</span>';
+    return;
+  }
   list.innerHTML = settings.categories.map(cat =>
-    `<span style="display:inline-flex;align-items:center;gap:4px;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:4px 10px;font-size:12px;font-weight:600">${cat}
-      <button onclick="removeCategory('${cat}')" style="border:none;background:none;cursor:pointer;color:var(--muted);font-size:14px;margin-left:2px">&times;</button>
-    </span>`
+    `<span style="display:inline-flex;align-items:center;gap:4px;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:4px 10px;font-size:12px;font-weight:600">${esc(cat)}</span>`
   ).join('');
 }
 
@@ -3357,26 +3361,7 @@ function updateIntegrationStatus() {
   update('status-woo', !!settings.woo_url, 'WooCommerce');
 }
 
-function addCategory() {
-  const input = document.getElementById('new-category');
-  const name = input.value.trim();
-  if (!name) return;
-  if (settings.categories.includes(name)) {
-    showToast('Category already exists', 'error');
-    return;
-  }
-  settings.categories.push(name);
-  localStorage.setItem('qamf_admin_settings', JSON.stringify(settings));
-  renderCategories();
-  input.value = '';
-  showToast('Category added!', 'success');
-}
-
-function removeCategory(name) {
-  settings.categories = settings.categories.filter(c => c !== name);
-  localStorage.setItem('qamf_admin_settings', JSON.stringify(settings));
-  renderCategories();
-}
+// Categories are read-only — synced from Printify product data
 
 // ═══════════════════════════════════════════════════════════════════════════
 // PERSISTENCE
