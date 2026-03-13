@@ -590,7 +590,7 @@ body.view-admin button,body.view-admin input,body.view-admin select,body.view-ad
 .pricing{background:#111113;padding:100px 40px;border-top:1px solid rgba(255,255,255,.04)}
 .pricing-inner{max-width:1200px;margin:0 auto}
 .pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:60px}
-.plan{background:rgba(255,255,255,.03);border-radius:var(--radius-xl);padding:40px;border:1.5px solid rgba(255,255,255,.06);position:relative;transition:all .35s cubic-bezier(.2,0,0,1)}
+.plan{background:rgba(255,255,255,.03);border-radius:var(--radius-xl);padding:40px;border:1.5px solid rgba(255,255,255,.06);position:relative;transition:all .35s cubic-bezier(.2,0,0,1);display:flex;flex-direction:column}
 .plan:hover{transform:translateY(-6px);box-shadow:0 24px 60px rgba(0,0,0,.3)}
 .plan.featured{background:linear-gradient(160deg,#1a0508,#160405);border-color:rgba(232,25,44,.2);color:#fff}
 .plan-badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--red);color:#fff;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:5px 16px;border-radius:100px;white-space:nowrap;box-shadow:0 4px 16px rgba(232,25,44,.4)}
@@ -604,11 +604,13 @@ body.view-admin button,body.view-admin input,body.view-admin select,body.view-ad
 .plan.featured .plan-cadence{color:rgba(255,255,255,.4)}
 .plan-divider{height:1px;background:rgba(255,255,255,.06);margin-bottom:24px}
 .plan.featured .plan-divider{background:rgba(232,25,44,.15)}
-.plan-features{display:flex;flex-direction:column;gap:11px;margin-bottom:32px}
+.plan-features{display:flex;flex-direction:column;gap:11px;margin-bottom:32px;flex:1}
 .pf{display:flex;align-items:flex-start;gap:9px;font-size:13px;color:rgba(255,255,255,.6);font-weight:400}
 .plan.featured .pf{color:rgba(255,255,255,.75)}
 .pf-check{color:var(--red);font-weight:700;flex-shrink:0;margin-top:1px}
 .plan.featured .pf-check{color:var(--red)}
+.plan-cta{margin-top:auto}
+.plan-consult{text-align:center;font-size:11px;color:rgba(255,255,255,.35);margin-top:10px}
 .plan-physical{display:inline-flex;align-items:center;gap:5px;background:rgba(201,146,42,.1);color:var(--gold);font-size:11px;font-weight:700;padding:3px 10px;border-radius:8px;margin-bottom:8px}
 .plan.featured .plan-physical{background:rgba(201,146,42,.15);color:#f9c86a}
 
@@ -1686,8 +1688,10 @@ textarea.form-input{resize:vertical;min-height:80px}
           <div class="pf"><span class="pf-check">✓</span> 30-day content calendar</div>
           <div class="pf"><span class="pf-check">✓</span> Canva editable files</div>
         </div>
-        <a href="mailto:marketing@qubicaamf.com?subject=Starter%20Plan%20Inquiry%20-%20Personalized%20Consultation&body=I'm%20interested%20in%20the%20Starter%20plan%20(%2429%2Fmo).%20Please%20send%20more%20info%20and%20schedule%20a%20consultation." class="btn btn-ghost" style="width:100%;padding:12px;border-radius:9px;font-size:14px;font-weight:700;text-align:center;display:block">Get Started</a>
-        <div style="text-align:center;font-size:11px;color:rgba(255,255,255,.35);margin-top:8px">Request your personalized consultation</div>
+        <div class="plan-cta">
+          <a href="mailto:marketing@qubicaamf.com?subject=Starter%20Plan%20Inquiry%20-%20Personalized%20Consultation&body=I'm%20interested%20in%20the%20Starter%20plan%20(%2429%2Fmo).%20Please%20send%20more%20info%20and%20schedule%20a%20consultation." class="btn btn-ghost" style="width:100%;padding:14px;border-radius:10px;font-size:14px;font-weight:700;text-align:center;display:block">Select Starter</a>
+          <div class="plan-consult">Request your personalized consultation</div>
+        </div>
       </div>
 
       <!-- Pro (Featured) -->
@@ -1707,8 +1711,10 @@ textarea.form-input{resize:vertical;min-height:80px}
           <div class="pf"><span class="pf-check">✓</span> 4 email templates</div>
           <div class="pf"><span class="pf-check">✓</span> Priority email support</div>
         </div>
-        <a href="mailto:marketing@qubicaamf.com?subject=Pro%20Plan%20Inquiry%20-%20Personalized%20Consultation&body=I'm%20interested%20in%20the%20Pro%20plan%20(%2459%2Fmo)%20with%20printed%20materials.%20Please%20send%20more%20info%20and%20schedule%20a%20consultation." class="btn btn-red" style="width:100%;padding:12px;border-radius:9px;font-size:14px;font-weight:700;text-align:center;display:block">Get Started</a>
-        <div style="text-align:center;font-size:11px;color:rgba(255,255,255,.35);margin-top:8px">Request your personalized consultation</div>
+        <div class="plan-cta">
+          <a href="mailto:marketing@qubicaamf.com?subject=Pro%20Plan%20Inquiry%20-%20Personalized%20Consultation&body=I'm%20interested%20in%20the%20Pro%20plan%20(%2459%2Fmo)%20with%20printed%20materials.%20Please%20send%20more%20info%20and%20schedule%20a%20consultation." class="btn btn-red" style="width:100%;padding:14px;border-radius:10px;font-size:14px;font-weight:700;text-align:center;display:block">Select Pro</a>
+          <div class="plan-consult">Request your personalized consultation</div>
+        </div>
       </div>
 
       <!-- Center Pack -->
@@ -1727,8 +1733,10 @@ textarea.form-input{resize:vertical;min-height:80px}
           <div class="pf"><span class="pf-check">✓</span> Dedicated account manager</div>
           <div class="pf"><span class="pf-check">✓</span> Bulk center discount available</div>
         </div>
-        <a href="mailto:marketing@qubicaamf.com?subject=Center%20Pack%20Inquiry%20-%20Personalized%20Consultation&body=I'm%20interested%20in%20the%20Center%20Pack%20(%2499%2Fmo)%20for%20my%20bowling%20center.%20Please%20send%20more%20info%20and%20schedule%20a%20consultation." class="btn btn-ghost" style="width:100%;padding:12px;border-radius:9px;font-size:14px;font-weight:700;text-align:center;display:block">Get Started</a>
-        <div style="text-align:center;font-size:11px;color:rgba(255,255,255,.35);margin-top:8px">Request your personalized consultation</div>
+        <div class="plan-cta">
+          <a href="mailto:marketing@qubicaamf.com?subject=Center%20Pack%20Inquiry%20-%20Personalized%20Consultation&body=I'm%20interested%20in%20the%20Center%20Pack%20(%2499%2Fmo)%20for%20my%20bowling%20center.%20Please%20send%20more%20info%20and%20schedule%20a%20consultation." class="btn btn-ghost" style="width:100%;padding:14px;border-radius:10px;font-size:14px;font-weight:700;text-align:center;display:block">Select Center Pack</a>
+          <div class="plan-consult">Request your personalized consultation</div>
+        </div>
       </div>
     </div>
   </div>
