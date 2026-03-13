@@ -6,8 +6,9 @@
  * colors, and all variants) and writes them to products.json for the storefront.
  *
  * Usage:
- *   npm run sync         # Sync from live Printify API (requires .env)
- *   npm run sync:demo    # Generate demo product data for preview
+ *   npm run sync              # Sync from live Printify API (requires .env)
+ *   npm run sync:demo         # Generate demo data (auto-switches to live if credentials exist)
+ *   npm run sync:force-demo   # Force demo data even with API credentials present
  */
 
 require('dotenv').config();
@@ -17,7 +18,12 @@ const path = require('path');
 
 const PRINTIFY_BASE = 'api.printify.com';
 const OUTPUT_FILE = path.join(__dirname, 'products.json');
-const IS_DEMO = process.argv.includes('--demo');
+const FORCE_DEMO = process.argv.includes('--force-demo');
+const DEMO_REQUESTED = process.argv.includes('--demo') || FORCE_DEMO;
+
+// Auto-detect: if credentials exist and demo was requested without --force-demo, use live sync
+const HAS_CREDENTIALS = !!(process.env.PRINTIFY_API_TOKEN && process.env.PRINTIFY_SHOP_ID);
+const IS_DEMO = FORCE_DEMO || (DEMO_REQUESTED && !HAS_CREDENTIALS);
 
 // ─── Printify API helper ────────────────────────────────────────────────────
 
@@ -417,6 +423,11 @@ async function main() {
   console.log('╚══════════════════════════════════════╝\n');
 
   let products;
+
+  if (DEMO_REQUESTED && HAS_CREDENTIALS && !FORCE_DEMO) {
+    console.log('⚡ API credentials detected — switching to live sync.');
+    console.log('   Use --force-demo to generate demo data anyway.\n');
+  }
 
   if (IS_DEMO) {
     products = generateDemoProducts();

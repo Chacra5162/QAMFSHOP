@@ -4,7 +4,8 @@
   "description": "QubicaAMF Official Merch Store - Printify sync and storefront",
   "scripts": {
     "sync": "node sync-printify.js",
-    "sync:demo": "node sync-printify.js --demo"
+    "sync:demo": "node sync-printify.js --demo",
+    "sync:force-demo": "node sync-printify.js --force-demo"
   },
   "dependencies": {
     "dotenv": "^16.4.7"
