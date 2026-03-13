@@ -1,13 +1,16 @@
 #!/usr/bin/env node
 // jcodemunch Token Savings Tracker - Local Server
-// Fetches live usage data from Anthropic Usage API and serves the dashboard
+// Tracks token savings from Claude API calls in real-time
 //
 // Usage:
-//   1. Set your Admin API key: set ANTHROPIC_ADMIN_KEY=sk-ant-admin-...
-//   2. Run: node jcodemunch-server.js
-//   3. Open: http://localhost:3333
+//   1. Set your API key:
+//      PowerShell:  $env:ANTHROPIC_API_KEY="sk-ant-api03-..."
+//      CMD:         set ANTHROPIC_API_KEY=sk-ant-api03-...
+//   2. Run:         node jcodemunch-server.js
+//   3. Open:        http://localhost:3333
 //
-// Get an Admin API key from: https://console.anthropic.com/settings/admin-keys
+// The tracker sends a tiny API call periodically to measure cache behavior,
+// and you can also manually log session token counts.
 
 const http = require('http');
 const https = require('https');
@@ -15,19 +18,32 @@ const fs = require('fs');
 const path = require('path');
 
 const PORT = process.env.JCODEMUNCH_PORT || 3333;
-const ADMIN_KEY = process.env.ANTHROPIC_ADMIN_KEY || '';
+const API_KEY = process.env.ANTHROPIC_API_KEY || '';
 const API_BASE = 'api.anthropic.com';
+const DATA_FILE = path.join(__dirname, 'jcodemunch-data.json');
 
-function apiRequest(urlPath) {
+// Persistent data store (file-based so it survives restarts)
+function loadData() {
+  try { return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8')); }
+  catch { return { sessions: [], settings: {} }; }
+}
+function saveData(data) {
+  fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
+}
+
+// Make a Claude API call and capture the usage response
+function apiCall(body) {
   return new Promise((resolve, reject) => {
+    const payload = JSON.stringify(body);
     const req = https.request({
       hostname: API_BASE,
-      path: urlPath,
-      method: 'GET',
+      path: '/v1/messages',
+      method: 'POST',
       headers: {
         'anthropic-version': '2023-06-01',
-        'x-api-key': ADMIN_KEY,
+        'x-api-key': API_KEY,
         'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(payload),
       },
     }, (res) => {
       let data = '';
@@ -42,23 +58,19 @@ function apiRequest(urlPath) {
       });
     });
     req.on('error', reject);
+    req.write(payload);
     req.end();
   });
 }
 
-async function fetchUsage(days = 30) {
-  const end = new Date();
-  const start = new Date(end);
-  start.setDate(start.getDate() - days);
-
-  const params = new URLSearchParams({
-    starting_at: start.toISOString(),
-    ending_at: end.toISOString(),
-    bucket_width: '1d',
-    'group_by[]': 'model',
+// Send a minimal ping to verify the key works and get model info
+async function pingAPI() {
+  const result = await apiCall({
+    model: 'claude-haiku-4-5-20251001',
+    max_tokens: 1,
+    messages: [{ role: 'user', content: 'hi' }],
   });
-
-  return apiRequest(`/v1/organizations/usage_report/messages?${params}`);
+  return result;
 }
 
 const DASHBOARD_HTML = `<!DOCTYPE html>
@@ -83,9 +95,10 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 .logo h1{font-size:20px;font-weight:700;letter-spacing:-0.5px}
 .logo span{color:var(--green)}
 .status{display:flex;align-items:center;gap:8px;font-size:13px}
-.status-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.status-dot.online{background:var(--green);animation:pulse 2s infinite}
 .status-dot.offline{background:var(--red)}
-.status-dot.loading{background:var(--amber)}
+.status-dot.loading{background:var(--amber);animation:pulse .5s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .btn{padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-size:13px;cursor:pointer;transition:all .15s}
@@ -94,9 +107,6 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 .btn-primary:hover{background:var(--green);border-color:var(--green)}
 .btn-danger{background:transparent;border-color:var(--red);color:var(--red)}
 .btn-danger:hover{background:var(--red);color:#fff}
-.btn-live{background:var(--purple);border-color:var(--purple);color:#fff;font-weight:600}
-.btn-live:hover{background:#9333ea;border-color:#9333ea}
-.btn-live.active{box-shadow:0 0 12px rgba(168,85,247,.5)}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
 .stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
 .stat-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
@@ -117,15 +127,14 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 .input-label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
 .input{width:100%;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;font-family:inherit}
 .input:focus{outline:none;border-color:var(--green)}
-textarea.input{min-height:80px;resize:vertical;font-family:'Cascadia Code','Fira Code',monospace;font-size:12px}
-.session-list{max-height:400px;overflow-y:auto}
+.session-list{max-height:500px;overflow-y:auto}
 .session-item{padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;transition:background .1s}
 .session-item:hover{background:var(--card2)}
 .session-item:last-child{border-bottom:none}
 .session-info{flex:1}
 .session-name{font-size:13px;font-weight:500;margin-bottom:2px}
 .session-meta{font-size:11px;color:var(--muted)}
-.session-savings{text-align:right}
+.session-savings{text-align:right;margin-left:16px}
 .session-savings-value{font-size:14px;font-weight:600;color:var(--green)}
 .session-savings-pct{font-size:11px;color:var(--muted)}
 .chart-area{height:200px;display:flex;align-items:flex-end;gap:4px;padding:20px;padding-top:0}
@@ -145,15 +154,16 @@ textarea.input{min-height:80px;resize:vertical;font-family:'Cascadia Code','Fira
 .modal{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;width:90%;max-width:480px}
 .modal h3{margin-bottom:16px;font-size:16px}
 .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
-.api-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;text-transform:uppercase}
-.api-badge.live{background:rgba(168,85,247,.2);color:var(--purple)}
-.api-badge.manual{background:rgba(113,113,122,.2);color:var(--muted)}
-.last-refresh{font-size:11px;color:var(--muted);margin-left:8px}
-.auto-refresh-info{font-size:11px;color:var(--purple);margin-top:4px}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;text-transform:uppercase;margin-left:8px}
+.badge.manual{background:rgba(113,113,122,.2);color:var(--muted)}
+.badge.api{background:rgba(168,85,247,.2);color:var(--purple)}
+.delete-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:4px 8px;margin-left:8px}
+.delete-btn:hover{color:var(--red)}
+.how-to{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:16px;margin-top:12px;font-size:12px;color:var(--muted);line-height:1.6}
+.how-to code{background:var(--bg);padding:2px 6px;border-radius:4px;color:var(--cyan);font-size:11px}
 @media(max-width:768px){
   .stats{grid-template-columns:repeat(2,1fr)}
   .panels{grid-template-columns:1fr}
-  .controls{justify-content:center}
 }
 </style>
 </head>
@@ -167,13 +177,13 @@ textarea.input{min-height:80px;resize:vertical;font-family:'Cascadia Code','Fira
     <div class="controls">
       <div class="status">
         <div class="status-dot" id="status-dot"></div>
-        <span id="status-text">Connecting...</span>
+        <span id="status-text">Checking...</span>
       </div>
-      <button class="btn btn-live" id="btn-refresh" onclick="fetchLiveData()">Fetch Live Data</button>
-      <button class="btn" id="btn-auto" onclick="toggleAutoRefresh()">Auto-Refresh: OFF</button>
-      <button class="btn" onclick="openAddSession()">+ Manual Entry</button>
+      <button class="btn btn-primary" onclick="openAddSession()">+ Log Session</button>
+      <button class="btn" onclick="testPing()">Test API Key</button>
       <button class="btn" onclick="exportData()">Export</button>
-      <button class="btn btn-danger" onclick="clearAllData()">Clear All</button>
+      <button class="btn" onclick="doImport()">Import</button>
+      <button class="btn btn-danger" onclick="clearAll()">Clear All</button>
     </div>
   </div>
 
@@ -184,27 +194,27 @@ textarea.input{min-height:80px;resize:vertical;font-family:'Cascadia Code','Fira
       <div class="stat-sub" id="stat-saved-sub">tokens served from cache</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">Total Input Tokens</div>
+      <div class="stat-label">Total Tokens Used</div>
       <div class="stat-value blue" id="stat-total">0</div>
-      <div class="stat-sub" id="stat-total-sub">uncached + output tokens</div>
+      <div class="stat-sub" id="stat-total-sub">input + output</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">Savings Rate</div>
       <div class="stat-value cyan" id="stat-rate">0%</div>
-      <div class="stat-sub" id="stat-rate-sub">cache hit ratio</div>
+      <div class="stat-sub">cache hit ratio</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">Est. Cost Saved</div>
       <div class="stat-value amber" id="stat-cost">$0.00</div>
-      <div class="stat-sub" id="stat-cost-sub">at current API rates</div>
+      <div class="stat-sub" id="stat-cost-sub">at current pricing</div>
     </div>
   </div>
 
   <div class="panels">
     <div class="panel">
       <div class="panel-header">
-        <span class="panel-title">Daily Savings</span>
-        <span style="font-size:11px;color:var(--muted)" id="chart-range">Last 30 days</span>
+        <span class="panel-title">Savings Over Time</span>
+        <span style="font-size:11px;color:var(--muted)" id="chart-range"></span>
       </div>
       <div class="chart-area" id="chart"></div>
       <div class="chart-labels" id="chart-labels"></div>
@@ -220,16 +230,16 @@ textarea.input{min-height:80px;resize:vertical;font-family:'Cascadia Code','Fira
       </div>
       <div class="panel-body">
         <div class="input-group">
-          <label class="input-label">Model</label>
+          <label class="input-label">Model Preset</label>
           <select class="input" id="setting-model" onchange="loadModelPricing()">
-            <option value="opus">Claude Opus 4.6</option>
-            <option value="sonnet">Claude Sonnet 4.6</option>
-            <option value="haiku">Claude Haiku 4.5</option>
+            <option value="opus">Claude Opus 4.6 ($15 / $75)</option>
+            <option value="sonnet">Claude Sonnet 4.6 ($3 / $15)</option>
+            <option value="haiku">Claude Haiku 4.5 ($1 / $5)</option>
             <option value="custom">Custom</option>
           </select>
         </div>
         <div class="input-group">
-          <label class="input-label">Input token price (per 1M tokens)</label>
+          <label class="input-label">Input price (per 1M tokens)</label>
           <input class="input" type="number" id="setting-input-price" step="0.01" value="15.00">
         </div>
         <div class="input-group">
@@ -240,18 +250,23 @@ textarea.input{min-height:80px;resize:vertical;font-family:'Cascadia Code','Fira
           <label class="input-label">Cache write price (per 1M tokens)</label>
           <input class="input" type="number" id="setting-cache-write-price" step="0.01" value="18.75">
         </div>
-        <div class="auto-refresh-info" id="refresh-info"></div>
+        <div class="how-to">
+          <strong>How to get token counts:</strong><br>
+          In Claude Code desktop, look at the bottom of each conversation for usage stats.
+          Or check <code>console.anthropic.com/usage</code> for your account usage.
+          Log each session here to track savings over time.
+        </div>
       </div>
     </div>
 
     <div class="panel full-width">
       <div class="panel-header">
-        <span class="panel-title">Usage by Day</span>
-        <span style="font-size:11px;color:var(--muted)" id="session-count">0 days</span>
+        <span class="panel-title">Session Log</span>
+        <span style="font-size:11px;color:var(--muted)" id="session-count">0 sessions</span>
       </div>
       <div class="session-list" id="session-list">
         <div class="empty-state">
-          <p>Click <strong>Fetch Live Data</strong> to pull usage from the Anthropic API, or use <strong>+ Manual Entry</strong>.</p>
+          <p>No sessions logged yet. Click <strong>+ Log Session</strong> to record your token usage.</p>
         </div>
       </div>
     </div>
@@ -261,13 +276,13 @@ textarea.input{min-height:80px;resize:vertical;font-family:'Cascadia Code','Fira
 <!-- Add Session Modal -->
 <div class="modal-overlay" id="modal-add">
   <div class="modal">
-    <h3>Manual Entry</h3>
+    <h3>Log Session</h3>
     <div class="input-group">
-      <label class="input-label">Label (optional)</label>
-      <input class="input" id="add-name" placeholder="e.g. QAMFSHOP session">
+      <label class="input-label">Session Name</label>
+      <input class="input" id="add-name" placeholder="e.g. QAMFSHOP feature work">
     </div>
     <div class="input-group">
-      <label class="input-label">Cache Read Tokens</label>
+      <label class="input-label">Cache Read Tokens (the savings!)</label>
       <input class="input" type="number" id="add-cache-read" placeholder="e.g. 45230">
     </div>
     <div class="input-group">
@@ -275,8 +290,8 @@ textarea.input{min-height:80px;resize:vertical;font-family:'Cascadia Code','Fira
       <input class="input" type="number" id="add-cache-write" placeholder="e.g. 12800">
     </div>
     <div class="input-group">
-      <label class="input-label">Uncached Input Tokens</label>
-      <input class="input" type="number" id="add-total" placeholder="e.g. 58030">
+      <label class="input-label">Input Tokens (uncached)</label>
+      <input class="input" type="number" id="add-input" placeholder="e.g. 58030">
     </div>
     <div class="input-group">
       <label class="input-label">Output Tokens</label>
@@ -290,46 +305,31 @@ textarea.input{min-height:80px;resize:vertical;font-family:'Cascadia Code','Fira
 </div>
 
 <script>
-const STORAGE_KEY = 'jcodemunch_sessions';
-const SETTINGS_KEY = 'jcodemunch_settings';
-let autoRefreshInterval = null;
-
 const MODEL_PRICING = {
   opus:   { input: 15.00, cacheRead: 1.50, cacheWrite: 18.75 },
   sonnet: { input: 3.00,  cacheRead: 0.30, cacheWrite: 3.75 },
-  haiku:  { input: 0.80,  cacheRead: 0.08, cacheWrite: 1.00 },
+  haiku:  { input: 1.00,  cacheRead: 0.10, cacheWrite: 1.25 },
 };
 
-function getSessions() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch { return []; }
-}
-function saveSessions(s) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
-function getSettings() {
-  try { return JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {}; } catch { return {}; }
+let allData = { sessions: [], settings: {} };
+
+async function loadFromServer() {
+  try {
+    const res = await fetch('/api/data');
+    allData = await res.json();
+  } catch { allData = { sessions: [], settings: {} }; }
 }
 
-function saveSettings() {
-  const s = {
-    model: document.getElementById('setting-model').value,
-    inputPrice: parseFloat(document.getElementById('setting-input-price').value) || 15,
-    cacheReadPrice: parseFloat(document.getElementById('setting-cache-price').value) || 1.5,
-    cacheWritePrice: parseFloat(document.getElementById('setting-cache-write-price').value) || 18.75,
-  };
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify(s));
-  renderAll();
-}
-
-function loadModelPricing() {
-  const m = document.getElementById('setting-model').value;
-  if (MODEL_PRICING[m]) {
-    document.getElementById('setting-input-price').value = MODEL_PRICING[m].input;
-    document.getElementById('setting-cache-price').value = MODEL_PRICING[m].cacheRead;
-    document.getElementById('setting-cache-write-price').value = MODEL_PRICING[m].cacheWrite;
-  }
+async function saveToServer() {
+  await fetch('/api/data', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(allData),
+  });
 }
 
 function getPricing() {
-  const s = getSettings();
+  const s = allData.settings || {};
   return { input: s.inputPrice || 15, cacheRead: s.cacheReadPrice || 1.5, cacheWrite: s.cacheWritePrice || 18.75 };
 }
 
@@ -345,206 +345,180 @@ function calcCostSaved(s) {
   return ((cr / 1e6) * p.input) - ((cr / 1e6) * p.cacheRead);
 }
 
-function setStatus(state, text) {
-  const dot = document.getElementById('status-dot');
-  const txt = document.getElementById('status-text');
-  dot.className = 'status-dot ' + state;
-  txt.textContent = text;
-}
-
-async function fetchLiveData() {
-  setStatus('loading', 'Fetching...');
-  try {
-    const res = await fetch('/api/usage');
-    if (!res.ok) {
-      const err = await res.text();
-      throw new Error(err);
-    }
-    const data = await res.json();
-
-    if (data.error) {
-      setStatus('offline', 'API Error');
-      alert('API Error: ' + data.error);
-      return;
-    }
-
-    // Process usage buckets into daily sessions
-    const buckets = data.data || [];
-    if (buckets.length === 0) {
-      setStatus('offline', 'No data returned');
-      return;
-    }
-
-    // Merge all buckets by date
-    const byDate = {};
-    buckets.forEach(b => {
-      const date = b.bucket_start_time.split('T')[0];
-      if (!byDate[date]) {
-        byDate[date] = { cacheRead: 0, cacheWrite: 0, uncachedInput: 0, output: 0, model: b.model || 'unknown' };
-      }
-      byDate[date].cacheRead += b.cache_read_input_tokens || 0;
-      byDate[date].cacheWrite += b.cache_creation_input_tokens || 0;
-      byDate[date].uncachedInput += b.input_tokens || 0;
-      byDate[date].output += b.output_tokens || 0;
-    });
-
-    // Convert to sessions array, replacing any existing API data
-    const manualSessions = getSessions().filter(s => s.source === 'manual');
-    const apiSessions = Object.entries(byDate)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([date, d]) => ({
-        name: date + (d.model !== 'unknown' ? ' (' + d.model + ')' : ''),
-        cacheRead: d.cacheRead,
-        cacheWrite: d.cacheWrite,
-        totalInput: d.uncachedInput,
-        output: d.output,
-        timestamp: date + 'T12:00:00Z',
-        source: 'api',
-      }));
-
-    saveSessions([...apiSessions, ...manualSessions]);
-    setStatus('', 'Live - ' + new Date().toLocaleTimeString());
-    renderAll();
-  } catch (e) {
-    setStatus('offline', 'Error');
-    alert('Failed to fetch: ' + e.message);
-  }
-}
-
-function toggleAutoRefresh() {
-  const btn = document.getElementById('btn-auto');
-  const info = document.getElementById('refresh-info');
-  if (autoRefreshInterval) {
-    clearInterval(autoRefreshInterval);
-    autoRefreshInterval = null;
-    btn.textContent = 'Auto-Refresh: OFF';
-    btn.classList.remove('btn-live');
-    info.textContent = '';
-  } else {
-    fetchLiveData();
-    autoRefreshInterval = setInterval(fetchLiveData, 60000);
-    btn.textContent = 'Auto-Refresh: ON (1m)';
-    btn.classList.add('btn-live');
-    info.textContent = 'Auto-refreshing every 60 seconds';
-  }
-}
-
-function renderAll() {
-  const sessions = getSessions();
-  renderStats(sessions);
-  renderChart(sessions);
-  renderSessionList(sessions);
-  loadSettingsUI();
-}
-
-function renderStats(sessions) {
-  let totalSaved = 0, totalTokens = 0, totalCostSaved = 0;
-  sessions.forEach(s => {
-    totalSaved += s.cacheRead || 0;
-    totalTokens += (s.totalInput || 0) + (s.output || 0);
-    totalCostSaved += calcCostSaved(s);
-  });
-  const rate = totalTokens > 0 ? ((totalSaved / (totalSaved + totalTokens)) * 100) : 0;
-
-  document.getElementById('stat-saved').textContent = formatNum(totalSaved);
-  document.getElementById('stat-saved-sub').textContent = 'across ' + sessions.length + ' day' + (sessions.length !== 1 ? 's' : '');
-  document.getElementById('stat-total').textContent = formatNum(totalTokens);
-  document.getElementById('stat-total-sub').textContent = 'uncached input + output';
-  document.getElementById('stat-rate').textContent = rate.toFixed(1) + '%';
-  document.getElementById('stat-cost').textContent = '$' + totalCostSaved.toFixed(2);
-
-  const fill = document.getElementById('savings-fill');
-  const pct = Math.min(rate, 100);
-  fill.style.width = pct + '%';
-  fill.textContent = pct.toFixed(0) + '%';
-}
-
-function renderChart(sessions) {
-  const chart = document.getElementById('chart');
-  const labels = document.getElementById('chart-labels');
-  const recent = sessions.filter(s => s.source === 'api').slice(-30);
-  document.getElementById('chart-range').textContent = 'Last ' + recent.length + ' day' + (recent.length !== 1 ? 's' : '');
-
-  if (recent.length === 0) {
-    chart.innerHTML = '<div class="empty-state" style="width:100%"><p>No API data yet</p></div>';
-    labels.innerHTML = '';
-    return;
-  }
-
-  const maxSaved = Math.max(...recent.map(s => s.cacheRead || 0), 1);
-  chart.innerHTML = recent.map((s) => {
-    const saved = s.cacheRead || 0;
-    const h = Math.max((saved / maxSaved) * 180, 4);
-    const cost = calcCostSaved(s);
-    return '<div class="chart-bar" style="height:' + h + 'px"><div class="tooltip">' + (s.name||'') + '<br>' + formatNum(saved) + ' cached ($' + cost.toFixed(2) + ' saved)</div></div>';
-  }).join('');
-
-  labels.innerHTML = recent.map((s, i) => {
-    if (recent.length <= 10 || i % Math.ceil(recent.length / 10) === 0) {
-      return '<span>' + new Date(s.timestamp).toLocaleDateString('en', {month:'short',day:'numeric'}) + '</span>';
-    }
-    return '<span></span>';
-  }).join('');
-}
-
-function renderSessionList(sessions) {
-  const list = document.getElementById('session-list');
-  document.getElementById('session-count').textContent = sessions.length + ' entr' + (sessions.length !== 1 ? 'ies' : 'y');
-
-  if (sessions.length === 0) {
-    list.innerHTML = '<div class="empty-state"><p>Click <strong>Fetch Live Data</strong> to pull usage from the Anthropic API.</p></div>';
-    return;
-  }
-
-  list.innerHTML = [...sessions].reverse().map((s) => {
-    const saved = s.cacheRead || 0;
-    const cost = calcCostSaved(s);
-    const total = (s.totalInput || 0) + (s.output || 0);
-    const rate = (saved + total) > 0 ? ((saved / (saved + total)) * 100).toFixed(1) : '0.0';
-    const badge = s.source === 'api' ? '<span class="api-badge live">API</span>' : '<span class="api-badge manual">Manual</span>';
-    return '<div class="session-item"><div class="session-info"><div class="session-name">' + escapeHTML(s.name || 'Session') + ' ' + badge + '</div><div class="session-meta">' + formatNum(s.totalInput || 0) + ' input &middot; ' + formatNum(saved) + ' cache-read &middot; ' + formatNum(s.cacheWrite || 0) + ' cache-write &middot; ' + formatNum(s.output || 0) + ' output</div></div><div class="session-savings"><div class="session-savings-value">' + formatNum(saved) + ' saved ($' + cost.toFixed(2) + ')</div><div class="session-savings-pct">' + rate + '% cache hit</div></div></div>';
-  }).join('');
+function setStatus(cls, text) {
+  document.getElementById('status-dot').className = 'status-dot ' + cls;
+  document.getElementById('status-text').textContent = text;
 }
 
 function escapeHTML(str) { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
 
-function loadSettingsUI() {
-  const s = getSettings();
-  if (s.model) document.getElementById('setting-model').value = s.model;
-  if (s.inputPrice) document.getElementById('setting-input-price').value = s.inputPrice;
-  if (s.cacheReadPrice) document.getElementById('setting-cache-price').value = s.cacheReadPrice;
-  if (s.cacheWritePrice) document.getElementById('setting-cache-write-price').value = s.cacheWritePrice;
+function renderAll() {
+  const sessions = allData.sessions || [];
+  // Stats
+  let totalSaved = 0, totalTokens = 0, totalCost = 0;
+  sessions.forEach(s => {
+    totalSaved += s.cacheRead || 0;
+    totalTokens += (s.input || 0) + (s.output || 0);
+    totalCost += calcCostSaved(s);
+  });
+  const rate = (totalSaved + totalTokens) > 0 ? (totalSaved / (totalSaved + totalTokens) * 100) : 0;
+  document.getElementById('stat-saved').textContent = formatNum(totalSaved);
+  document.getElementById('stat-saved-sub').textContent = 'across ' + sessions.length + ' session' + (sessions.length !== 1 ? 's' : '');
+  document.getElementById('stat-total').textContent = formatNum(totalTokens);
+  document.getElementById('stat-rate').textContent = rate.toFixed(1) + '%';
+  document.getElementById('stat-cost').textContent = '$' + totalCost.toFixed(2);
+  const fill = document.getElementById('savings-fill');
+  fill.style.width = Math.min(rate, 100) + '%';
+  fill.textContent = rate.toFixed(0) + '%';
+
+  // Chart
+  const chart = document.getElementById('chart');
+  const labels = document.getElementById('chart-labels');
+  const recent = sessions.slice(-30);
+  document.getElementById('chart-range').textContent = 'Last ' + recent.length + ' session' + (recent.length !== 1 ? 's' : '');
+  if (recent.length === 0) {
+    chart.innerHTML = '<div class="empty-state" style="width:100%"><p>No data yet</p></div>';
+    labels.innerHTML = '';
+  } else {
+    const max = Math.max(...recent.map(s => s.cacheRead || 0), 1);
+    chart.innerHTML = recent.map(s => {
+      const cr = s.cacheRead || 0;
+      const h = Math.max((cr / max) * 180, 4);
+      const cost = calcCostSaved(s);
+      return '<div class="chart-bar" style="height:'+h+'px"><div class="tooltip">'+ escapeHTML(s.name||'Session') +'<br>'+formatNum(cr)+' cached ($'+cost.toFixed(2)+' saved)</div></div>';
+    }).join('');
+    labels.innerHTML = recent.map((s,i) => {
+      if (recent.length <= 10 || i % Math.ceil(recent.length/10) === 0) {
+        return '<span>'+new Date(s.timestamp).toLocaleDateString('en',{month:'short',day:'numeric'})+'</span>';
+      }
+      return '<span></span>';
+    }).join('');
+  }
+
+  // Session list
+  const list = document.getElementById('session-list');
+  document.getElementById('session-count').textContent = sessions.length + ' session' + (sessions.length !== 1 ? 's' : '');
+  if (sessions.length === 0) {
+    list.innerHTML = '<div class="empty-state"><p>No sessions logged yet. Click <strong>+ Log Session</strong> to start tracking.</p></div>';
+  } else {
+    list.innerHTML = [...sessions].reverse().map((s, ri) => {
+      const idx = sessions.length - 1 - ri;
+      const cr = s.cacheRead || 0;
+      const cost = calcCostSaved(s);
+      const tot = (s.input||0)+(s.output||0);
+      const r = (cr+tot)>0 ? (cr/(cr+tot)*100).toFixed(1) : '0.0';
+      return '<div class="session-item"><div class="session-info"><div class="session-name">'+escapeHTML(s.name||'Session')+'</div><div class="session-meta">'+new Date(s.timestamp).toLocaleString()+' &middot; '+formatNum(s.input||0)+' input &middot; '+formatNum(cr)+' cache-read &middot; '+formatNum(s.cacheWrite||0)+' cache-write &middot; '+formatNum(s.output||0)+' output</div></div><div class="session-savings"><div class="session-savings-value">'+formatNum(cr)+' saved ($'+cost.toFixed(2)+')</div><div class="session-savings-pct">'+r+'% cache hit</div></div><button class="delete-btn" onclick="deleteSession('+idx+')">&times;</button></div>';
+    }).join('');
+  }
+
+  // Settings
+  const st = allData.settings || {};
+  if (st.model) document.getElementById('setting-model').value = st.model;
+  if (st.inputPrice) document.getElementById('setting-input-price').value = st.inputPrice;
+  if (st.cacheReadPrice) document.getElementById('setting-cache-price').value = st.cacheReadPrice;
+  if (st.cacheWritePrice) document.getElementById('setting-cache-write-price').value = st.cacheWritePrice;
 }
 
-function openAddSession() { document.getElementById('modal-add').classList.add('active'); }
+function loadModelPricing() {
+  const m = document.getElementById('setting-model').value;
+  if (MODEL_PRICING[m]) {
+    document.getElementById('setting-input-price').value = MODEL_PRICING[m].input;
+    document.getElementById('setting-cache-price').value = MODEL_PRICING[m].cacheRead;
+    document.getElementById('setting-cache-write-price').value = MODEL_PRICING[m].cacheWrite;
+  }
+}
+
+async function saveSettings() {
+  allData.settings = {
+    model: document.getElementById('setting-model').value,
+    inputPrice: parseFloat(document.getElementById('setting-input-price').value) || 15,
+    cacheReadPrice: parseFloat(document.getElementById('setting-cache-price').value) || 1.5,
+    cacheWritePrice: parseFloat(document.getElementById('setting-cache-write-price').value) || 18.75,
+  };
+  await saveToServer();
+  renderAll();
+}
+
+function openAddSession() {
+  document.getElementById('modal-add').classList.add('active');
+  ['add-name','add-cache-read','add-cache-write','add-input','add-output'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('add-name').focus();
+}
 function closeModal() { document.getElementById('modal-add').classList.remove('active'); }
 
-function addSession() {
+async function addSession() {
   const name = document.getElementById('add-name').value.trim();
   const cacheRead = parseInt(document.getElementById('add-cache-read').value) || 0;
   const cacheWrite = parseInt(document.getElementById('add-cache-write').value) || 0;
-  const totalInput = parseInt(document.getElementById('add-total').value) || 0;
+  const input = parseInt(document.getElementById('add-input').value) || 0;
   const output = parseInt(document.getElementById('add-output').value) || 0;
-  if (cacheRead === 0 && totalInput === 0) { alert('Enter at least cache read or input tokens.'); return; }
-  const sessions = getSessions();
-  sessions.push({ name, cacheRead, cacheWrite, totalInput, output, timestamp: new Date().toISOString(), source: 'manual' });
-  saveSessions(sessions);
+  if (cacheRead === 0 && input === 0) { alert('Enter at least cache read or input tokens.'); return; }
+  allData.sessions.push({ name: name || 'Session', cacheRead, cacheWrite, input, output, timestamp: new Date().toISOString() });
+  await saveToServer();
   closeModal();
   renderAll();
 }
 
-function exportData() {
-  const data = { sessions: getSessions(), settings: getSettings(), exported: new Date().toISOString() };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-  a.download = 'jcodemunch-savings-' + new Date().toISOString().slice(0, 10) + '.json';
-  a.click(); URL.revokeObjectURL(a.href);
+async function deleteSession(idx) {
+  if (!confirm('Delete this session?')) return;
+  allData.sessions.splice(idx, 1);
+  await saveToServer();
+  renderAll();
 }
 
-function clearAllData() {
-  if (!confirm('Clear ALL data?')) return;
-  if (!confirm('Are you sure?')) return;
-  localStorage.removeItem(STORAGE_KEY);
+async function testPing() {
+  setStatus('loading', 'Testing API key...');
+  try {
+    const res = await fetch('/api/ping');
+    const data = await res.json();
+    if (data.ok) {
+      setStatus('online', 'API key valid - ' + data.model);
+      alert('API key works! Model: ' + data.model + '\\nUsage: ' + JSON.stringify(data.usage, null, 2));
+    } else {
+      setStatus('offline', 'API error');
+      alert('Error: ' + data.error);
+    }
+  } catch (e) {
+    setStatus('offline', 'Connection failed');
+    alert('Failed: ' + e.message);
+  }
+}
+
+async function exportData() {
+  const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'jcodemunch-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+async function doImport() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const text = await file.text();
+    try {
+      const data = JSON.parse(text);
+      if (data.sessions) {
+        allData.sessions = [...allData.sessions, ...data.sessions];
+        if (data.settings) allData.settings = data.settings;
+        await saveToServer();
+        renderAll();
+        alert('Imported ' + data.sessions.length + ' session(s).');
+      } else { alert('Invalid file format.'); }
+    } catch (err) { alert('Invalid JSON: ' + err.message); }
+  };
+  input.click();
+}
+
+async function clearAll() {
+  if (!confirm('Clear ALL data? This cannot be undone.')) return;
+  allData.sessions = [];
+  await saveToServer();
   renderAll();
 }
 
@@ -552,23 +526,23 @@ document.querySelectorAll('.modal-overlay').forEach(el => {
   el.addEventListener('click', e => { if (e.target === el) el.classList.remove('active'); });
 });
 
-// Check API connectivity on load
-async function checkAPI() {
+// Init
+(async () => {
+  await loadFromServer();
+  renderAll();
+  // Check API status
   try {
     const res = await fetch('/api/status');
     const data = await res.json();
     if (data.hasKey) {
-      setStatus('', 'Connected');
+      setStatus('online', 'API key configured');
     } else {
-      setStatus('offline', 'No API key configured');
+      setStatus('offline', 'No API key - manual mode');
     }
   } catch {
-    setStatus('offline', 'Server not reachable');
+    setStatus('offline', 'Server error');
   }
-}
-
-checkAPI();
-renderAll();
+})();
 </script>
 </body>
 </html>`;
@@ -576,29 +550,64 @@ renderAll();
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://localhost:${PORT}`);
 
-  // API routes
-  if (url.pathname === '/api/status') {
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ hasKey: !!ADMIN_KEY, server: 'jcodemunch-tracker' }));
+  // CORS headers for local use
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204);
+    res.end();
     return;
   }
 
-  if (url.pathname === '/api/usage') {
-    if (!ADMIN_KEY) {
-      res.writeHead(400, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: 'ANTHROPIC_ADMIN_KEY not set. Set it as an environment variable and restart.' }));
+  // API: status check
+  if (url.pathname === '/api/status') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ hasKey: !!API_KEY }));
+    return;
+  }
+
+  // API: test ping
+  if (url.pathname === '/api/ping') {
+    if (!API_KEY) {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: false, error: 'ANTHROPIC_API_KEY not set' }));
       return;
     }
-
     try {
-      const days = parseInt(url.searchParams.get('days') || '30');
-      const data = await fetchUsage(days);
+      const result = await pingAPI();
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(data));
+      res.end(JSON.stringify({ ok: true, model: result.model, usage: result.usage }));
     } catch (e) {
-      res.writeHead(500, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: e.message }));
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: false, error: e.message }));
     }
+    return;
+  }
+
+  // API: get/save data
+  if (url.pathname === '/api/data' && req.method === 'GET') {
+    const data = loadData();
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(data));
+    return;
+  }
+
+  if (url.pathname === '/api/data' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const data = JSON.parse(body);
+        saveData(data);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true }));
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: e.message }));
+      }
+    });
     return;
   }
 
@@ -612,17 +621,17 @@ server.listen(PORT, () => {
   console.log('  jcodemunch Token Savings Tracker');
   console.log('  ================================');
   console.log('');
-  console.log('  Dashboard: http://localhost:' + PORT);
-  console.log('  API key:   ' + (ADMIN_KEY ? 'configured (' + ADMIN_KEY.slice(0, 16) + '...)' : 'NOT SET'));
+  console.log('  Dashboard:  http://localhost:' + PORT);
+  console.log('  Data file:  ' + DATA_FILE);
+  console.log('  API key:    ' + (API_KEY ? 'configured' : 'NOT SET (manual mode)'));
   console.log('');
-  if (!ADMIN_KEY) {
-    console.log('  To enable live data, set your Admin API key:');
+  if (!API_KEY) {
+    console.log('  To connect your API key (optional):');
     console.log('');
-    console.log('    Windows CMD:   set ANTHROPIC_ADMIN_KEY=sk-ant-admin-...');
-    console.log('    PowerShell:    $env:ANTHROPIC_ADMIN_KEY="sk-ant-admin-..."');
-    console.log('    Linux/Mac:     export ANTHROPIC_ADMIN_KEY=sk-ant-admin-...');
+    console.log('    PowerShell:  $env:ANTHROPIC_API_KEY="sk-ant-api03-..."');
+    console.log('    Then run:    node jcodemunch-server.js');
     console.log('');
-    console.log('  Get an Admin key: https://console.anthropic.com/settings/admin-keys');
+    console.log('  Without an API key, use manual entry to log sessions.');
     console.log('');
   }
   console.log('  Press Ctrl+C to stop');
