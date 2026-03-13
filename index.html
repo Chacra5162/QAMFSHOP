@@ -2160,10 +2160,22 @@ textarea.form-input{resize:vertical;min-height:80px}
   <div class="panel" id="panel-settings">
     <div class="settings-grid">
       <div class="settings-card">
-        <h4>Notification Email</h4>
-        <p>Email address for custom order notifications</p>
-        <div class="form-group" style="margin-bottom:12px">
+        <h4>Email Addresses</h4>
+        <p>Route notifications to the right team</p>
+        <div class="form-group" style="margin-bottom:10px">
+          <label>Order Notifications</label>
           <input type="email" class="form-input" id="setting-email" placeholder="orders@qubicaamf.com">
+          <span style="font-size:11px;color:var(--muted)">Custom fulfillment order alerts</span>
+        </div>
+        <div class="form-group" style="margin-bottom:10px">
+          <label>Marketing Help</label>
+          <input type="email" class="form-input" id="setting-email-marketing" placeholder="marketing@qubicaamf.com">
+          <span style="font-size:11px;color:var(--muted)">Marketing item inquiries &amp; consultation requests</span>
+        </div>
+        <div class="form-group" style="margin-bottom:12px">
+          <label>Tracking &amp; Sales Support</label>
+          <input type="email" class="form-input" id="setting-email-support" placeholder="support@qubicaamf.com">
+          <span style="font-size:11px;color:var(--muted)">Returns, exchanges, order tracking &amp; sales inquiries</span>
         </div>
         <button class="btn btn-primary btn-sm" onclick="saveSettings()">Save</button>
       </div>
@@ -3278,6 +3290,8 @@ let customProducts = [];
 let printifyProducts = [];
 let settings = {
   notification_email: 'orders@qubicaamf.com',
+  marketing_email: 'marketing@qubicaamf.com',
+  support_email: 'support@qubicaamf.com',
   categories: ['T-Shirts','Hoodies','Polos','Jackets','Hats & Caps','Bags','Drinkware','Equipment','Awards'],
   printify_token: '',
   printify_shop: '',
@@ -3626,6 +3640,8 @@ function deleteProduct(id) {
 // ═══════════════════════════════════════════════════════════════════════════
 function loadSettings() {
   document.getElementById('setting-email').value = settings.notification_email || '';
+  document.getElementById('setting-email-marketing').value = settings.marketing_email || '';
+  document.getElementById('setting-email-support').value = settings.support_email || '';
   document.getElementById('setting-printify-token').value = settings.printify_token || '';
   document.getElementById('setting-printify-shop').value = settings.printify_shop || '';
   document.getElementById('setting-store-name').value = settings.store_name || '';
@@ -3642,6 +3658,8 @@ function loadSettings() {
 
 function saveSettings() {
   settings.notification_email = document.getElementById('setting-email').value.trim();
+  settings.marketing_email = document.getElementById('setting-email-marketing').value.trim();
+  settings.support_email = document.getElementById('setting-email-support').value.trim();
   settings.printify_token = document.getElementById('setting-printify-token').value.trim();
   settings.printify_shop = document.getElementById('setting-printify-shop').value.trim();
   settings.store_name = document.getElementById('setting-store-name').value.trim();
@@ -4261,7 +4279,10 @@ function submitReturns(e) {
   formData.append('Reason', data.reason || 'Not specified');
   formData.append('_replyto', data.email);
   formData.append('_template', 'table');
-  fetch('https://formsubmit.co/ajax/support@qubicaamf.com', {
+  // Use support email from admin settings, fallback to default
+  let _supportEmail = 'support@qubicaamf.com';
+  try { const _ss = localStorage.getItem('qamf_admin_settings'); if (_ss) { const _se = JSON.parse(_ss).support_email; if (_se) _supportEmail = _se; } } catch(e) {}
+  fetch('https://formsubmit.co/ajax/' + encodeURIComponent(_supportEmail), {
     method: 'POST',
     body: formData
   }).then(resp => resp.json()).then(result => {
@@ -4280,7 +4301,7 @@ function submitReturns(e) {
   }).catch(() => {
     btn.disabled = false;
     btn.textContent = 'Submit Request';
-    showToast('Could not send request. Please try again or email support@qubicaamf.com directly.', 'error');
+    showToast('Could not send request. Please try again or email ' + _supportEmail + ' directly.', 'error');
   });
 }
 
