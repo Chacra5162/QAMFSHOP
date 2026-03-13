@@ -976,7 +976,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <h1>Gear Up.<br><mark>Strike Bold.</mark></h1>
       <p class="hero-desc">Official QubicaAMF merchandise for employees, bowling centers, and fans worldwide. Premium print-on-demand — delivered to your door.</p>
       <div class="hero-actions">
-        <button class="btn-hero solid" onclick="document.getElementById('product-grid').scrollIntoView({behavior:'smooth'})">Shop the Collection</button>
+        <button class="btn-hero solid" onclick="shopSeasonalCollection()">Shop the Collection</button>
         <button class="btn-hero ghost" onclick="document.getElementById('product-grid').scrollIntoView({behavior:'smooth'})">Browse All Products →</button>
       </div>
       <div class="hero-stats">
@@ -1147,7 +1147,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div class="sec-title" id="seasonal-title">Seasonal <em>Collection</em></div>
       <div class="sec-sub" id="seasonal-subtitle">Curated picks for the season</div>
     </div>
-    <a href="javascript:void(0)" class="sec-link" onclick="document.querySelectorAll('.header-nav a[data-nav-cat]').forEach(a=>a.classList.remove('active'));activeCategory='All';renderProducts(allProducts,'All');document.getElementById('product-grid').scrollIntoView({behavior:'smooth'})">View all products →</a>
+    <a href="javascript:void(0)" class="sec-link" onclick="shopSeasonalCollection()">Shop the Collection →</a>
   </div>
   <div id="seasonal-grid" class="seasonal-grid"></div>
 </div>
@@ -2743,9 +2743,17 @@ function renderProducts(products, category) {
   // Clear existing cards and empty messages
   grid.querySelectorAll('.pcard,.loading-state,.view-all-wrap').forEach(c => c.remove());
 
-  let filtered = category === 'All'
-    ? products
-    : products.filter(p => p.category === category);
+  let filtered;
+  if (category === '__seasonal') {
+    // Show only seasonal collection products
+    let scIds = [];
+    try { const ss = localStorage.getItem('qamf_admin_settings'); if (ss) scIds = JSON.parse(ss).seasonal?.product_ids || []; } catch(e) {}
+    filtered = scIds.map(id => products.find(p => p.id === id)).filter(Boolean);
+  } else {
+    filtered = category === 'All'
+      ? products
+      : products.filter(p => p.category === category);
+  }
 
   // Apply search filter
   if (searchQuery) {
@@ -3124,6 +3132,54 @@ function renderStoreLookbook(products) {
 }
 
 // ─── Render seasonal collection on the storefront ─────────────────────────────
+// ─── Shop seasonal collection — filters product grid to seasonal items only ──
+function shopSeasonalCollection() {
+  let sc = {};
+  try { const ss = localStorage.getItem('qamf_admin_settings'); if (ss) sc = JSON.parse(ss).seasonal || {}; } catch(e) {}
+  const ids = sc.product_ids || [];
+  if (ids.length === 0) {
+    // No seasonal products configured — just scroll to all products
+    document.getElementById('product-grid').scrollIntoView({ behavior: 'smooth' });
+    return;
+  }
+
+  // Clear search
+  searchQuery = '';
+  const searchInput = document.getElementById('store-search');
+  if (searchInput) searchInput.value = '';
+  const clearBtn = document.getElementById('search-clear-btn');
+  if (clearBtn) clearBtn.style.display = 'none';
+
+  // Deselect nav pills
+  document.querySelectorAll('.header-nav a[data-nav-cat]').forEach(a => a.classList.remove('active'));
+  document.querySelectorAll('.cats-inner button').forEach(b => b.classList.remove('active'));
+
+  activeCategory = '__seasonal';
+  renderProducts(allProducts, '__seasonal');
+
+  // Update section title
+  const secTitle = document.querySelector('#page-store .sec-title');
+  const secSub = document.querySelector('#page-store .sec-sub');
+  const title = sc.title || 'Seasonal Collection';
+  if (secTitle) {
+    const words = title.split(' ');
+    if (words.length > 1) {
+      secTitle.innerHTML = esc(words.slice(0, -1).join(' ')) + ' <em>' + esc(words[words.length - 1]) + '</em>';
+    } else {
+      secTitle.innerHTML = '<em>' + esc(title) + '</em>';
+    }
+  }
+  if (secSub) secSub.textContent = sc.desc || 'Curated picks for the season';
+
+  // Scroll to section head
+  const sectionHead = document.querySelector('#page-store .sec-head');
+  if (sectionHead) {
+    const headerH = document.querySelector('.header') ? document.querySelector('.header').offsetHeight : 72;
+    const y = sectionHead.getBoundingClientRect().top + window.pageYOffset - headerH - 16;
+    window.scrollTo({ top: y, behavior: 'smooth' });
+  }
+}
+
 function renderStoreSeasonal(products) {
   const section = document.getElementById('seasonal-section');
   const grid = document.getElementById('seasonal-grid');
