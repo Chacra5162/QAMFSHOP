@@ -391,8 +391,9 @@ body.view-admin button,body.view-admin input,body.view-admin select,body.view-ad
   .header-nav{display:none;position:absolute;top:56px;left:0;right:0;background:rgba(254,254,254,.98);backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,0,0,.04);flex-direction:column;padding:12px 16px;z-index:199;box-shadow:0 8px 32px rgba(0,0,0,.08)}
   .header-nav.mobile-open{display:flex}
   .h-search{display:none}
-  .search-input{width:120px;padding:8px 10px;font-size:12px}
-  .h-btn{padding:7px 12px;font-size:12px}
+  .search-input{width:100px;padding:8px 10px;font-size:12px}
+  #search-go-btn{padding:8px 10px}
+  .h-btn{padding:7px 10px;font-size:11px}
   .hero-copy{padding:28px 0}
   .hero h1{font-size:30px}
   .hero-desc{font-size:14px;margin-bottom:20px}
@@ -930,7 +931,13 @@ textarea.form-input{resize:vertical;min-height:80px}
       <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
     </button>
     <div class="header-right">
-      <input type="text" class="search-input" id="store-search" placeholder="Search merch..." aria-label="Search products">
+      <div style="display:flex;align-items:center;gap:0;position:relative">
+        <input type="text" class="search-input" id="store-search" placeholder="Search merch..." aria-label="Search products" style="border-radius:10px 0 0 10px;padding-right:32px">
+        <button id="search-go-btn" aria-label="Search" style="background:var(--dark);color:#fff;border:none;border-radius:0 10px 10px 0;padding:10px 14px;cursor:pointer;height:100%;display:flex;align-items:center;font-size:13px;font-weight:600;font-family:var(--font-body)">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke="#fff" stroke-width="2"/><path d="m21 21-4.35-4.35" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <button id="search-clear-btn" aria-label="Clear search" style="display:none;position:absolute;right:52px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:4px;line-height:1">&times;</button>
+      </div>
       <button class="h-btn outline" onclick="window.location.hash='admin'">Admin</button>
       <button class="h-btn primary" id="cart-toggle-btn" aria-label="Open cart">
         <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -3448,23 +3455,53 @@ function showToast(message, type) {
 // ═══════════════════════════════════════════════════════════════════════════
 // STORE SEARCH
 // ═══════════════════════════════════════════════════════════════════════════
+function executeSearch() {
+  const input = document.getElementById('store-search');
+  searchQuery = input.value.trim();
+  const clearBtn = document.getElementById('search-clear-btn');
+  if (clearBtn) clearBtn.style.display = searchQuery ? 'block' : 'none';
+  renderProducts(allProducts, activeCategory);
+  // Update section title to reflect search
+  const secTitle = document.querySelector('#page-store .sec-title');
+  const secSub = document.querySelector('#page-store .sec-sub');
+  if (searchQuery) {
+    if (secTitle) secTitle.innerHTML = 'Search Results';
+    if (secSub) secSub.textContent = 'Showing results for "' + esc(searchQuery) + '"';
+    // Scroll to results
+    const sectionHead = document.querySelector('#page-store .sec-head');
+    if (sectionHead) {
+      const headerH = document.querySelector('.header') ? document.querySelector('.header').offsetHeight : 72;
+      const y = sectionHead.getBoundingClientRect().top + window.pageYOffset - headerH - 16;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+  } else if (activeCategory === 'All') {
+    if (secTitle) secTitle.innerHTML = 'Featured <em>Drops</em>';
+    if (secSub) secSub.textContent = 'Handpicked from the latest collection';
+  }
+}
 let _storeSearchTimer = null;
 document.getElementById('store-search').addEventListener('input', function() {
-  searchQuery = this.value.trim();
   clearTimeout(_storeSearchTimer);
-  _storeSearchTimer = setTimeout(() => {
-    renderProducts(allProducts, activeCategory);
-    // Update section title to reflect search
-    const secTitle = document.querySelector('#page-store .sec-title');
-    const secSub = document.querySelector('#page-store .sec-sub');
-    if (searchQuery) {
-      if (secTitle) secTitle.innerHTML = 'Search Results';
-      if (secSub) secSub.textContent = 'Showing results for "' + esc(searchQuery) + '"';
-    } else if (activeCategory === 'All') {
-      if (secTitle) secTitle.innerHTML = 'Featured <em>Drops</em>';
-      if (secSub) secSub.textContent = 'Handpicked from the latest collection';
-    }
-  }, 200);
+  _storeSearchTimer = setTimeout(executeSearch, 300);
+});
+document.getElementById('store-search').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') { e.preventDefault(); clearTimeout(_storeSearchTimer); executeSearch(); }
+});
+document.getElementById('search-go-btn').addEventListener('click', function() {
+  clearTimeout(_storeSearchTimer);
+  executeSearch();
+});
+document.getElementById('search-clear-btn').addEventListener('click', function() {
+  document.getElementById('store-search').value = '';
+  this.style.display = 'none';
+  searchQuery = '';
+  renderProducts(allProducts, activeCategory);
+  const secTitle = document.querySelector('#page-store .sec-title');
+  const secSub = document.querySelector('#page-store .sec-sub');
+  if (activeCategory === 'All') {
+    if (secTitle) secTitle.innerHTML = 'Featured <em>Drops</em>';
+    if (secSub) secSub.textContent = 'Handpicked from the latest collection';
+  }
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
