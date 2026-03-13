@@ -896,7 +896,7 @@ textarea.form-input{resize:vertical;min-height:80px}
 <!-- HEADER -->
 <header class="header">
   <div class="header-inner">
-    <div class="logo">
+    <a href="#store" class="logo" style="text-decoration:none" onclick="activeCategory='All';if(allProducts.length)renderProducts(allProducts,'All');window.scrollTo({top:0,behavior:'smooth'})">
       <svg class="logo-mark" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="22" cy="22" r="21" stroke="#E8192C" stroke-width="2.2"/>
         <circle cx="22" cy="22" r="13.5" stroke="#E8192C" stroke-width="1.5" opacity=".35"/>
@@ -910,7 +910,7 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div class="logo-main">Qubica<em>AMF</em></div>
         <div class="logo-sub">Official Merch Store</div>
       </div>
-    </div>
+    </a>
 
     <nav class="header-nav">
       <a href="javascript:void(0)" class="active" data-nav-cat="All">Shop All</a>
@@ -929,7 +929,7 @@ textarea.form-input{resize:vertical;min-height:80px}
     </button>
     <div class="header-right">
       <input type="text" class="search-input" id="store-search" placeholder="Search merch..." aria-label="Search products">
-      <button class="h-btn outline" onclick="window.location.hash='admin'">Sign In</button>
+      <button class="h-btn outline" onclick="window.location.hash='admin'">Admin</button>
       <button class="h-btn primary" id="cart-toggle-btn" aria-label="Open cart">
         <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Cart
@@ -1204,12 +1204,14 @@ textarea.form-input{resize:vertical;min-height:80px}
       <a href="mailto:orders@qubicaamf.com?subject=Bulk%20%26%20Team%20Order%20Inquiry">Bulk &amp; Team Orders</a>
       <a href="https://www.qubicaamf.com/careers" target="_blank" rel="noopener">Careers</a>
       <a href="#marketing" onclick="setTimeout(()=>document.getElementById('pricing').scrollIntoView({behavior:'smooth'}),300)">Marketing Suite</a>
+      <a href="https://www.qubicaamf.com/privacy" target="_blank" rel="noopener">Privacy Policy</a>
+      <a href="https://www.qubicaamf.com/terms" target="_blank" rel="noopener">Terms of Service</a>
     </div>
   </div>
 </div>
 <div class="footer-bot">
   <div class="footer-bot-inner">
-    <p>© 2026 QubicaAMF Worldwide. All rights reserved. Fulfillment by Printify · Payments by Stripe.</p>
+    <p>© 2026 QubicaAMF Worldwide. All rights reserved. Fulfillment by Printify · Payments by Stripe. <a href="https://www.qubicaamf.com/privacy" target="_blank" rel="noopener" style="color:#999;text-decoration:underline">Privacy</a> · <a href="https://www.qubicaamf.com/terms" target="_blank" rel="noopener" style="color:#999;text-decoration:underline">Terms</a></p>
     <div class="pay-badges">
       <span style="font-size:11.5px;color:#999;margin-right:4px">Accepted:</span>
       <span class="pay-badge">VISA</span>
@@ -1288,6 +1290,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <span class="cart-total-price" id="cart-total-price">$0.00</span>
     </div>
     <button class="cart-checkout" id="cart-checkout-btn">Proceed to Checkout</button>
+    <button class="cart-clear" id="cart-clear-btn" style="width:100%;padding:10px;border:1.5px solid rgba(0,0,0,.08);border-radius:10px;background:transparent;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;margin-top:8px;transition:all .2s">Clear Cart</button>
   </div>
 </div>
 
@@ -1380,7 +1383,7 @@ textarea.form-input{resize:vertical;min-height:80px}
 
 <!-- NAV -->
 <nav>
-  <div class="nav-logo">
+  <a href="#store" class="nav-logo" style="text-decoration:none">
     <svg class="nav-logomark" viewBox="0 0 38 38" fill="none">
       <circle cx="19" cy="19" r="18" stroke="#E8192C" stroke-width="2"/>
       <circle cx="19" cy="19" r="11" stroke="#E8192C" stroke-width="1.4" opacity=".35"/>
@@ -1390,13 +1393,13 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div class="nav-brand">Qubica<span>AMF</span></div>
       <div class="nav-sub">Marketing Suite</div>
     </div>
-  </div>
+  </a>
   <div class="nav-links">
     <a href="#store" style="color:var(--red)">Merch Store</a>
     <a href="javascript:void(0)" onclick="document.getElementById('whats-inside').scrollIntoView({behavior:'smooth'})">What's Inside</a>
     <a href="javascript:void(0)" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">How It Works</a>
     <a href="javascript:void(0)" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">Pricing</a>
-    <a href="javascript:void(0)" onclick="document.getElementById('virtual-marketing-manager').scrollIntoView({behavior:'smooth'})">Digital Pack</a>
+    <a href="javascript:void(0)" onclick="document.getElementById('virtual-marketing-manager').scrollIntoView({behavior:'smooth'})">VMM</a>
     <a href="javascript:void(0)" onclick="document.getElementById('blog').scrollIntoView({behavior:'smooth'})">Blog</a>
   </div>
   <div class="nav-cta">
@@ -1595,7 +1598,7 @@ textarea.form-input{resize:vertical;min-height:80px}
         </div>
         <div class="hw-card">
           <span class="hw-icon">💳</span>
-          <div><div class="hw-label">Stripe Billing</div><div class="hw-sub">Auto-renews monthly, cancel anytime</div></div>
+          <div><div class="hw-label">Stripe Billing</div><div class="hw-sub">Auto-renews monthly, secure payments</div></div>
           <span class="hw-arrow">→</span>
         </div>
         <div class="hw-card">
@@ -1605,7 +1608,7 @@ textarea.form-input{resize:vertical;min-height:80px}
         </div>
         <div class="hw-month">
           <span class="hw-month-label">Current Theme</span>
-          <span class="hw-month-badge">🎳 Summer Strike Season</span>
+          <span class="hw-month-badge" id="seasonal-theme-badge">🎳 Spring Strike Season</span>
         </div>
       </div>
     </div>
@@ -1618,7 +1621,7 @@ textarea.form-input{resize:vertical;min-height:80px}
     <div class="reveal" style="text-align:center">
       <div class="sec-eyebrow" style="text-align:center">Simple, Transparent Pricing</div>
       <div class="sec-title" style="text-align:center">Pick your <em>plan</em></div>
-      <div class="sec-sub" style="text-align:center;margin:0 auto">Cancel or pause anytime. Annual plans save 20%.</div>
+      <div class="sec-sub" style="text-align:center;margin:0 auto">No long-term contracts. Annual plans save 20%.</div>
     </div>
     <div class="pricing-grid">
 
@@ -1626,7 +1629,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div class="plan reveal">
         <div class="plan-name">Starter</div>
         <div class="plan-price">$29<span>/mo</span></div>
-        <div class="plan-cadence">Billed monthly · Cancel anytime</div>
+        <div class="plan-cadence">Billed monthly</div>
         <div class="plan-divider"></div>
         <div class="plan-features">
           <div class="pf"><span class="pf-check">✓</span> 8 social media graphics</div>
@@ -1635,16 +1638,17 @@ textarea.form-input{resize:vertical;min-height:80px}
           <div class="pf"><span class="pf-check">✓</span> 30-day content calendar</div>
           <div class="pf"><span class="pf-check">✓</span> Canva editable files</div>
         </div>
-        <a href="mailto:marketing@qubicaamf.com?subject=Starter%20Plan%20Inquiry&body=I'm%20interested%20in%20the%20Starter%20plan%20(%2429%2Fmo).%20Please%20send%20more%20info." class="btn btn-ghost" style="width:100%;padding:12px;border-radius:9px;font-size:14px;font-weight:700;text-align:center;display:block">Get Started</a>
+        <a href="mailto:marketing@qubicaamf.com?subject=Starter%20Plan%20Inquiry%20-%20Personalized%20Consultation&body=I'm%20interested%20in%20the%20Starter%20plan%20(%2429%2Fmo).%20Please%20send%20more%20info%20and%20schedule%20a%20consultation." class="btn btn-ghost" style="width:100%;padding:12px;border-radius:9px;font-size:14px;font-weight:700;text-align:center;display:block">Get Started</a>
+        <div style="text-align:center;font-size:11px;color:rgba(255,255,255,.35);margin-top:8px">Request your personalized consultation</div>
       </div>
 
       <!-- Pro (Featured) -->
       <div class="plan featured reveal">
         <div class="plan-badge">Most Popular</div>
-        <div class="plan-physical">📦 Includes Printed Materials</div>
         <div class="plan-name">Pro</div>
+        <div class="plan-physical" style="margin-bottom:6px">📦 Includes Printed Materials</div>
         <div class="plan-price" style="color:#fff">$59<span>/mo</span></div>
-        <div class="plan-cadence">Billed monthly · Cancel anytime</div>
+        <div class="plan-cadence">Billed monthly</div>
         <div class="plan-divider"></div>
         <div class="plan-features">
           <div class="pf"><span class="pf-check">✓</span> Everything in Starter</div>
@@ -1655,7 +1659,8 @@ textarea.form-input{resize:vertical;min-height:80px}
           <div class="pf"><span class="pf-check">✓</span> 4 email templates</div>
           <div class="pf"><span class="pf-check">✓</span> Priority email support</div>
         </div>
-        <a href="mailto:marketing@qubicaamf.com?subject=Pro%20Plan%20Inquiry&body=I'm%20interested%20in%20the%20Pro%20plan%20(%2459%2Fmo)%20with%20printed%20materials.%20Please%20send%20more%20info." class="btn btn-red" style="width:100%;padding:12px;border-radius:9px;font-size:14px;font-weight:700;text-align:center;display:block">Start Pro Plan</a>
+        <a href="mailto:marketing@qubicaamf.com?subject=Pro%20Plan%20Inquiry%20-%20Personalized%20Consultation&body=I'm%20interested%20in%20the%20Pro%20plan%20(%2459%2Fmo)%20with%20printed%20materials.%20Please%20send%20more%20info%20and%20schedule%20a%20consultation." class="btn btn-red" style="width:100%;padding:12px;border-radius:9px;font-size:14px;font-weight:700;text-align:center;display:block">Get Started</a>
+        <div style="text-align:center;font-size:11px;color:rgba(255,255,255,.35);margin-top:8px">Request your personalized consultation</div>
       </div>
 
       <!-- Center Pack -->
@@ -1674,7 +1679,8 @@ textarea.form-input{resize:vertical;min-height:80px}
           <div class="pf"><span class="pf-check">✓</span> Dedicated account manager</div>
           <div class="pf"><span class="pf-check">✓</span> Bulk center discount available</div>
         </div>
-        <a href="mailto:marketing@qubicaamf.com?subject=Center%20Pack%20Inquiry&body=I'm%20interested%20in%20the%20Center%20Pack%20(%2499%2Fmo)%20for%20my%20bowling%20center.%20Please%20send%20more%20info." class="btn btn-ghost" style="width:100%;padding:12px;border-radius:9px;font-size:14px;font-weight:700;text-align:center;display:block">Contact Sales</a>
+        <a href="mailto:marketing@qubicaamf.com?subject=Center%20Pack%20Inquiry%20-%20Personalized%20Consultation&body=I'm%20interested%20in%20the%20Center%20Pack%20(%2499%2Fmo)%20for%20my%20bowling%20center.%20Please%20send%20more%20info%20and%20schedule%20a%20consultation." class="btn btn-ghost" style="width:100%;padding:12px;border-radius:9px;font-size:14px;font-weight:700;text-align:center;display:block">Get Started</a>
+        <div style="text-align:center;font-size:11px;color:rgba(255,255,255,.35);margin-top:8px">Request your personalized consultation</div>
       </div>
     </div>
   </div>
@@ -1706,9 +1712,9 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div class="vmm-price-row">
           <div class="vmm-price">$39<span>/mo</span></div>
         </div>
-        <div class="vmm-price-note">Billed monthly · No shipping costs · Cancel anytime</div>
+        <div class="vmm-price-note">Billed monthly · No shipping costs · Digital delivery</div>
         <div class="vmm-cta-row">
-          <a href="mailto:marketing@qubicaamf.com?subject=Virtual%20Marketing%20Manager%20Inquiry&body=I'm%20interested%20in%20the%20Digital%20Pack%20(%2439%2Fmo).%20Please%20send%20more%20info." class="btn btn-red btn-lg" style="text-align:center">Start Digital Pack</a>
+          <a href="mailto:marketing@qubicaamf.com?subject=Virtual%20Marketing%20Manager%20Inquiry&body=I'm%20interested%20in%20the%20Virtual%20Marketing%20Manager%20(%2439%2Fmo).%20Please%20send%20more%20info%20and%20schedule%20a%20consultation." class="btn btn-red btn-lg" style="text-align:center">Start VMM Plan</a>
           <button class="btn-outline-white" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">Compare Plans</button>
         </div>
       </div>
@@ -1971,7 +1977,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       </div>
       <div class="settings-card">
         <h4>Store Categories</h4>
-        <p>Categories available for custom products</p>
+        <p>Categories sync automatically from Printify. Custom categories below are for manually-added products only.</p>
         <div id="category-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px"></div>
         <div style="display:flex;gap:8px">
           <input type="text" class="form-input" id="new-category" placeholder="New category name" style="flex:1">
@@ -2003,6 +2009,48 @@ textarea.form-input{resize:vertical;min-height:80px}
           <input type="text" class="form-input" id="setting-announce" placeholder="Free shipping on orders over $75">
         </div>
         <button class="btn btn-secondary btn-sm" onclick="saveSettings()">Save</button>
+      </div>
+      <div class="settings-card">
+        <h4>Social Links</h4>
+        <p>Social media URLs displayed in the store footer</p>
+        <div class="form-group" style="margin-bottom:8px">
+          <label>X (Twitter)</label>
+          <input type="url" class="form-input" id="setting-social-x" placeholder="https://x.com/QubicaAMF">
+        </div>
+        <div class="form-group" style="margin-bottom:8px">
+          <label>LinkedIn</label>
+          <input type="url" class="form-input" id="setting-social-linkedin" placeholder="https://www.linkedin.com/company/qubicaamf">
+        </div>
+        <div class="form-group" style="margin-bottom:8px">
+          <label>Facebook</label>
+          <input type="url" class="form-input" id="setting-social-facebook" placeholder="https://www.facebook.com/QubicaAMF">
+        </div>
+        <div class="form-group" style="margin-bottom:12px">
+          <label>Instagram</label>
+          <input type="url" class="form-input" id="setting-social-instagram" placeholder="https://www.instagram.com/qubicaamf">
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="saveSettings()">Save</button>
+      </div>
+      <div class="settings-card">
+        <h4>Stripe / WooCommerce</h4>
+        <p>Payment and e-commerce integration (configured on WordPress)</p>
+        <div class="form-group" style="margin-bottom:8px">
+          <label>Stripe Public Key</label>
+          <input type="text" class="form-input" id="setting-stripe-pk" placeholder="pk_live_... (set in WooCommerce)">
+        </div>
+        <div class="form-group" style="margin-bottom:8px">
+          <label>WooCommerce Store URL</label>
+          <input type="url" class="form-input" id="setting-woo-url" placeholder="https://shop.qubicaamf.com">
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="saveSettings()">Save</button>
+        <div style="margin-top:12px;padding:12px;background:rgba(0,0,0,.03);border-radius:8px;font-size:12px;color:var(--muted)">
+          <strong>Integration Status</strong>
+          <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px">
+            <div id="status-printify" style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:#dc2626"></span> Printify: Not connected</div>
+            <div id="status-stripe" style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:#dc2626"></span> Stripe: Not connected</div>
+            <div id="status-woo" style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:#dc2626"></span> WooCommerce: Not connected</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -2847,9 +2895,23 @@ document.querySelectorAll('#page-marketing .reveal').forEach(el=>marketingObs.ob
 document.querySelectorAll('#page-marketing .nav-links a').forEach(a=>{
   a.addEventListener('click',function(e){
     document.querySelectorAll('.nav-links a').forEach(x=>x.style.color='');
-    this.style.color='var(--ink)';
+    this.style.color='var(--red)';
   });
 });
+
+// Auto-detect season for theme badge
+(function() {
+  const m = new Date().getMonth(); // 0-11
+  const seasons = [
+    { name: 'Winter', icon: '❄️', range: [11, 0, 1] },
+    { name: 'Spring', icon: '🌸', range: [2, 3, 4] },
+    { name: 'Summer', icon: '☀️', range: [5, 6, 7] },
+    { name: 'Fall', icon: '🍂', range: [8, 9, 10] }
+  ];
+  const s = seasons.find(s => s.range.includes(m)) || seasons[1];
+  const badge = document.getElementById('seasonal-theme-badge');
+  if (badge) badge.textContent = s.icon + ' ' + s.name + ' Strike Season';
+})();
 
 // Load marketing blog using shared loader
 loadBlogInto('marketing-blog-grid', true);
@@ -2868,7 +2930,13 @@ let settings = {
   printify_token: '',
   printify_shop: '',
   store_name: '',
-  announce_text: ''
+  announce_text: '',
+  social_x: 'https://x.com/QubicaAMF',
+  social_linkedin: 'https://www.linkedin.com/company/qubicaamf',
+  social_facebook: 'https://www.facebook.com/QubicaAMF',
+  social_instagram: 'https://www.instagram.com/qubicaamf',
+  stripe_pk: '',
+  woo_url: ''
 };
 let editingId = null; // null = add mode, string = editing existing
 
@@ -3196,6 +3264,14 @@ function loadSettings() {
   document.getElementById('setting-printify-shop').value = settings.printify_shop || '';
   document.getElementById('setting-store-name').value = settings.store_name || '';
   document.getElementById('setting-announce').value = settings.announce_text || '';
+  document.getElementById('setting-social-x').value = settings.social_x || '';
+  document.getElementById('setting-social-linkedin').value = settings.social_linkedin || '';
+  document.getElementById('setting-social-facebook').value = settings.social_facebook || '';
+  document.getElementById('setting-social-instagram').value = settings.social_instagram || '';
+  document.getElementById('setting-stripe-pk').value = settings.stripe_pk || '';
+  document.getElementById('setting-woo-url').value = settings.woo_url || '';
+  // Update integration status indicators
+  updateIntegrationStatus();
 }
 
 function saveSettings() {
@@ -3204,8 +3280,28 @@ function saveSettings() {
   settings.printify_shop = document.getElementById('setting-printify-shop').value.trim();
   settings.store_name = document.getElementById('setting-store-name').value.trim();
   settings.announce_text = document.getElementById('setting-announce').value.trim();
+  settings.social_x = document.getElementById('setting-social-x').value.trim();
+  settings.social_linkedin = document.getElementById('setting-social-linkedin').value.trim();
+  settings.social_facebook = document.getElementById('setting-social-facebook').value.trim();
+  settings.social_instagram = document.getElementById('setting-social-instagram').value.trim();
+  settings.stripe_pk = document.getElementById('setting-stripe-pk').value.trim();
+  settings.woo_url = document.getElementById('setting-woo-url').value.trim();
   localStorage.setItem('qamf_admin_settings', JSON.stringify(settings));
+  updateIntegrationStatus();
   showToast('Settings saved!', 'success');
+}
+
+function updateIntegrationStatus() {
+  const update = (id, connected, label) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const color = connected ? '#16a34a' : '#dc2626';
+    const status = connected ? 'Connected' : 'Not connected';
+    el.innerHTML = '<span style="width:8px;height:8px;border-radius:50%;background:' + color + ';display:inline-block"></span> ' + label + ': ' + status;
+  };
+  update('status-printify', !!(settings.printify_token && settings.printify_shop), 'Printify');
+  update('status-stripe', !!settings.stripe_pk, 'Stripe');
+  update('status-woo', !!settings.woo_url, 'WooCommerce');
 }
 
 function addCategory() {
@@ -3371,6 +3467,13 @@ document.getElementById('sort-select').addEventListener('change', function() {
 document.getElementById('cart-toggle-btn').addEventListener('click', openCartDrawer);
 document.getElementById('cart-drawer-close').addEventListener('click', closeCartDrawer);
 document.getElementById('cart-overlay').addEventListener('click', closeCartDrawer);
+document.getElementById('cart-clear-btn').addEventListener('click', function() {
+  if (!confirm('Clear all items from your cart?')) return;
+  localStorage.removeItem('qamf_cart');
+  updateCartBadge();
+  renderCartDrawer();
+  showToast('Cart cleared', 'success');
+});
 document.getElementById('cart-checkout-btn').addEventListener('click', function() {
   const cart = getCart();
   if (cart.length === 0) return;
@@ -3464,27 +3567,47 @@ document.querySelectorAll('.header-nav a[data-nav-cat]').forEach(link => {
   link.addEventListener('click', function(e) {
     e.preventDefault();
     const cat = this.dataset.navCat;
-    // Scroll to product grid
-    document.getElementById('product-grid').scrollIntoView({ behavior: 'smooth', block: 'start' });
     // Update active state on header nav
     document.querySelectorAll('.header-nav a[data-nav-cat]').forEach(a => a.classList.remove('active'));
     this.classList.add('active');
+    // Update section title based on selection
+    const secTitle = document.querySelector('#page-store .sec-title');
+    const secSub = document.querySelector('#page-store .sec-sub');
     // Handle "new" as a special filter for badge="new"
     if (cat === 'new') {
       activeCategory = 'All';
       const newProducts = allProducts.filter(p => p.badge === 'new');
       renderProducts(newProducts, 'All');
+      if (secTitle) secTitle.innerHTML = 'New <em>Arrivals</em>';
+      if (secSub) secSub.textContent = 'The latest additions to the collection';
       // Update pills
       document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
       const allPill = document.querySelector('.cat-pill');
       if (allPill) allPill.classList.add('active');
+    } else if (cat === 'All') {
+      activeCategory = 'All';
+      renderProducts(allProducts, 'All');
+      if (secTitle) secTitle.innerHTML = 'Featured <em>Drops</em>';
+      if (secSub) secSub.textContent = 'Handpicked from the latest collection';
+      document.querySelectorAll('.cat-pill').forEach(p => {
+        p.classList.toggle('active', p.textContent.trim().startsWith('All'));
+      });
     } else {
       activeCategory = cat;
       renderProducts(allProducts, cat);
+      if (secTitle) secTitle.innerHTML = esc(cat);
+      if (secSub) secSub.textContent = 'Browse our ' + cat.toLowerCase() + ' collection';
       // Sync category pills
       document.querySelectorAll('.cat-pill').forEach(p => {
         p.classList.toggle('active', p.textContent.trim().startsWith(cat));
       });
+    }
+    // Scroll to section title area (not past it)
+    const sectionHead = document.querySelector('#page-store .sec-head');
+    if (sectionHead) {
+      const headerH = document.querySelector('.header') ? document.querySelector('.header').offsetHeight : 72;
+      const y = sectionHead.getBoundingClientRect().top + window.pageYOffset - headerH - 16;
+      window.scrollTo({ top: y, behavior: 'smooth' });
     }
   });
 });
