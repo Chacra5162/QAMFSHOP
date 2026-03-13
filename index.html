@@ -977,7 +977,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <p class="hero-desc">Official QubicaAMF merchandise for employees, bowling centers, and fans worldwide. Premium print-on-demand — delivered to your door.</p>
       <div class="hero-actions">
         <button class="btn-hero solid" onclick="shopSeasonalCollection()">Shop the Collection</button>
-        <button class="btn-hero ghost" onclick="document.getElementById('product-grid').scrollIntoView({behavior:'smooth'})">Browse All Products →</button>
+        <button class="btn-hero ghost" onclick="searchQuery='';activeCategory='All';renderProducts(allProducts,'All');document.querySelectorAll('.cats-inner button').forEach(b=>b.classList.remove('active'));var ab=document.querySelector('.cats-inner button');if(ab)ab.classList.add('active');var sh=document.querySelector('#page-store .sec-head');if(sh){var hh=document.querySelector('.header')?document.querySelector('.header').offsetHeight:72;window.scrollTo({top:sh.getBoundingClientRect().top+window.pageYOffset-hh-16,behavior:'smooth'})}">Browse All Products →</button>
       </div>
       <div class="hero-stats">
         <div>
