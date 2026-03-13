@@ -792,6 +792,19 @@ body.view-admin button,body.view-admin input,body.view-admin select,body.view-ad
 .btn-icon{width:34px;height:34px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:10px;border:1.5px solid rgba(0,0,0,.06);background:var(--white);cursor:pointer;transition:all .2s}
 .btn-icon:hover{border-color:rgba(0,0,0,.15);background:var(--bg)}
 
+/* ─── FEATURED CARD ─── */
+.feat-card{background:var(--white);border:2px solid rgba(0,0,0,.06);border-radius:var(--radius);padding:12px;cursor:pointer;transition:all .2s;position:relative;text-align:center}
+.feat-card:hover{border-color:rgba(0,0,0,.15);transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.feat-card.selected{border-color:var(--red);background:rgba(232,25,44,.03)}
+.feat-card-img{width:100%;aspect-ratio:1;border-radius:10px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:40px;margin-bottom:10px;overflow:hidden}
+.feat-card-img img{width:100%;height:100%;object-fit:cover}
+.feat-card-name{font-size:12px;font-weight:600;color:var(--dark);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.feat-card-price{font-size:11px;color:var(--muted)}
+.feat-card-star{position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;background:var(--white);border:1.5px solid rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .2s}
+.feat-card.selected .feat-card-star{background:var(--red);border-color:var(--red);color:#fff}
+.feat-card-order{position:absolute;top:8px;left:8px;width:22px;height:22px;border-radius:50%;background:var(--red);color:#fff;font-size:10px;font-weight:800;display:none;align-items:center;justify-content:center}
+.feat-card.selected .feat-card-order{display:flex}
+
 /* ─── PRODUCT TABLE ─── */
 .product-table{background:var(--white);border-radius:var(--radius);border:1px solid rgba(0,0,0,.04);overflow:hidden}
 .pt-header{display:grid;grid-template-columns:40px 2.5fr 1fr 1fr 1fr 1fr 120px;padding:12px 20px;background:var(--bg);border-bottom:1px solid rgba(0,0,0,.04);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
@@ -1944,6 +1957,7 @@ textarea.form-input{resize:vertical;min-height:80px}
   <!-- TABS -->
   <div class="tabs">
     <button class="tab active" data-panel="products">Products</button>
+    <button class="tab" data-panel="featured">Featured Drops</button>
     <button class="tab" data-panel="settings">Settings</button>
     <button class="tab" data-panel="export">Export / Import</button>
   </div>
@@ -2014,6 +2028,33 @@ textarea.form-input{resize:vertical;min-height:80px}
           <p>Add a custom product or sync from Printify to get started.</p>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ FEATURED DROPS PANEL ═══════════ -->
+  <div class="panel" id="panel-featured">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div>
+        <h3 style="font-family:var(--font-display);font-size:20px;font-weight:800;margin-bottom:4px">Curate Featured Drops</h3>
+        <p style="font-size:13px;color:var(--muted)">Select products to showcase in the "Featured Drops" section on the storefront. <span id="featured-count-label" style="font-weight:600;color:var(--dark)">0 selected</span></p>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="saveFeatured()">Save Featured</button>
+    </div>
+    <div class="toolbar" style="margin-bottom:16px">
+      <div class="toolbar-left">
+        <div class="toolbar-search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" placeholder="Search products to feature..." id="featured-search-input">
+        </div>
+        <select class="form-input" id="featured-filter-cat" style="width:auto;padding:8px 32px 8px 12px;font-size:12.5px;font-weight:600">
+          <option value="all">All Categories</option>
+        </select>
+      </div>
+      <div class="toolbar-right">
+        <button class="btn btn-secondary btn-sm" onclick="clearFeatured()">Clear All</button>
+      </div>
+    </div>
+    <div id="featured-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">
     </div>
   </div>
 
@@ -2519,6 +2560,15 @@ function sortProducts(products, sortBy) {
   return sorted;
 }
 
+// ─── Get featured IDs from admin settings ────────────────────────────────────
+function getFeaturedIds() {
+  try {
+    const ss = localStorage.getItem('qamf_admin_settings');
+    if (ss) { const s = JSON.parse(ss); return s.featured_ids || []; }
+  } catch(e) {}
+  return [];
+}
+
 // ─── Render all products ────────────────────────────────────────────────────
 function renderProducts(products, category) {
   const grid = document.getElementById('product-grid');
@@ -2526,7 +2576,7 @@ function renderProducts(products, category) {
   if (loading) loading.remove();
 
   // Clear existing cards and empty messages
-  grid.querySelectorAll('.pcard,.loading-state').forEach(c => c.remove());
+  grid.querySelectorAll('.pcard,.loading-state,.view-all-wrap').forEach(c => c.remove());
 
   let filtered = category === 'All'
     ? products
@@ -2543,8 +2593,19 @@ function renderProducts(products, category) {
     );
   }
 
-  // Apply sort
-  filtered = sortProducts(filtered, currentSort);
+  // Featured Drops: when showing "All" with default sort and no search, show featured first
+  const featuredIds = getFeaturedIds();
+  let showingFeaturedOnly = false;
+  if (category === 'All' && !searchQuery && currentSort === 'default' && featuredIds.length > 0) {
+    // Show featured products first, then the rest
+    const featuredProducts = featuredIds.map(id => filtered.find(p => p.id === id)).filter(Boolean);
+    const rest = filtered.filter(p => !featuredIds.includes(p.id));
+    filtered = [...featuredProducts, ...rest];
+    showingFeaturedOnly = true;
+  } else {
+    // Apply sort
+    filtered = sortProducts(filtered, currentSort);
+  }
 
   if (filtered.length === 0) {
     const empty = document.createElement('div');
@@ -2986,7 +3047,8 @@ let settings = {
   social_facebook: 'https://www.facebook.com/QubicaAMF',
   social_instagram: 'https://www.instagram.com/qubicaamf',
   stripe_pk: '',
-  woo_url: ''
+  woo_url: '',
+  featured_ids: []
 };
 let editingId = null; // null = add mode, string = editing existing
 
@@ -3026,6 +3088,7 @@ async function initAdmin() {
 
   renderAll();
   loadSettings();
+  renderFeaturedGrid();
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -3038,6 +3101,7 @@ document.querySelectorAll('#page-admin .tab').forEach(tab => {
     tab.classList.add('active');
     document.getElementById('panel-' + tab.dataset.panel).classList.add('active');
     if (tab.dataset.panel === 'export') updateJSONPreview();
+    if (tab.dataset.panel === 'featured') renderFeaturedGrid();
   });
 });
 
@@ -3362,6 +3426,110 @@ function updateIntegrationStatus() {
 }
 
 // Categories are read-only — synced from Printify product data
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FEATURED DROPS
+// ═══════════════════════════════════════════════════════════════════════════
+let _featuredSearchTimer = null;
+function renderFeaturedGrid() {
+  const grid = document.getElementById('featured-grid');
+  const search = (document.getElementById('featured-search-input').value || '').toLowerCase();
+  const catFilter = document.getElementById('featured-filter-cat').value;
+
+  let all = [
+    ...printifyProducts.map(p => ({ ...p, fulfillment: 'printify' })),
+    ...customProducts.map(p => ({ ...p, fulfillment: 'custom' }))
+  ];
+
+  // Populate category filter dropdown
+  const catSelect = document.getElementById('featured-filter-cat');
+  const currentVal = catSelect.value;
+  const cats = new Set();
+  all.forEach(p => { if (p.category) cats.add(p.category); });
+  catSelect.innerHTML = '<option value="all">All Categories</option>' +
+    [...cats].sort().map(c => '<option value="' + esc(c) + '"' + (c === currentVal ? ' selected' : '') + '>' + esc(c) + '</option>').join('');
+
+  // Filter
+  if (catFilter !== 'all') {
+    all = all.filter(p => p.category === catFilter);
+  }
+  if (search) {
+    all = all.filter(p =>
+      p.title.toLowerCase().includes(search) ||
+      (p.category || '').toLowerCase().includes(search)
+    );
+  }
+
+  const featured = settings.featured_ids || [];
+  // Sort: featured first, then by title
+  all.sort((a, b) => {
+    const aF = featured.includes(a.id) ? 0 : 1;
+    const bF = featured.includes(b.id) ? 0 : 1;
+    if (aF !== bF) return aF - bF;
+    return a.title.localeCompare(b.title);
+  });
+
+  const EMOJI = {'T-Shirts':'👕','Hoodies':'🧥','Polos':'👔','Jackets':'🧥','Hats & Caps':'🧢','Bags':'🎒','Drinkware':'☕','Equipment':'🎳','Awards':'🏆','Other':'📦'};
+  grid.innerHTML = all.map(p => {
+    const isFeatured = featured.includes(p.id);
+    const idx = isFeatured ? featured.indexOf(p.id) + 1 : 0;
+    const hasImg = p.images && p.images[0] && p.images[0].src;
+    const emoji = EMOJI[p.category] || '📦';
+    const imgContent = hasImg
+      ? '<img src="' + esc(p.images[0].src) + '" alt="">'
+      : emoji;
+    const price = p.price_range
+      ? (p.price_range.min === p.price_range.max ? '$' + p.price_range.min : '$' + p.price_range.min + '–$' + p.price_range.max)
+      : (p.priceFormatted || '');
+    return '<div class="feat-card' + (isFeatured ? ' selected' : '') + '" data-id="' + esc(p.id) + '">'
+      + '<div class="feat-card-order">' + idx + '</div>'
+      + '<div class="feat-card-star">' + (isFeatured ? '★' : '☆') + '</div>'
+      + '<div class="feat-card-img">' + imgContent + '</div>'
+      + '<div class="feat-card-name">' + esc(p.title) + '</div>'
+      + '<div class="feat-card-price">' + esc(price) + '</div>'
+      + '</div>';
+  }).join('');
+
+  updateFeaturedCount();
+}
+
+function updateFeaturedCount() {
+  const count = (settings.featured_ids || []).length;
+  const label = document.getElementById('featured-count-label');
+  if (label) label.textContent = count + ' selected';
+}
+
+// Click to toggle featured
+document.getElementById('featured-grid').addEventListener('click', function(e) {
+  const card = e.target.closest('.feat-card');
+  if (!card) return;
+  const id = card.dataset.id;
+  if (!settings.featured_ids) settings.featured_ids = [];
+  const idx = settings.featured_ids.indexOf(id);
+  if (idx >= 0) {
+    settings.featured_ids.splice(idx, 1);
+  } else {
+    settings.featured_ids.push(id);
+  }
+  renderFeaturedGrid();
+});
+
+function saveFeatured() {
+  localStorage.setItem('qamf_admin_settings', JSON.stringify(settings));
+  showToast('Featured Drops saved! ' + (settings.featured_ids || []).length + ' products featured.', 'success');
+}
+
+function clearFeatured() {
+  if (!confirm('Remove all products from Featured Drops?')) return;
+  settings.featured_ids = [];
+  renderFeaturedGrid();
+}
+
+document.getElementById('featured-search-input').addEventListener('input', function() {
+  clearTimeout(_featuredSearchTimer);
+  _featuredSearchTimer = setTimeout(renderFeaturedGrid, 200);
+});
+document.getElementById('featured-filter-cat').addEventListener('change', renderFeaturedGrid);
 
 // ═══════════════════════════════════════════════════════════════════════════
 // PERSISTENCE
