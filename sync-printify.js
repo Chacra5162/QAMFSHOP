@@ -209,7 +209,7 @@ function generateDemoProducts() {
       description: 'Premium 100% cotton crew neck tee with front logo print. Unisex fit.',
       tags: ['t-shirt', 'tee', 'apparel', 'new'],
       category: 'T-Shirts',
-      images: [{ src: '', variant_ids: [], is_default: true }],
+      images: [{ src: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&h=600&fit=crop', variant_ids: [], is_default: true }],
       sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
       colors: ['Black', 'Red', 'White', 'Navy'],
       variants: [
@@ -244,7 +244,7 @@ function generateDemoProducts() {
       description: 'Heavyweight fleece hoodie with embroidered chest logo and kangaroo pocket.',
       tags: ['hoodie', 'sweatshirt', 'apparel'],
       category: 'Hoodies',
-      images: [{ src: '', variant_ids: [], is_default: true }],
+      images: [{ src: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&h=600&fit=crop', variant_ids: [], is_default: true }],
       sizes: ['S', 'M', 'L', 'XL', '2XL'],
       colors: ['Navy', 'Red', 'Charcoal'],
       variants: [
@@ -274,7 +274,7 @@ function generateDemoProducts() {
       description: 'Structured 6-panel cap with flat brim and embroidered logo.',
       tags: ['hat', 'cap', 'snapback', 'accessories'],
       category: 'Hats & Caps',
-      images: [{ src: '', variant_ids: [], is_default: true }],
+      images: [{ src: 'https://images.unsplash.com/photo-1588850561407-ed78c334e67a?w=600&h=600&fit=crop', variant_ids: [], is_default: true }],
       sizes: ['One Size'],
       colors: ['Black', 'Red', 'Dark Red'],
       variants: [
@@ -294,7 +294,7 @@ function generateDemoProducts() {
       description: '15oz ceramic mug with glossy finish. Dishwasher and microwave safe.',
       tags: ['mug', 'drinkware', 'new'],
       category: 'Drinkware',
-      images: [{ src: '', variant_ids: [], is_default: true }],
+      images: [{ src: 'https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=600&h=600&fit=crop', variant_ids: [], is_default: true }],
       sizes: ['15oz'],
       colors: ['White', 'Black', 'Red'],
       variants: [
@@ -314,7 +314,7 @@ function generateDemoProducts() {
       description: 'Lightweight softshell jacket. Full-zip with water-resistant finish.',
       tags: ['jacket', 'outerwear', 'apparel'],
       category: 'Jackets',
-      images: [{ src: '', variant_ids: [], is_default: true }],
+      images: [{ src: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&h=600&fit=crop', variant_ids: [], is_default: true }],
       sizes: ['S', 'M', 'L', 'XL', '2XL'],
       colors: ['Black', 'Navy'],
       variants: [
@@ -341,7 +341,7 @@ function generateDemoProducts() {
       description: '30L capacity backpack with padded laptop sleeve and screen-print logo.',
       tags: ['bag', 'backpack', 'accessories', 'new'],
       category: 'Bags',
-      images: [{ src: '', variant_ids: [], is_default: true }],
+      images: [{ src: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&h=600&fit=crop', variant_ids: [], is_default: true }],
       sizes: ['One Size'],
       colors: ['Black', 'Red'],
       variants: [
@@ -360,7 +360,7 @@ function generateDemoProducts() {
       description: 'Moisture-wicking performance polo with embroidered chest logo.',
       tags: ['polo', 'apparel'],
       category: 'Polos',
-      images: [{ src: '', variant_ids: [], is_default: true }],
+      images: [{ src: 'https://images.unsplash.com/photo-1625910513413-5fc421e0da9d?w=600&h=600&fit=crop', variant_ids: [], is_default: true }],
       sizes: ['S', 'M', 'L', 'XL', '2XL'],
       colors: ['Black', 'Red', 'White'],
       variants: [
@@ -390,7 +390,7 @@ function generateDemoProducts() {
       description: '32oz stainless steel double-wall insulated bottle. Leak-proof lid.',
       tags: ['bottle', 'drinkware'],
       category: 'Drinkware',
-      images: [{ src: '', variant_ids: [], is_default: true }],
+      images: [{ src: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=600&h=600&fit=crop', variant_ids: [], is_default: true }],
       sizes: ['32oz'],
       colors: ['Silver', 'Black', 'Red'],
       variants: [
