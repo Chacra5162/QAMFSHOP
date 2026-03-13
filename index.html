@@ -493,7 +493,7 @@ body.view-admin button,body.view-admin input,body.view-admin select,body.view-ad
 .hero-noise{position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='.03'/%3E%3C/svg%3E");pointer-events:none}
 .hero-glow{position:absolute;top:-200px;right:-150px;width:800px;height:800px;background:radial-gradient(circle,rgba(232,25,44,.15) 0%,transparent 65%);pointer-events:none}
 .hero-glow2{position:absolute;bottom:-100px;left:-120px;width:600px;height:600px;background:radial-gradient(circle,rgba(201,146,42,.08) 0%,transparent 65%);pointer-events:none}
-.hero-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:end;position:relative;z-index:1}
+.hero-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 420px;gap:60px;align-items:end;position:relative;z-index:1}
 .hero-copy{padding-bottom:100px}
 .hero-tag{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:100px;padding:5px 14px 5px 8px;font-size:11px;font-weight:600;color:rgba(255,255,255,.6);letter-spacing:.08em;text-transform:uppercase;margin-bottom:28px}
 .hero-tag-dot{width:7px;height:7px;border-radius:50%;background:var(--red);animation:pulse 2s infinite}
@@ -510,8 +510,8 @@ body.view-admin button,body.view-admin input,body.view-admin select,body.view-ad
 .proof-text strong{color:rgba(255,255,255,.8)}
 
 /* ── HERO VISUAL: 3D BOX MOCKUP ── */
-.hero-visual{padding-bottom:0;display:flex;align-items:flex-end;justify-content:center}
-.kit-mockup{position:relative;width:380px;height:440px}
+.hero-visual{padding-bottom:0;display:flex;align-items:flex-end;justify-content:center;overflow:visible;min-height:480px}
+.kit-mockup{position:relative;width:380px;height:440px;flex-shrink:0}
 .kit-box{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:300px}
 .box-face-top{width:300px;height:60px;background:linear-gradient(135deg,var(--red),#9a0012);border-radius:10px 10px 0 0;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:13px;color:#fff;letter-spacing:.12em;text-transform:uppercase;border:1px solid rgba(255,255,255,.1)}
 .box-face-front{width:300px;background:linear-gradient(160deg,#151517,#0e0e10);border:1px solid rgba(255,255,255,.08);border-top:none;padding:24px;border-radius:0 0 10px 10px}
@@ -526,11 +526,11 @@ body.view-admin button,body.view-admin input,body.view-admin select,body.view-ad
 .seal-price span{font-family:var(--font-body);font-size:11px;color:rgba(255,255,255,.3);font-weight:400}
 
 /* Floating items above box */
-.float-item{position:absolute;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);border-radius:14px;padding:12px 16px;box-shadow:0 20px 60px rgba(0,0,0,.5);display:flex;align-items:center;gap:10px;animation:float 3.5s ease-in-out infinite}
+.float-item{position:absolute;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);border-radius:14px;padding:12px 16px;box-shadow:0 20px 60px rgba(0,0,0,.5);display:flex;align-items:center;gap:10px;animation:float 3.5s ease-in-out infinite;z-index:2;max-width:200px}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-.float-1{top:10px;left:-10px;animation-delay:0s}
-.float-2{top:90px;right:-10px;animation-delay:1.2s}
-.float-3{top:200px;left:-30px;animation-delay:.6s}
+.float-1{top:20px;left:0;animation-delay:0s}
+.float-2{top:110px;right:0;animation-delay:1.2s}
+.float-3{top:230px;left:-10px;animation-delay:.6s}
 .float-icon{font-size:22px}
 .float-label{font-size:11px;font-weight:700;color:var(--ink);white-space:nowrap}
 .float-sub{font-size:10px;color:var(--mid);font-weight:400}
@@ -693,9 +693,11 @@ body.view-admin button,body.view-admin input,body.view-admin select,body.view-ad
 .reveal.visible{opacity:1;transform:none}
 
 /* ── MARKETING RESPONSIVE ── */
-@media(max-width:860px){
+@media(max-width:1060px){
   .hero-inner{grid-template-columns:1fr;gap:40px}
   .hero-visual{display:none}
+}
+@media(max-width:860px){
   .hero{padding:72px 20px 0}
   .hero h1{font-size:40px}
   .inside{padding:64px 20px}
@@ -905,12 +907,12 @@ textarea.form-input{resize:vertical;min-height:80px}
     </div>
 
     <nav class="header-nav">
-      <a href="#" class="active">Shop All</a>
-      <a href="#">Apparel</a>
-      <a href="#">Accessories</a>
-      <a href="#">Drinkware</a>
-      <a href="#">Bundles</a>
-      <a href="#">New Arrivals</a>
+      <a href="javascript:void(0)" class="active" data-nav-cat="All">Shop All</a>
+      <a href="javascript:void(0)" data-nav-cat="T-Shirts">T-Shirts</a>
+      <a href="javascript:void(0)" data-nav-cat="Hoodies">Hoodies</a>
+      <a href="javascript:void(0)" data-nav-cat="Hats & Caps">Accessories</a>
+      <a href="javascript:void(0)" data-nav-cat="Drinkware">Drinkware</a>
+      <a href="javascript:void(0)" data-nav-cat="new">New Arrivals</a>
       <a href="#marketing" style="color:var(--red)">Marketing Suite</a>
       <a href="https://besxtras.com/" target="_blank">Blog</a>
       <a href="#admin" style="color:var(--muted);font-size:12px">Admin</a>
@@ -3450,6 +3452,36 @@ document.addEventListener('keydown', function(e) {
     closeSizeGuide();
     closeDrawer();
   }
+});
+
+// ─── Header nav category links ──────────────────────────────────
+document.querySelectorAll('.header-nav a[data-nav-cat]').forEach(link => {
+  link.addEventListener('click', function(e) {
+    e.preventDefault();
+    const cat = this.dataset.navCat;
+    // Scroll to product grid
+    document.getElementById('product-grid').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Update active state on header nav
+    document.querySelectorAll('.header-nav a[data-nav-cat]').forEach(a => a.classList.remove('active'));
+    this.classList.add('active');
+    // Handle "new" as a special filter for badge="new"
+    if (cat === 'new') {
+      activeCategory = 'All';
+      const newProducts = allProducts.filter(p => p.badge === 'new');
+      renderProducts(newProducts, 'All');
+      // Update pills
+      document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+      const allPill = document.querySelector('.cat-pill');
+      if (allPill) allPill.classList.add('active');
+    } else {
+      activeCategory = cat;
+      renderProducts(allProducts, cat);
+      // Sync category pills
+      document.querySelectorAll('.cat-pill').forEach(p => {
+        p.classList.toggle('active', p.textContent.trim().startsWith(cat));
+      });
+    }
+  });
 });
 
 // ─── INIT SPA ──────────────────────────────────────────────────
