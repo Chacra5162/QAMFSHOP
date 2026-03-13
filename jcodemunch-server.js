@@ -1,16 +1,21 @@
 #!/usr/bin/env node
-// jcodemunch Token Savings Tracker - Local Server
-// Tracks token savings from Claude API calls in real-time
+// jcodemunch Token Savings Tracker - API Proxy
+// Sits between you and the Claude API, auto-tracking all token usage
 //
 // Usage:
 //   1. Set your API key:
 //      PowerShell:  $env:ANTHROPIC_API_KEY="sk-ant-api03-..."
-//      CMD:         set ANTHROPIC_API_KEY=sk-ant-api03-...
 //   2. Run:         node jcodemunch-server.js
 //   3. Open:        http://localhost:3333
 //
-// The tracker sends a tiny API call periodically to measure cache behavior,
-// and you can also manually log session token counts.
+// PROXY MODE: Point your apps at http://localhost:3333 instead of
+// https://api.anthropic.com and all usage is automatically tracked.
+//
+// Example with curl:
+//   curl http://localhost:3333/v1/messages -H "x-api-key: your-key" ...
+//
+// Example with Anthropic SDK:
+//   const client = new Anthropic({ baseURL: 'http://localhost:3333' });
 
 const http = require('http');
 const https = require('https');
@@ -19,60 +24,83 @@ const path = require('path');
 
 const PORT = process.env.JCODEMUNCH_PORT || 3333;
 const API_KEY = process.env.ANTHROPIC_API_KEY || '';
-const API_BASE = 'api.anthropic.com';
+const API_HOST = 'api.anthropic.com';
 const DATA_FILE = path.join(__dirname, 'jcodemunch-data.json');
 
-// Persistent data store (file-based so it survives restarts)
+// --- Data persistence ---
 function loadData() {
   try { return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8')); }
-  catch { return { sessions: [], settings: {} }; }
+  catch { return { requests: [], totals: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, requests: 0 }, settings: {} }; }
 }
-function saveData(data) {
+function saveDataFile(data) {
   fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
 }
 
-// Make a Claude API call and capture the usage response
-function apiCall(body) {
+let DATA = loadData();
+
+function recordUsage(usage, model, endpoint) {
+  const entry = {
+    timestamp: new Date().toISOString(),
+    model: model || 'unknown',
+    endpoint: endpoint || '/v1/messages',
+    input: usage.input_tokens || 0,
+    output: usage.output_tokens || 0,
+    cacheRead: usage.cache_read_input_tokens || 0,
+    cacheWrite: usage.cache_creation_input_tokens || 0,
+  };
+  DATA.requests.push(entry);
+  DATA.totals.input += entry.input;
+  DATA.totals.output += entry.output;
+  DATA.totals.cacheRead += entry.cacheRead;
+  DATA.totals.cacheWrite += entry.cacheWrite;
+  DATA.totals.requests += 1;
+  saveDataFile(DATA);
+
+  const saved = entry.cacheRead;
+  const total = entry.input + entry.output;
+  console.log(`  [${new Date().toLocaleTimeString()}] ${model} | in:${entry.input} out:${entry.output} cache-read:${saved} cache-write:${entry.cacheWrite} | total saved: ${DATA.totals.cacheRead.toLocaleString()}`);
+}
+
+// --- Proxy: forward request to Anthropic API ---
+function proxyToAnthropic(req, bodyBuffer) {
   return new Promise((resolve, reject) => {
-    const payload = JSON.stringify(body);
-    const req = https.request({
-      hostname: API_BASE,
-      path: '/v1/messages',
-      method: 'POST',
-      headers: {
-        'anthropic-version': '2023-06-01',
-        'x-api-key': API_KEY,
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(payload),
-      },
-    }, (res) => {
-      let data = '';
-      res.on('data', chunk => data += chunk);
-      res.on('end', () => {
-        if (res.statusCode >= 400) {
-          reject(new Error(`API ${res.statusCode}: ${data}`));
-        } else {
-          try { resolve(JSON.parse(data)); }
-          catch { resolve(data); }
-        }
+    const headers = { ...req.headers };
+    // Use server's API key if client didn't provide one
+    if (!headers['x-api-key'] && API_KEY) {
+      headers['x-api-key'] = API_KEY;
+    }
+    // Ensure required headers
+    if (!headers['anthropic-version']) {
+      headers['anthropic-version'] = '2023-06-01';
+    }
+    delete headers['host'];
+    delete headers['connection'];
+    headers['content-length'] = bodyBuffer.length;
+
+    const proxyReq = https.request({
+      hostname: API_HOST,
+      port: 443,
+      path: req.url,
+      method: req.method,
+      headers: headers,
+    }, (proxyRes) => {
+      let data = [];
+      proxyRes.on('data', chunk => data.push(chunk));
+      proxyRes.on('end', () => {
+        resolve({
+          statusCode: proxyRes.statusCode,
+          headers: proxyRes.headers,
+          body: Buffer.concat(data),
+        });
       });
     });
-    req.on('error', reject);
-    req.write(payload);
-    req.end();
+    proxyReq.on('error', reject);
+    if (bodyBuffer.length > 0) proxyReq.write(bodyBuffer);
+    proxyReq.end();
   });
 }
 
-// Send a minimal ping to verify the key works and get model info
-async function pingAPI() {
-  const result = await apiCall({
-    model: 'claude-haiku-4-5-20251001',
-    max_tokens: 1,
-    messages: [{ role: 'user', content: 'hi' }],
-  });
-  return result;
-}
-
+// --- Dashboard HTML ---
 const DASHBOARD_HTML = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -89,16 +117,13 @@ const DASHBOARD_HTML = `<!DOCTYPE html>
 }
 body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 .app{max-width:1200px;margin:0 auto;padding:24px}
-.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border)}
 .logo{display:flex;align-items:center;gap:12px}
 .logo-icon{width:40px;height:40px;background:linear-gradient(135deg,var(--green),var(--cyan));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:#000}
 .logo h1{font-size:20px;font-weight:700;letter-spacing:-0.5px}
 .logo span{color:var(--green)}
 .status{display:flex;align-items:center;gap:8px;font-size:13px}
-.status-dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}
-.status-dot.online{background:var(--green);animation:pulse 2s infinite}
-.status-dot.offline{background:var(--red)}
-.status-dot.loading{background:var(--amber);animation:pulse .5s infinite}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .btn{padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-size:13px;cursor:pointer;transition:all .15s}
@@ -107,6 +132,15 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 .btn-primary:hover{background:var(--green);border-color:var(--green)}
 .btn-danger{background:transparent;border-color:var(--red);color:var(--red)}
 .btn-danger:hover{background:var(--red);color:#fff}
+.proxy-banner{background:linear-gradient(135deg,#1e1b4b,#172554);border:1px solid #312e81;border-radius:12px;padding:16px 20px;margin-bottom:24px;display:flex;align-items:center;gap:16px}
+.proxy-banner .icon{font-size:24px;background:rgba(99,102,241,.2);padding:10px;border-radius:8px}
+.proxy-banner .info{flex:1}
+.proxy-banner .info h3{font-size:14px;color:#818cf8;margin-bottom:4px}
+.proxy-banner .info p{font-size:12px;color:var(--muted);line-height:1.5}
+.proxy-banner code{background:rgba(99,102,241,.15);color:#a5b4fc;padding:2px 8px;border-radius:4px;font-size:12px}
+.proxy-banner .req-count{text-align:right;min-width:100px}
+.proxy-banner .req-num{font-size:28px;font-weight:700;color:#818cf8}
+.proxy-banner .req-label{font-size:11px;color:var(--muted)}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
 .stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
 .stat-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
@@ -114,9 +148,8 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 .stat-sub{font-size:12px;color:var(--muted);margin-top:4px}
 .stat-value.green{color:var(--green)}
 .stat-value.blue{color:var(--blue)}
-.stat-value.purple{color:var(--purple)}
-.stat-value.amber{color:var(--amber)}
 .stat-value.cyan{color:var(--cyan)}
+.stat-value.amber{color:var(--amber)}
 .panels{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
 .panel{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
 .panel-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
@@ -127,43 +160,37 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 .input-label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
 .input{width:100%;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;font-family:inherit}
 .input:focus{outline:none;border-color:var(--green)}
-.session-list{max-height:500px;overflow-y:auto}
-.session-item{padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;transition:background .1s}
-.session-item:hover{background:var(--card2)}
-.session-item:last-child{border-bottom:none}
-.session-info{flex:1}
-.session-name{font-size:13px;font-weight:500;margin-bottom:2px}
-.session-meta{font-size:11px;color:var(--muted)}
-.session-savings{text-align:right;margin-left:16px}
-.session-savings-value{font-size:14px;font-weight:600;color:var(--green)}
-.session-savings-pct{font-size:11px;color:var(--muted)}
-.chart-area{height:200px;display:flex;align-items:flex-end;gap:4px;padding:20px;padding-top:0}
-.chart-bar{flex:1;background:linear-gradient(to top,var(--green2),var(--cyan));border-radius:4px 4px 0 0;min-height:4px;transition:height .3s;position:relative;cursor:pointer}
+.chart-area{height:200px;display:flex;align-items:flex-end;gap:2px;padding:20px;padding-top:0}
+.chart-bar{flex:1;border-radius:3px 3px 0 0;min-height:2px;transition:height .3s;position:relative;cursor:pointer}
+.chart-bar.cache{background:linear-gradient(to top,var(--green2),var(--cyan))}
+.chart-bar.input{background:linear-gradient(to top,#1e3a5f,var(--blue))}
 .chart-bar:hover{opacity:.8}
-.chart-bar .tooltip{display:none;position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:#000;color:#fff;padding:4px 8px;border-radius:4px;font-size:11px;white-space:nowrap;margin-bottom:4px;z-index:10}
+.chart-bar .tooltip{display:none;position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:#000;color:#fff;padding:6px 10px;border-radius:6px;font-size:11px;white-space:nowrap;margin-bottom:4px;z-index:10;line-height:1.5}
 .chart-bar:hover .tooltip{display:block}
-.chart-labels{display:flex;gap:4px;padding:0 20px;margin-bottom:12px}
+.chart-labels{display:flex;gap:2px;padding:0 20px;margin-bottom:4px}
 .chart-labels span{flex:1;text-align:center;font-size:9px;color:var(--muted)}
-.savings-meter{margin:20px;background:var(--bg);border-radius:12px;overflow:hidden;height:32px;position:relative}
-.savings-fill{height:100%;background:linear-gradient(90deg,var(--green2),var(--cyan));border-radius:12px;transition:width .5s;display:flex;align-items:center;justify-content:flex-end;padding-right:12px;font-size:12px;font-weight:700;min-width:60px}
+.chart-legend{display:flex;gap:16px;padding:8px 20px 16px;font-size:11px;color:var(--muted)}
+.chart-legend .dot{width:8px;height:8px;border-radius:2px;display:inline-block;margin-right:4px;vertical-align:middle}
+.savings-meter{margin:0 20px 20px;background:var(--bg);border-radius:12px;overflow:hidden;height:28px;position:relative}
+.savings-fill{height:100%;background:linear-gradient(90deg,var(--green2),var(--cyan));border-radius:12px;transition:width .5s;display:flex;align-items:center;justify-content:flex-end;padding-right:12px;font-size:11px;font-weight:700;min-width:50px}
 .full-width{grid-column:1/-1}
 .empty-state{text-align:center;padding:40px 20px;color:var(--muted)}
 .empty-state p{margin-top:8px;font-size:13px}
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;align-items:center;justify-content:center}
-.modal-overlay.active{display:flex}
-.modal{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;width:90%;max-width:480px}
-.modal h3{margin-bottom:16px;font-size:16px}
-.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
-.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;text-transform:uppercase;margin-left:8px}
-.badge.manual{background:rgba(113,113,122,.2);color:var(--muted)}
-.badge.api{background:rgba(168,85,247,.2);color:var(--purple)}
-.delete-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:4px 8px;margin-left:8px}
-.delete-btn:hover{color:var(--red)}
-.how-to{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:16px;margin-top:12px;font-size:12px;color:var(--muted);line-height:1.6}
-.how-to code{background:var(--bg);padding:2px 6px;border-radius:4px;color:var(--cyan);font-size:11px}
+.req-list{max-height:400px;overflow-y:auto}
+.req-item{padding:10px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;transition:background .1s;font-size:12px}
+.req-item:hover{background:var(--card2)}
+.req-item:last-child{border-bottom:none}
+.req-info{flex:1}
+.req-model{font-weight:500;color:var(--text);margin-bottom:2px}
+.req-meta{font-size:11px;color:var(--muted)}
+.req-tokens{text-align:right;margin-left:16px}
+.req-saved{font-weight:600;color:var(--green);font-size:13px}
+.req-pct{font-size:10px;color:var(--muted)}
+.live-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1s infinite;margin-right:6px;vertical-align:middle}
 @media(max-width:768px){
   .stats{grid-template-columns:repeat(2,1fr)}
   .panels{grid-template-columns:1fr}
+  .proxy-banner{flex-direction:column;text-align:center}
 }
 </style>
 </head>
@@ -176,27 +203,37 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
     </div>
     <div class="controls">
       <div class="status">
-        <div class="status-dot" id="status-dot"></div>
-        <span id="status-text">Checking...</span>
+        <div class="status-dot"></div>
+        <span><span class="live-dot"></span>Live Proxy</span>
       </div>
-      <button class="btn btn-primary" onclick="openAddSession()">+ Log Session</button>
-      <button class="btn" onclick="testPing()">Test API Key</button>
       <button class="btn" onclick="exportData()">Export</button>
-      <button class="btn" onclick="doImport()">Import</button>
-      <button class="btn btn-danger" onclick="clearAll()">Clear All</button>
+      <button class="btn btn-danger" onclick="clearAll()">Reset</button>
+    </div>
+  </div>
+
+  <div class="proxy-banner">
+    <div class="icon">&#x1f50c;</div>
+    <div class="info">
+      <h3>API Proxy Active</h3>
+      <p>Point your apps at <code>http://localhost:${PORT}</code> instead of <code>https://api.anthropic.com</code><br>
+      All API calls are forwarded to Anthropic and token usage is automatically tracked.</p>
+    </div>
+    <div class="req-count">
+      <div class="req-num" id="total-requests">0</div>
+      <div class="req-label">requests tracked</div>
     </div>
   </div>
 
   <div class="stats">
     <div class="stat-card">
-      <div class="stat-label">Total Cache-Read Tokens</div>
+      <div class="stat-label">Cache-Read (Saved)</div>
       <div class="stat-value green" id="stat-saved">0</div>
-      <div class="stat-sub" id="stat-saved-sub">tokens served from cache</div>
+      <div class="stat-sub" id="stat-saved-sub">tokens from cache</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">Total Tokens Used</div>
-      <div class="stat-value blue" id="stat-total">0</div>
-      <div class="stat-sub" id="stat-total-sub">input + output</div>
+      <div class="stat-label">Input Tokens</div>
+      <div class="stat-value blue" id="stat-input">0</div>
+      <div class="stat-sub">uncached input</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">Savings Rate</div>
@@ -206,18 +243,20 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
     <div class="stat-card">
       <div class="stat-label">Est. Cost Saved</div>
       <div class="stat-value amber" id="stat-cost">$0.00</div>
-      <div class="stat-sub" id="stat-cost-sub">at current pricing</div>
+      <div class="stat-sub" id="stat-cost-model">at Opus pricing</div>
     </div>
   </div>
 
   <div class="panels">
     <div class="panel">
       <div class="panel-header">
-        <span class="panel-title">Savings Over Time</span>
-        <span style="font-size:11px;color:var(--muted)" id="chart-range"></span>
+        <span class="panel-title">Token Flow (Last 50 requests)</span>
       </div>
       <div class="chart-area" id="chart"></div>
-      <div class="chart-labels" id="chart-labels"></div>
+      <div class="chart-legend">
+        <span><span class="dot" style="background:var(--cyan)"></span> Cache-read (saved)</span>
+        <span><span class="dot" style="background:var(--blue)"></span> Uncached input</span>
+      </div>
       <div class="savings-meter">
         <div class="savings-fill" id="savings-fill" style="width:0%">0%</div>
       </div>
@@ -225,13 +264,13 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 
     <div class="panel">
       <div class="panel-header">
-        <span class="panel-title">Pricing Config</span>
-        <button class="btn" onclick="saveSettings()" style="font-size:12px;padding:4px 12px">Save</button>
+        <span class="panel-title">Pricing</span>
+        <button class="btn" onclick="savePricing()" style="font-size:12px;padding:4px 12px">Save</button>
       </div>
       <div class="panel-body">
         <div class="input-group">
           <label class="input-label">Model Preset</label>
-          <select class="input" id="setting-model" onchange="loadModelPricing()">
+          <select class="input" id="pricing-model" onchange="loadPreset()">
             <option value="opus">Claude Opus 4.6 ($15 / $75)</option>
             <option value="sonnet">Claude Sonnet 4.6 ($3 / $15)</option>
             <option value="haiku">Claude Haiku 4.5 ($1 / $5)</option>
@@ -239,401 +278,257 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
           </select>
         </div>
         <div class="input-group">
-          <label class="input-label">Input price (per 1M tokens)</label>
-          <input class="input" type="number" id="setting-input-price" step="0.01" value="15.00">
+          <label class="input-label">Input price / 1M tokens</label>
+          <input class="input" type="number" id="price-input" step="0.01" value="15">
         </div>
         <div class="input-group">
-          <label class="input-label">Cache read price (per 1M tokens)</label>
-          <input class="input" type="number" id="setting-cache-price" step="0.01" value="1.50">
-        </div>
-        <div class="input-group">
-          <label class="input-label">Cache write price (per 1M tokens)</label>
-          <input class="input" type="number" id="setting-cache-write-price" step="0.01" value="18.75">
-        </div>
-        <div class="how-to">
-          <strong>How to get token counts:</strong><br>
-          In Claude Code desktop, look at the bottom of each conversation for usage stats.
-          Or check <code>console.anthropic.com/usage</code> for your account usage.
-          Log each session here to track savings over time.
+          <label class="input-label">Cache read price / 1M tokens</label>
+          <input class="input" type="number" id="price-cache" step="0.01" value="1.50">
         </div>
       </div>
     </div>
 
     <div class="panel full-width">
       <div class="panel-header">
-        <span class="panel-title">Session Log</span>
-        <span style="font-size:11px;color:var(--muted)" id="session-count">0 sessions</span>
+        <span class="panel-title"><span class="live-dot"></span>Live Request Feed</span>
+        <span style="font-size:11px;color:var(--muted)" id="feed-count">0 requests</span>
       </div>
-      <div class="session-list" id="session-list">
+      <div class="req-list" id="req-list">
         <div class="empty-state">
-          <p>No sessions logged yet. Click <strong>+ Log Session</strong> to record your token usage.</p>
+          <p>Waiting for API calls... Point your app at <strong>http://localhost:${PORT}</strong></p>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Add Session Modal -->
-<div class="modal-overlay" id="modal-add">
-  <div class="modal">
-    <h3>Log Session</h3>
-    <div class="input-group">
-      <label class="input-label">Session Name</label>
-      <input class="input" id="add-name" placeholder="e.g. QAMFSHOP feature work">
-    </div>
-    <div class="input-group">
-      <label class="input-label">Cache Read Tokens (the savings!)</label>
-      <input class="input" type="number" id="add-cache-read" placeholder="e.g. 45230">
-    </div>
-    <div class="input-group">
-      <label class="input-label">Cache Write Tokens</label>
-      <input class="input" type="number" id="add-cache-write" placeholder="e.g. 12800">
-    </div>
-    <div class="input-group">
-      <label class="input-label">Input Tokens (uncached)</label>
-      <input class="input" type="number" id="add-input" placeholder="e.g. 58030">
-    </div>
-    <div class="input-group">
-      <label class="input-label">Output Tokens</label>
-      <input class="input" type="number" id="add-output" placeholder="e.g. 5000">
-    </div>
-    <div class="modal-actions">
-      <button class="btn" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="addSession()">Save</button>
-    </div>
-  </div>
-</div>
-
 <script>
-const MODEL_PRICING = {
-  opus:   { input: 15.00, cacheRead: 1.50, cacheWrite: 18.75 },
-  sonnet: { input: 3.00,  cacheRead: 0.30, cacheWrite: 3.75 },
-  haiku:  { input: 1.00,  cacheRead: 0.10, cacheWrite: 1.25 },
+const PRESETS = {
+  opus:   { input: 15, cache: 1.50 },
+  sonnet: { input: 3,  cache: 0.30 },
+  haiku:  { input: 1,  cache: 0.10 },
 };
 
-let allData = { sessions: [], settings: {} };
-
-async function loadFromServer() {
-  try {
-    const res = await fetch('/api/data');
-    allData = await res.json();
-  } catch { allData = { sessions: [], settings: {} }; }
-}
-
-async function saveToServer() {
-  await fetch('/api/data', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(allData),
-  });
-}
-
-function getPricing() {
-  const s = allData.settings || {};
-  return { input: s.inputPrice || 15, cacheRead: s.cacheReadPrice || 1.5, cacheWrite: s.cacheWritePrice || 18.75 };
-}
+let pricing = { input: 15, cache: 1.50 };
+let pollTimer = null;
 
 function formatNum(n) {
-  if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
-  if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+  if (n >= 1e6) return (n/1e6).toFixed(1)+'M';
+  if (n >= 1e3) return (n/1e3).toFixed(1)+'K';
   return n.toLocaleString();
 }
 
-function calcCostSaved(s) {
-  const p = getPricing();
-  const cr = s.cacheRead || 0;
-  return ((cr / 1e6) * p.input) - ((cr / 1e6) * p.cacheRead);
+function escapeHTML(s) { const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+function costSaved(cacheRead) {
+  return (cacheRead / 1e6) * (pricing.input - pricing.cache);
 }
 
-function setStatus(cls, text) {
-  document.getElementById('status-dot').className = 'status-dot ' + cls;
-  document.getElementById('status-text').textContent = text;
+function loadPreset() {
+  const m = document.getElementById('pricing-model').value;
+  if (PRESETS[m]) {
+    document.getElementById('price-input').value = PRESETS[m].input;
+    document.getElementById('price-cache').value = PRESETS[m].cache;
+  }
 }
 
-function escapeHTML(str) { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+function savePricing() {
+  pricing.input = parseFloat(document.getElementById('price-input').value) || 15;
+  pricing.cache = parseFloat(document.getElementById('price-cache').value) || 1.5;
+  localStorage.setItem('jcodemunch_pricing', JSON.stringify(pricing));
+  render(lastData);
+}
 
-function renderAll() {
-  const sessions = allData.sessions || [];
-  // Stats
-  let totalSaved = 0, totalTokens = 0, totalCost = 0;
-  sessions.forEach(s => {
-    totalSaved += s.cacheRead || 0;
-    totalTokens += (s.input || 0) + (s.output || 0);
-    totalCost += calcCostSaved(s);
-  });
-  const rate = (totalSaved + totalTokens) > 0 ? (totalSaved / (totalSaved + totalTokens) * 100) : 0;
-  document.getElementById('stat-saved').textContent = formatNum(totalSaved);
-  document.getElementById('stat-saved-sub').textContent = 'across ' + sessions.length + ' session' + (sessions.length !== 1 ? 's' : '');
-  document.getElementById('stat-total').textContent = formatNum(totalTokens);
+let lastData = null;
+
+function render(data) {
+  if (!data) return;
+  lastData = data;
+  const t = data.totals || {};
+  const reqs = data.requests || [];
+
+  document.getElementById('total-requests').textContent = (t.requests || 0).toLocaleString();
+  document.getElementById('stat-saved').textContent = formatNum(t.cacheRead || 0);
+  document.getElementById('stat-saved-sub').textContent = formatNum(t.cacheWrite || 0) + ' cache-write';
+  document.getElementById('stat-input').textContent = formatNum((t.input || 0) + (t.output || 0));
+
+  const total = (t.input||0) + (t.output||0) + (t.cacheRead||0);
+  const rate = total > 0 ? ((t.cacheRead||0) / total * 100) : 0;
   document.getElementById('stat-rate').textContent = rate.toFixed(1) + '%';
-  document.getElementById('stat-cost').textContent = '$' + totalCost.toFixed(2);
+  document.getElementById('stat-cost').textContent = '$' + costSaved(t.cacheRead||0).toFixed(2);
+
   const fill = document.getElementById('savings-fill');
   fill.style.width = Math.min(rate, 100) + '%';
   fill.textContent = rate.toFixed(0) + '%';
 
-  // Chart
+  // Chart - last 50 requests, stacked bars
   const chart = document.getElementById('chart');
-  const labels = document.getElementById('chart-labels');
-  const recent = sessions.slice(-30);
-  document.getElementById('chart-range').textContent = 'Last ' + recent.length + ' session' + (recent.length !== 1 ? 's' : '');
+  const recent = reqs.slice(-50);
   if (recent.length === 0) {
-    chart.innerHTML = '<div class="empty-state" style="width:100%"><p>No data yet</p></div>';
-    labels.innerHTML = '';
+    chart.innerHTML = '<div class="empty-state" style="width:100%"><p>Waiting for requests...</p></div>';
   } else {
-    const max = Math.max(...recent.map(s => s.cacheRead || 0), 1);
-    chart.innerHTML = recent.map(s => {
-      const cr = s.cacheRead || 0;
-      const h = Math.max((cr / max) * 180, 4);
-      const cost = calcCostSaved(s);
-      return '<div class="chart-bar" style="height:'+h+'px"><div class="tooltip">'+ escapeHTML(s.name||'Session') +'<br>'+formatNum(cr)+' cached ($'+cost.toFixed(2)+' saved)</div></div>';
-    }).join('');
-    labels.innerHTML = recent.map((s,i) => {
-      if (recent.length <= 10 || i % Math.ceil(recent.length/10) === 0) {
-        return '<span>'+new Date(s.timestamp).toLocaleDateString('en',{month:'short',day:'numeric'})+'</span>';
-      }
-      return '<span></span>';
+    const maxTokens = Math.max(...recent.map(r => (r.cacheRead||0) + (r.input||0)), 1);
+    chart.innerHTML = recent.map(r => {
+      const cr = r.cacheRead || 0;
+      const inp = r.input || 0;
+      const totalH = Math.max(((cr + inp) / maxTokens) * 180, 4);
+      const cacheH = totalH > 0 ? (cr / (cr + inp || 1)) * totalH : 0;
+      const inputH = totalH - cacheH;
+      const time = new Date(r.timestamp).toLocaleTimeString();
+      return '<div style="flex:1;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-end;position:relative;cursor:pointer" class="chart-col">'
+        + '<div class="chart-bar input" style="height:'+inputH+'px;border-radius:3px 3px 0 0"><div class="tooltip">'+escapeHTML(r.model)+'<br>'+time+'<br>Input: '+formatNum(inp)+'<br>Cache-read: '+formatNum(cr)+'<br>Output: '+formatNum(r.output||0)+'</div></div>'
+        + '<div class="chart-bar cache" style="height:'+cacheH+'px;border-radius:0"></div>'
+        + '</div>';
     }).join('');
   }
 
-  // Session list
-  const list = document.getElementById('session-list');
-  document.getElementById('session-count').textContent = sessions.length + ' session' + (sessions.length !== 1 ? 's' : '');
-  if (sessions.length === 0) {
-    list.innerHTML = '<div class="empty-state"><p>No sessions logged yet. Click <strong>+ Log Session</strong> to start tracking.</p></div>';
+  // Request feed
+  const list = document.getElementById('req-list');
+  document.getElementById('feed-count').textContent = reqs.length + ' request' + (reqs.length!==1?'s':'');
+  if (reqs.length === 0) {
+    list.innerHTML = '<div class="empty-state"><p>Waiting for API calls...</p></div>';
   } else {
-    list.innerHTML = [...sessions].reverse().map((s, ri) => {
-      const idx = sessions.length - 1 - ri;
-      const cr = s.cacheRead || 0;
-      const cost = calcCostSaved(s);
-      const tot = (s.input||0)+(s.output||0);
-      const r = (cr+tot)>0 ? (cr/(cr+tot)*100).toFixed(1) : '0.0';
-      return '<div class="session-item"><div class="session-info"><div class="session-name">'+escapeHTML(s.name||'Session')+'</div><div class="session-meta">'+new Date(s.timestamp).toLocaleString()+' &middot; '+formatNum(s.input||0)+' input &middot; '+formatNum(cr)+' cache-read &middot; '+formatNum(s.cacheWrite||0)+' cache-write &middot; '+formatNum(s.output||0)+' output</div></div><div class="session-savings"><div class="session-savings-value">'+formatNum(cr)+' saved ($'+cost.toFixed(2)+')</div><div class="session-savings-pct">'+r+'% cache hit</div></div><button class="delete-btn" onclick="deleteSession('+idx+')">&times;</button></div>';
+    list.innerHTML = [...reqs].reverse().slice(0, 100).map(r => {
+      const cr = r.cacheRead || 0;
+      const inp = r.input || 0;
+      const pct = (cr+inp) > 0 ? (cr/(cr+inp)*100).toFixed(0) : '0';
+      const saved = costSaved(cr);
+      return '<div class="req-item"><div class="req-info"><div class="req-model">'+escapeHTML(r.model||'unknown')+'</div><div class="req-meta">'+new Date(r.timestamp).toLocaleString()+' &middot; in:'+formatNum(inp)+' out:'+formatNum(r.output||0)+' cache-read:'+formatNum(cr)+' cache-write:'+formatNum(r.cacheWrite||0)+'</div></div><div class="req-tokens"><div class="req-saved">'+formatNum(cr)+' saved</div><div class="req-pct">'+pct+'% cache &middot; $'+saved.toFixed(3)+' saved</div></div></div>';
     }).join('');
   }
-
-  // Settings
-  const st = allData.settings || {};
-  if (st.model) document.getElementById('setting-model').value = st.model;
-  if (st.inputPrice) document.getElementById('setting-input-price').value = st.inputPrice;
-  if (st.cacheReadPrice) document.getElementById('setting-cache-price').value = st.cacheReadPrice;
-  if (st.cacheWritePrice) document.getElementById('setting-cache-write-price').value = st.cacheWritePrice;
 }
 
-function loadModelPricing() {
-  const m = document.getElementById('setting-model').value;
-  if (MODEL_PRICING[m]) {
-    document.getElementById('setting-input-price').value = MODEL_PRICING[m].input;
-    document.getElementById('setting-cache-price').value = MODEL_PRICING[m].cacheRead;
-    document.getElementById('setting-cache-write-price').value = MODEL_PRICING[m].cacheWrite;
-  }
-}
-
-async function saveSettings() {
-  allData.settings = {
-    model: document.getElementById('setting-model').value,
-    inputPrice: parseFloat(document.getElementById('setting-input-price').value) || 15,
-    cacheReadPrice: parseFloat(document.getElementById('setting-cache-price').value) || 1.5,
-    cacheWritePrice: parseFloat(document.getElementById('setting-cache-write-price').value) || 18.75,
-  };
-  await saveToServer();
-  renderAll();
-}
-
-function openAddSession() {
-  document.getElementById('modal-add').classList.add('active');
-  ['add-name','add-cache-read','add-cache-write','add-input','add-output'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('add-name').focus();
-}
-function closeModal() { document.getElementById('modal-add').classList.remove('active'); }
-
-async function addSession() {
-  const name = document.getElementById('add-name').value.trim();
-  const cacheRead = parseInt(document.getElementById('add-cache-read').value) || 0;
-  const cacheWrite = parseInt(document.getElementById('add-cache-write').value) || 0;
-  const input = parseInt(document.getElementById('add-input').value) || 0;
-  const output = parseInt(document.getElementById('add-output').value) || 0;
-  if (cacheRead === 0 && input === 0) { alert('Enter at least cache read or input tokens.'); return; }
-  allData.sessions.push({ name: name || 'Session', cacheRead, cacheWrite, input, output, timestamp: new Date().toISOString() });
-  await saveToServer();
-  closeModal();
-  renderAll();
-}
-
-async function deleteSession(idx) {
-  if (!confirm('Delete this session?')) return;
-  allData.sessions.splice(idx, 1);
-  await saveToServer();
-  renderAll();
-}
-
-async function testPing() {
-  setStatus('loading', 'Testing API key...');
+async function poll() {
   try {
-    const res = await fetch('/api/ping');
+    const res = await fetch('/api/data');
     const data = await res.json();
-    if (data.ok) {
-      setStatus('online', 'API key valid - ' + data.model);
-      alert('API key works! Model: ' + data.model + '\\nUsage: ' + JSON.stringify(data.usage, null, 2));
-    } else {
-      setStatus('offline', 'API error');
-      alert('Error: ' + data.error);
-    }
-  } catch (e) {
-    setStatus('offline', 'Connection failed');
-    alert('Failed: ' + e.message);
-  }
+    render(data);
+  } catch {}
 }
 
 async function exportData() {
-  const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'jcodemunch-' + new Date().toISOString().slice(0,10) + '.json';
-  a.click();
-  URL.revokeObjectURL(a.href);
-}
-
-async function doImport() {
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = '.json';
-  input.onchange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const text = await file.text();
-    try {
-      const data = JSON.parse(text);
-      if (data.sessions) {
-        allData.sessions = [...allData.sessions, ...data.sessions];
-        if (data.settings) allData.settings = data.settings;
-        await saveToServer();
-        renderAll();
-        alert('Imported ' + data.sessions.length + ' session(s).');
-      } else { alert('Invalid file format.'); }
-    } catch (err) { alert('Invalid JSON: ' + err.message); }
-  };
-  input.click();
+  try {
+    const res = await fetch('/api/data');
+    const data = await res.json();
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'jcodemunch-'+new Date().toISOString().slice(0,10)+'.json';
+    a.click();
+  } catch(e) { alert('Export failed: '+e.message); }
 }
 
 async function clearAll() {
-  if (!confirm('Clear ALL data? This cannot be undone.')) return;
-  allData.sessions = [];
-  await saveToServer();
-  renderAll();
+  if (!confirm('Reset all tracking data?')) return;
+  await fetch('/api/reset', { method: 'POST' });
+  poll();
 }
 
-document.querySelectorAll('.modal-overlay').forEach(el => {
-  el.addEventListener('click', e => { if (e.target === el) el.classList.remove('active'); });
-});
+// Load saved pricing
+try {
+  const saved = JSON.parse(localStorage.getItem('jcodemunch_pricing'));
+  if (saved) { pricing = saved; document.getElementById('price-input').value = saved.input; document.getElementById('price-cache').value = saved.cache; }
+} catch {}
 
-// Init
-(async () => {
-  await loadFromServer();
-  renderAll();
-  // Check API status
-  try {
-    const res = await fetch('/api/status');
-    const data = await res.json();
-    if (data.hasKey) {
-      setStatus('online', 'API key configured');
-    } else {
-      setStatus('offline', 'No API key - manual mode');
-    }
-  } catch {
-    setStatus('offline', 'Server error');
-  }
-})();
+// Start polling
+poll();
+pollTimer = setInterval(poll, 2000);
 </script>
 </body>
 </html>`;
 
+// --- HTTP Server ---
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://localhost:${PORT}`);
 
-  // CORS headers for local use
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-  if (req.method === 'OPTIONS') {
-    res.writeHead(204);
-    res.end();
+  // Dashboard
+  if (url.pathname === '/' || url.pathname === '/dashboard') {
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end(DASHBOARD_HTML);
     return;
   }
 
-  // API: status check
-  if (url.pathname === '/api/status') {
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ hasKey: !!API_KEY }));
-    return;
-  }
-
-  // API: test ping
-  if (url.pathname === '/api/ping') {
-    if (!API_KEY) {
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ ok: false, error: 'ANTHROPIC_API_KEY not set' }));
-      return;
-    }
-    try {
-      const result = await pingAPI();
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ ok: true, model: result.model, usage: result.usage }));
-    } catch (e) {
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ ok: false, error: e.message }));
-    }
-    return;
-  }
-
-  // API: get/save data
+  // Internal API: get data
   if (url.pathname === '/api/data' && req.method === 'GET') {
-    const data = loadData();
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify(data));
+    res.end(JSON.stringify(DATA));
     return;
   }
 
-  if (url.pathname === '/api/data' && req.method === 'POST') {
-    let body = '';
-    req.on('data', chunk => body += chunk);
-    req.on('end', () => {
-      try {
-        const data = JSON.parse(body);
-        saveData(data);
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ ok: true }));
-      } catch (e) {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: e.message }));
+  // Internal API: reset
+  if (url.pathname === '/api/reset' && req.method === 'POST') {
+    DATA = { requests: [], totals: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, requests: 0 }, settings: {} };
+    saveDataFile(DATA);
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: true }));
+    return;
+  }
+
+  // --- PROXY: Forward everything else to Anthropic API ---
+  let bodyChunks = [];
+  req.on('data', chunk => bodyChunks.push(chunk));
+  req.on('end', async () => {
+    const bodyBuffer = Buffer.concat(bodyChunks);
+
+    try {
+      const apiRes = await proxyToAnthropic(req, bodyBuffer);
+
+      // Copy response headers (skip transfer-encoding as we send the full body)
+      const respHeaders = { ...apiRes.headers };
+      delete respHeaders['transfer-encoding'];
+      respHeaders['access-control-allow-origin'] = '*';
+      respHeaders['access-control-allow-headers'] = '*';
+      respHeaders['access-control-allow-methods'] = '*';
+
+      if (req.method === 'OPTIONS') {
+        res.writeHead(204, respHeaders);
+        res.end();
+        return;
       }
-    });
-    return;
-  }
 
-  // Serve dashboard
-  res.writeHead(200, { 'Content-Type': 'text/html' });
-  res.end(DASHBOARD_HTML);
+      res.writeHead(apiRes.statusCode, respHeaders);
+      res.end(apiRes.body);
+
+      // Extract usage from response if it's a messages call
+      if (req.url.includes('/messages') && apiRes.statusCode === 200) {
+        try {
+          const parsed = JSON.parse(apiRes.body.toString());
+          if (parsed.usage) {
+            recordUsage(parsed.usage, parsed.model, req.url);
+          }
+        } catch {}
+      }
+    } catch (e) {
+      console.error('  Proxy error:', e.message);
+      res.writeHead(502, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Proxy error: ' + e.message }));
+    }
+  });
 });
 
 server.listen(PORT, () => {
   console.log('');
-  console.log('  jcodemunch Token Savings Tracker');
-  console.log('  ================================');
+  console.log('  jcodemunch Token Savings Tracker - PROXY MODE');
+  console.log('  =============================================');
   console.log('');
-  console.log('  Dashboard:  http://localhost:' + PORT);
-  console.log('  Data file:  ' + DATA_FILE);
-  console.log('  API key:    ' + (API_KEY ? 'configured' : 'NOT SET (manual mode)'));
+  console.log('  Dashboard:    http://localhost:' + PORT);
+  console.log('  Proxy:        http://localhost:' + PORT + '/v1/messages');
+  console.log('  Data file:    ' + DATA_FILE);
+  console.log('  API key:      ' + (API_KEY ? 'configured' : 'NOT SET'));
   console.log('');
-  if (!API_KEY) {
-    console.log('  To connect your API key (optional):');
-    console.log('');
-    console.log('    PowerShell:  $env:ANTHROPIC_API_KEY="sk-ant-api03-..."');
-    console.log('    Then run:    node jcodemunch-server.js');
-    console.log('');
-    console.log('  Without an API key, use manual entry to log sessions.');
+  console.log('  HOW TO USE:');
+  console.log('  Point your Claude API calls at http://localhost:' + PORT);
+  console.log('  instead of https://api.anthropic.com');
+  console.log('');
+  console.log('  Examples:');
+  console.log('    Anthropic SDK:  new Anthropic({ baseURL: "http://localhost:' + PORT + '" })');
+  console.log('    curl:           curl http://localhost:' + PORT + '/v1/messages ...');
+  console.log('    Claude Code:    ANTHROPIC_BASE_URL=http://localhost:' + PORT + ' claude');
+  console.log('');
+  if (DATA.totals.requests > 0) {
+    console.log('  Existing data: ' + DATA.totals.requests + ' requests, ' + DATA.totals.cacheRead.toLocaleString() + ' tokens saved');
     console.log('');
   }
-  console.log('  Press Ctrl+C to stop');
+  console.log('  Waiting for API calls...');
   console.log('');
 });
