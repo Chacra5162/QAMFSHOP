@@ -818,6 +818,7 @@ textarea.form-input{resize:vertical;min-height:80px}
 .toast.show{transform:translateY(0);opacity:1}
 .toast.success{background:var(--green)}
 .toast.error{background:#dc2626}
+.toast.info{background:#7c3aed}
 
 @media(max-width:860px){
   .stats-bar{grid-template-columns:1fr 1fr}
@@ -2192,6 +2193,7 @@ function addToCart(product, variant) {
       price: variant ? variant.price : product.price,
       emoji: CATEGORY_EMOJI[product.category] || '📦',
       image: (product.images && product.images[0] && product.images[0].src) || '',
+      fulfillment: product.fulfillment || 'printify',
       qty: 1
     });
   }
@@ -2241,7 +2243,7 @@ function renderCartDrawer() {
     html += '<div class="cart-item" data-key="' + esc(item.key) + '">'
       + '<div class="cart-item-img">' + imgContent + '</div>'
       + '<div class="cart-item-info"><div class="cart-item-name">' + esc(item.title) + '</div>'
-      + '<div class="cart-item-variant">' + esc(item.variant) + '</div></div>'
+      + '<div class="cart-item-variant">' + esc(item.variant) + (item.fulfillment === 'custom' ? ' <span style="background:#7c3aed;color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;margin-left:4px;letter-spacing:.04em">★ SPECIAL REQUEST</span>' : '') + '</div></div>'
       + '<div class="cart-item-qty">'
       + '<button aria-label="Decrease quantity" onclick="updateCartQty(\'' + esc(item.key) + '\',-1)">-</button>'
       + '<span>' + item.qty + '</span>'
@@ -2330,22 +2332,18 @@ function renderProductCard(product) {
     openProductModal(product);
   });
 
-  // Custom items get "Order Now" button style
+  // Custom items get "Special Request" button style
   const addBtn = card.querySelector('.pcard-add');
   if (product.fulfillment === 'custom') {
-    addBtn.textContent = 'Order Now';
+    addBtn.textContent = '★ Special Request';
     addBtn.style.background = '#7c3aed';
     addBtn.style.borderColor = '#7c3aed';
     addBtn.style.color = '#fff';
   }
 
-  // Add to cart button
+  // Add to cart button — custom items also go to cart now
   addBtn.addEventListener('click', (e) => {
     e.stopPropagation();
-    if (product.fulfillment === 'custom') {
-      openOrderForm(product, product.variants[0]);
-      return;
-    }
     addToCart(product, product.variants[0]);
     const btn = e.currentTarget;
     const orig = btn.textContent;
@@ -2355,8 +2353,8 @@ function renderProductCard(product) {
     btn.style.color = '#fff';
     setTimeout(() => {
       btn.textContent = orig;
-      btn.style.background = '';
-      btn.style.borderColor = '';
+      btn.style.background = product.fulfillment === 'custom' ? '#7c3aed' : '';
+      btn.style.borderColor = product.fulfillment === 'custom' ? '#7c3aed' : '';
       btn.style.color = '';
     }, 1400);
   });
@@ -2557,7 +2555,7 @@ function updateModalVariant() {
     infoEl.innerHTML = 'SKU: ' + esc(variant.sku || variant.id) + ' &middot; ' + esc(variant.title) + (variant.is_available ? ' <span style="color:#16a34a;font-weight:600">&#x2713; In Stock</span>' : ' <span style="color:#dc2626;font-weight:600">Out of Stock</span>');
     priceEl.textContent = '$' + variant.price.toFixed(2);
     addBtn.disabled = !variant.is_available;
-    addBtn.textContent = !variant.is_available ? 'Out of Stock' : (isCustom ? 'Order Now' : '+ Add to Cart');
+    addBtn.textContent = !variant.is_available ? 'Out of Stock' : (isCustom ? '★ Special Request' : '+ Add to Cart');
     addBtn.style.background = isCustom ? '#7c3aed' : '';
   } else {
     infoEl.textContent = 'Select options above';
@@ -2577,30 +2575,20 @@ document.getElementById('modal-close').addEventListener('click', closeModal);
 document.getElementById('product-modal').addEventListener('click', (e) => {
   if (e.target === e.currentTarget) closeModal();
 });
-// Modal add to cart
+// Modal add to cart — custom items also go to cart now
 document.getElementById('modal-add-btn').addEventListener('click', function() {
   if (this.disabled) return;
-  // Custom fulfillment: open order form instead
-  if (modalProduct && modalProduct.fulfillment === 'custom') {
-    const variant = modalProduct.variants.find(v =>
-      (!selectedColor || v.color === selectedColor) &&
-      (!selectedSize || v.size === selectedSize)
-    );
-    openOrderForm(modalProduct, variant || modalProduct.variants[0]);
-    closeModal();
-    return;
-  }
   const variant = modalProduct.variants.find(v =>
     (!selectedColor || v.color === selectedColor) &&
     (!selectedSize || v.size === selectedSize)
   );
   addToCart(modalProduct, variant || modalProduct.variants[0]);
+  const isCustom = modalProduct && modalProduct.fulfillment === 'custom';
   const orig = this.textContent;
   this.textContent = '✓ Added!';
   this.style.background = '#16a34a';
   setTimeout(() => {
-    this.textContent = orig;
-    this.style.background = '';
+    closeModal();
   }, 1400);
 });
 
@@ -3340,6 +3328,23 @@ document.getElementById('cart-overlay').addEventListener('click', closeCartDrawe
 document.getElementById('cart-checkout-btn').addEventListener('click', function() {
   const cart = getCart();
   if (cart.length === 0) return;
+
+  // Check for custom/special request items in cart
+  const customItems = cart.filter(i => i.fulfillment === 'custom');
+  if (customItems.length > 0) {
+    closeCartDrawer();
+    // Find the product data for the first custom item to populate the order form
+    const firstCustom = customItems[0];
+    const product = allProducts.find(p => p.id === firstCustom.productId);
+    if (product) {
+      const variant = product.variants.find(v => v.id === firstCustom.variantId) || product.variants[0];
+      // Show notification toast explaining why the order form appeared
+      showToast('Your cart has ' + customItems.length + ' special request item' + (customItems.length > 1 ? 's' : '') + ' that require' + (customItems.length === 1 ? 's' : '') + ' a custom order form', 'info');
+      openOrderForm(product, variant);
+    }
+    return;
+  }
+
   const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
   const items = cart.map(i => `${i.title} (${i.variant}) x${i.qty} — $${(i.price * i.qty).toFixed(2)}`).join('\n');
   // Close cart drawer and open checkout overlay
