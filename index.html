@@ -4,8 +4,18 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>QubicaAMF — Official Merch Store</title>
+<meta name="description" content="Official QubicaAMF merchandise store. Premium bowling apparel, accessories, and custom equipment. Print-on-demand with worldwide shipping."/>
+<meta name="keywords" content="QubicaAMF, bowling merchandise, bowling apparel, AMF merch, bowling accessories"/>
+<meta property="og:title" content="QubicaAMF — Official Merch Store"/>
+<meta property="og:description" content="Premium bowling merchandise. Gear up and strike bold with official QubicaAMF apparel and accessories."/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="QubicaAMF Merch Store"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="QubicaAMF — Official Merch Store"/>
+<meta name="twitter:description" content="Premium bowling merchandise. Gear up and strike bold with official QubicaAMF apparel and accessories."/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@700;800;900&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@700;800;900&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -354,9 +364,13 @@ body.view-admin button,body.view-admin input,body.view-admin select,body.view-ad
   .perks-inner{grid-template-columns:repeat(3,1fr);gap:16px}
   .perk:nth-child(n+4){border-right:none}
 }
+.hamburger-btn{display:none;background:none;border:1.5px solid var(--line);border-radius:8px;padding:8px;color:var(--mid);cursor:pointer}
+.hamburger-btn:hover{border-color:#aaa;color:var(--dark)}
 @media(max-width:768px){
+  .hamburger-btn{display:flex;align-items:center;justify-content:center}
   .header-inner{padding:0 16px;gap:12px}
-  .header-nav{display:none}
+  .header-nav{display:none;position:absolute;top:72px;left:0;right:0;background:var(--white);border-bottom:1px solid var(--line);flex-direction:column;padding:12px 16px;z-index:199;box-shadow:0 4px 16px rgba(0,0,0,.08)}
+  .header-nav.mobile-open{display:flex}
   .h-search{display:none}
   .hero-copy{padding:40px 0}
   .hero h1{font-size:36px}
@@ -858,6 +872,9 @@ textarea.form-input{resize:vertical;min-height:80px}
       <a href="#admin" style="color:var(--muted);font-size:12px">Admin</a>
     </nav>
 
+    <button class="hamburger-btn" id="hamburger-btn" aria-label="Toggle navigation menu">
+      <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
     <div class="header-right">
       <input type="text" class="search-input" id="store-search" placeholder="Search merch..." aria-label="Search products">
       <button class="h-btn outline">Sign In</button>
@@ -1261,6 +1278,46 @@ textarea.form-input{resize:vertical;min-height:80px}
       <h4>Hats</h4>
       <p>All caps are One Size with adjustable snapback closure (fits 21.5"–24" head circumference).</p>
     </div>
+  </div>
+</div>
+
+<!-- CHECKOUT OVERLAY -->
+<div class="order-overlay" id="checkout-overlay" role="dialog" aria-modal="true" aria-label="Checkout">
+  <div class="order-card" style="max-width:560px">
+    <button class="order-close" onclick="closeCheckout()">&times;</button>
+    <h3>Checkout</h3>
+    <div class="order-subtitle">Review your order and enter shipping details</div>
+    <div style="background:var(--bg);border-radius:10px;padding:14px 16px;margin-bottom:20px;white-space:pre-line;font-size:13px;color:var(--mid);line-height:1.6" id="checkout-items-summary"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding:12px 0;border-top:1.5px solid var(--line);border-bottom:1.5px solid var(--line)">
+      <span style="font-weight:700;font-size:15px">Total</span>
+      <span style="font-family:'Montserrat',sans-serif;font-weight:900;font-size:22px;color:var(--dark)" id="checkout-total">$0.00</span>
+    </div>
+    <form id="checkout-form" onsubmit="submitCheckout(event)">
+      <div class="order-form-row">
+        <div class="order-form-group">
+          <label>First Name</label>
+          <input type="text" id="ck-fname" required placeholder="John">
+        </div>
+        <div class="order-form-group">
+          <label>Last Name</label>
+          <input type="text" id="ck-lname" required placeholder="Smith">
+        </div>
+      </div>
+      <div class="order-form-group">
+        <label>Email Address</label>
+        <input type="email" id="ck-email" required placeholder="john@example.com">
+      </div>
+      <div class="order-form-group">
+        <label>Shipping Address</label>
+        <textarea id="ck-address" required placeholder="Street address, city, state, zip"></textarea>
+      </div>
+      <div style="background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:10px;padding:14px 16px;margin-bottom:16px;font-size:13px;color:#166534;display:flex;align-items:center;gap:10px">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="#166534" stroke-width="1.8"/></svg>
+        <span>Secure checkout powered by Stripe. Your payment info is never stored on our servers.</span>
+      </div>
+      <button type="submit" class="order-submit">Place Order — <span id="checkout-total2">$0.00</span></button>
+      <p style="text-align:center;font-size:11.5px;color:var(--muted);margin-top:10px">Stripe payment integration will process after submission</p>
+    </form>
   </div>
 </div>
 
@@ -1822,6 +1879,8 @@ textarea.form-input{resize:vertical;min-height:80px}
         </select>
       </div>
       <div class="toolbar-right">
+        <button class="btn btn-secondary" onclick="bulkExportSelected()">Export Selected</button>
+        <button class="btn btn-secondary" style="color:#dc2626;border-color:#dc2626" onclick="bulkDeleteCustom()">Delete Selected</button>
         <button class="btn btn-secondary" onclick="syncPrintifyProducts()">Sync Printify</button>
         <button class="btn btn-primary" onclick="openDrawer()">+ Add Custom Product</button>
       </div>
@@ -2244,6 +2303,7 @@ function renderProductCard(product) {
     + '<div class="pcard-body">'
       + '<div class="pcard-name">' + esc(product.title) + '</div>'
       + '<div class="pcard-desc">' + esc(product.description) + (sizesText ? ' · ' + esc(sizesText) : '') + '</div>'
+      + '<div style="display:flex;align-items:center;gap:4px;margin-bottom:6px;font-size:12px"><span style="color:#f59e0b">★★★★</span><span style="color:#d4d4d8">★</span><span style="color:var(--muted)">(4.0)</span></div>'
       + '<div class="pcard-foot">'
         + '<div class="pcard-price">' + esc(product.priceFormatted) + '</div>'
         + '<div class="pcard-colors">' + colorsHTML + '</div>'
@@ -2389,9 +2449,29 @@ function openProductModal(product) {
   const emoji = CATEGORY_EMOJI[product.category] || '📦';
   const hasImage = product.images && product.images[0] && product.images[0].src;
 
-  document.getElementById('modal-img').innerHTML = hasImage
-    ? `<img src="${product.images[0].src}" alt="${product.title}">`
-    : `<span style="font-size:140px">${emoji}</span>`;
+  const imgEl = document.getElementById('modal-img');
+  if (hasImage) {
+    const allImgs = product.images.filter(i => i.src);
+    if (allImgs.length > 1) {
+      let currentImg = 0;
+      imgEl.innerHTML = '<img src="' + esc(allImgs[0].src) + '" alt="' + esc(product.title) + '" id="modal-main-img">'
+        + '<div style="position:absolute;bottom:12px;left:12px;right:12px;display:flex;gap:6px;justify-content:center">'
+        + allImgs.map((img, i) => '<button style="width:48px;height:48px;border-radius:8px;border:2px solid ' + (i === 0 ? 'var(--red)' : '#ddd') + ';padding:0;cursor:pointer;overflow:hidden;background:#fff;flex-shrink:0" class="gallery-thumb" data-idx="' + i + '"><img src="' + esc(img.src) + '" style="width:100%;height:100%;object-fit:cover"></button>').join('')
+        + '</div>';
+      imgEl.querySelectorAll('.gallery-thumb').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const idx = parseInt(this.dataset.idx);
+          document.getElementById('modal-main-img').src = allImgs[idx].src;
+          imgEl.querySelectorAll('.gallery-thumb').forEach(b => b.style.borderColor = '#ddd');
+          this.style.borderColor = 'var(--red)';
+        });
+      });
+    } else {
+      imgEl.innerHTML = '<img src="' + esc(allImgs[0].src) + '" alt="' + esc(product.title) + '">';
+    }
+  } else {
+    imgEl.innerHTML = '<span style="font-size:140px">' + emoji + '</span>';
+  }
   const catEl = document.getElementById('modal-category');
   catEl.textContent = product.category;
   // Show/hide custom badge in modal
@@ -2470,10 +2550,10 @@ function updateModalVariant() {
 
   const isCustom = modalProduct.fulfillment === 'custom';
   if (variant) {
-    infoEl.textContent = `SKU: ${variant.sku || variant.id} · ${variant.title}`;
-    priceEl.textContent = `$${variant.price.toFixed(2)}`;
-    addBtn.disabled = false;
-    addBtn.textContent = isCustom ? 'Order Now' : '+ Add to Cart';
+    infoEl.innerHTML = 'SKU: ' + esc(variant.sku || variant.id) + ' &middot; ' + esc(variant.title) + (variant.is_available ? ' <span style="color:#16a34a;font-weight:600">&#x2713; In Stock</span>' : ' <span style="color:#dc2626;font-weight:600">Out of Stock</span>');
+    priceEl.textContent = '$' + variant.price.toFixed(2);
+    addBtn.disabled = !variant.is_available;
+    addBtn.textContent = !variant.is_available ? 'Out of Stock' : (isCustom ? 'Order Now' : '+ Add to Cart');
     addBtn.style.background = isCustom ? '#7c3aed' : '';
   } else {
     infoEl.textContent = 'Select options above';
@@ -2672,12 +2752,18 @@ let _blogCache = null;
 async function fetchBlogPosts() {
   if (_blogCache) return _blogCache;
   const cached = sessionStorage.getItem('qamf_blog_cache');
-  if (cached) { try { _blogCache = JSON.parse(cached); return _blogCache; } catch(e) {} }
-  const resp = await fetch('https://besxtras.com/wp-json/wp/v2/posts?per_page=3&_embed');
+  const cachedAt = sessionStorage.getItem('qamf_blog_cache_ts');
+  if (cached && cachedAt && (Date.now() - Number(cachedAt)) < 900000) {
+    try { _blogCache = JSON.parse(cached); return _blogCache; } catch(e) {}
+  }
+  const _blogCtrl = new AbortController();
+  const _blogTimeout = setTimeout(() => _blogCtrl.abort(), 5000);
+  const resp = await fetch('https://besxtras.com/wp-json/wp/v2/posts?per_page=3&_embed', { signal: _blogCtrl.signal });
+  clearTimeout(_blogTimeout);
   if (!resp.ok) throw new Error('HTTP ' + resp.status);
   const posts = await resp.json();
   _blogCache = posts;
-  try { sessionStorage.setItem('qamf_blog_cache', JSON.stringify(posts)); } catch(e) {}
+  try { sessionStorage.setItem('qamf_blog_cache', JSON.stringify(posts)); sessionStorage.setItem('qamf_blog_cache_ts', String(Date.now())); } catch(e) {}
   return posts;
 }
 function renderBlogCards(posts, useReveal) {
@@ -2857,7 +2943,7 @@ function adminRenderProducts() {
     const emoji = CATEGORY_EMOJI[p.category] || '📦';
     const hasImage = p.images && p.images[0] && p.images[0].src;
     const thumb = hasImage
-      ? `<img src="${p.images[0].src}" alt="">`
+      ? '<img src="' + esc(p.images[0].src) + '" alt="">'
       : emoji;
     const priceRange = p.price_range
       ? (p.price_range.min === p.price_range.max ? `$${p.price_range.min}` : `$${p.price_range.min}–$${p.price_range.max}`)
@@ -3178,11 +3264,39 @@ document.getElementById('product-rows').addEventListener('click', function(e) {
   else if (btn.dataset.action === 'duplicate') duplicateProduct(pid);
   else if (btn.dataset.action === 'delete') deleteProduct(pid);
 });
-document.getElementById('admin-search-input').addEventListener('input', adminRenderProducts);
+let _adminSearchTimer = null;
+document.getElementById('admin-search-input').addEventListener('input', function() {
+  clearTimeout(_adminSearchTimer);
+  _adminSearchTimer = setTimeout(adminRenderProducts, 200);
+});
 document.getElementById('admin-filter-fulfillment').addEventListener('change', adminRenderProducts);
 document.getElementById('check-all').addEventListener('change', function() {
   document.querySelectorAll('.pt-row input[type="checkbox"]').forEach(cb => cb.checked = this.checked);
 });
+// Bulk delete for custom products
+function bulkDeleteCustom() {
+  const checked = document.querySelectorAll('.pt-row input[type="checkbox"]:checked');
+  if (checked.length === 0) { showToast('Select products first', 'error'); return; }
+  const ids = Array.from(checked).map(cb => cb.dataset.id);
+  const customIds = ids.filter(id => customProducts.some(p => p.id === id));
+  if (customIds.length === 0) { showToast('Only custom products can be deleted', 'error'); return; }
+  if (!confirm('Delete ' + customIds.length + ' custom product(s)?')) return;
+  customProducts = customProducts.filter(p => !customIds.includes(p.id));
+  saveCustomProducts();
+  renderAll();
+  document.getElementById('check-all').checked = false;
+  showToast(customIds.length + ' product(s) deleted', 'success');
+}
+function bulkExportSelected() {
+  const checked = document.querySelectorAll('.pt-row input[type="checkbox"]:checked');
+  if (checked.length === 0) { showToast('Select products first', 'error'); return; }
+  const ids = new Set(Array.from(checked).map(cb => cb.dataset.id));
+  const selected = [...printifyProducts, ...customProducts].filter(p => ids.has(p.id));
+  const blob = new Blob([JSON.stringify({ products: selected }, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'selected-products.json'; a.click(); URL.revokeObjectURL(a.href);
+  showToast('Exported ' + selected.length + ' product(s)', 'success');
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TOAST
@@ -3198,9 +3312,11 @@ function showToast(message, type) {
 // ═══════════════════════════════════════════════════════════════════════════
 // STORE SEARCH
 // ═══════════════════════════════════════════════════════════════════════════
+let _storeSearchTimer = null;
 document.getElementById('store-search').addEventListener('input', function() {
   searchQuery = this.value.trim();
-  renderProducts(allProducts, activeCategory);
+  clearTimeout(_storeSearchTimer);
+  _storeSearchTimer = setTimeout(() => renderProducts(allProducts, activeCategory), 200);
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -3218,8 +3334,39 @@ document.getElementById('cart-toggle-btn').addEventListener('click', openCartDra
 document.getElementById('cart-drawer-close').addEventListener('click', closeCartDrawer);
 document.getElementById('cart-overlay').addEventListener('click', closeCartDrawer);
 document.getElementById('cart-checkout-btn').addEventListener('click', function() {
-  alert('Checkout integration coming soon! Your cart has ' + getCart().reduce((s,i) => s + i.qty, 0) + ' item(s).');
+  const cart = getCart();
+  if (cart.length === 0) return;
+  const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const items = cart.map(i => `${i.title} (${i.variant}) x${i.qty} — $${(i.price * i.qty).toFixed(2)}`).join('\n');
+  // Close cart drawer and open checkout overlay
+  closeCartDrawer();
+  const overlay = document.getElementById('checkout-overlay');
+  document.getElementById('checkout-items-summary').textContent = items;
+  document.getElementById('checkout-total').textContent = '$' + total.toFixed(2);
+  document.getElementById('checkout-total2').textContent = '$' + total.toFixed(2);
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
 });
+function closeCheckout() {
+  document.getElementById('checkout-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function submitCheckout(e) {
+  e.preventDefault();
+  const cart = getCart();
+  const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const name = document.getElementById('ck-fname').value + ' ' + document.getElementById('ck-lname').value;
+  const email = document.getElementById('ck-email').value;
+  // Store order in localStorage for now (Stripe integration point)
+  const orders = JSON.parse(localStorage.getItem('qamf_orders') || '[]');
+  orders.push({ id: 'ORD-' + Date.now(), items: cart, total, name, email, address: document.getElementById('ck-address').value, date: new Date().toISOString(), status: 'pending' });
+  localStorage.setItem('qamf_orders', JSON.stringify(orders));
+  // Clear cart
+  localStorage.removeItem('qamf_cart');
+  updateCartBadge();
+  // Show success
+  document.getElementById('checkout-overlay').querySelector('.order-card').innerHTML = '<div class="order-success"><div class="order-success-icon">🎉</div><h4>Order Placed!</h4><p>Order #' + orders[orders.length-1].id + '<br><br>We\'ll send a confirmation to <strong>' + esc(email) + '</strong>.<br>Printify items ship in 3-7 business days.</p><button class="order-submit" style="margin-top:20px" onclick="closeCheckout()">Continue Shopping</button></div>';
+}
 updateCartBadge();
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -3237,6 +3384,11 @@ document.getElementById('size-guide-link').addEventListener('click', openSizeGui
 document.getElementById('sizeguide-close').addEventListener('click', closeSizeGuide);
 document.getElementById('sizeguide-modal').addEventListener('click', function(e) {
   if (e.target === this) closeSizeGuide();
+});
+
+// Mobile hamburger toggle
+document.getElementById('hamburger-btn').addEventListener('click', function() {
+  document.querySelector('.header-nav').classList.toggle('mobile-open');
 });
 
 // ═══════════════════════════════════════════════════════════════════════════

@@ -68,28 +68,29 @@ function printifyRequest(endpoint) {
 async function fetchAllProducts(shopId) {
   let page = 1;
   let allProducts = [];
-  let hasMore = true;
 
   console.log(`Fetching products from shop ${shopId}...`);
 
-  while (hasMore) {
+  while (true) {
     const response = await printifyRequest(
       `shops/${shopId}/products.json?page=${page}&limit=100`
     );
 
-    const products = response.data || response;
-    if (Array.isArray(products) && products.length > 0) {
-      allProducts = allProducts.concat(products);
-      console.log(`  Page ${page}: ${products.length} products`);
+    // Printify API returns { current_page, last_page, data: [...] }
+    const products = response.data || (Array.isArray(response) ? response : []);
+    if (products.length === 0) break;
+
+    allProducts = allProducts.concat(products);
+    console.log(`  Page ${page}: ${products.length} products`);
+
+    // Check if there are more pages
+    if (response.last_page && page < response.last_page) {
       page++;
-      hasMore = products.length === 100;
-    } else if (response.data && response.data.length > 0) {
-      allProducts = allProducts.concat(response.data);
-      console.log(`  Page ${page}: ${response.data.length} products`);
-      hasMore = response.current_page < response.last_page;
+    } else if (products.length === 100) {
+      // Fallback: if no pagination metadata, use count heuristic
       page++;
     } else {
-      hasMore = false;
+      break;
     }
   }
 
@@ -112,7 +113,7 @@ function transformProduct(product) {
       title: variant.title,
       price: variant.price / 100, // Printify prices are in cents
       sku: variant.sku || '',
-      is_available: variant.is_enabled && !variant.is_default === false,
+      is_available: variant.is_enabled,
       options: {}
     };
 
