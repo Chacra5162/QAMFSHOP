@@ -28,6 +28,17 @@
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"const f=JSON.parse(process.env.CLAUDE_TOOL_INPUT||'{}'); const p=(f.file_path||'').replace(/\\\\\\\\/g,'/'); if(p.endsWith('index.html')){const h=require('fs').readFileSync(p,'utf8'); const issues=[]; if(!h.includes('</html>'))issues.push('missing </html>'); if(!h.includes('</head>'))issues.push('missing </head>'); if(!h.includes('</body>'))issues.push('missing </body>'); if(issues.length){process.stdout.write('WARN: index.html structural issues: '+issues.join(', '));process.exit(1)}}\""
+          }
+        ]
+      }
     ]
   },
   "permissions": {
