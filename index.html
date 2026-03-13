@@ -68,7 +68,7 @@ body.view-admin button,body.view-admin input,body.view-admin select,body.view-ad
 .header{background:rgba(254,254,254,.92);backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,0,0,.04);position:sticky;top:0;z-index:200;transition:box-shadow .3s}
 .header-inner{max-width:1320px;margin:0 auto;padding:0 40px;display:flex;align-items:center;height:72px;gap:40px}
 .logo{display:flex;align-items:center;gap:14px;flex-shrink:0}
-.logo-mark{width:44px;height:44px}
+.logo-mark{width:44px;height:44px;object-fit:contain}
 .logo-wordmark{display:flex;flex-direction:column;line-height:1}
 .logo-main{font-family:var(--font-display);font-weight:800;font-size:19px;letter-spacing:-.02em;color:var(--dark)}
 .logo-main em{color:var(--red);font-style:normal}
@@ -900,15 +900,7 @@ textarea.form-input{resize:vertical;min-height:80px}
 <header class="header">
   <div class="header-inner">
     <a href="#store" class="logo" style="text-decoration:none" onclick="activeCategory='All';if(allProducts.length)renderProducts(allProducts,'All');window.scrollTo({top:0,behavior:'smooth'})">
-      <svg class="logo-mark" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="22" cy="22" r="21" stroke="#E8192C" stroke-width="2.2"/>
-        <circle cx="22" cy="22" r="13.5" stroke="#E8192C" stroke-width="1.5" opacity=".35"/>
-        <circle cx="22" cy="22" r="6" fill="#E8192C"/>
-        <line x1="22" y1="3" x2="22" y2="0" stroke="#E8192C" stroke-width="2.2" stroke-linecap="round"/>
-        <line x1="22" y1="44" x2="22" y2="41" stroke="#E8192C" stroke-width="2.2" stroke-linecap="round"/>
-        <line x1="41" y1="22" x2="44" y2="22" stroke="#E8192C" stroke-width="2.2" stroke-linecap="round"/>
-        <line x1="0" y1="22" x2="3" y2="22" stroke="#E8192C" stroke-width="2.2" stroke-linecap="round"/>
-      </svg>
+      <img class="logo-mark" src="https://www.qubicaamfbowling.com/static/media/qubicaminilogo.604a5c88.png" alt="QubicaAMF">
       <div class="logo-wordmark">
         <div class="logo-main">Qubica<em>AMF</em></div>
         <div class="logo-sub">Official Merch Store</div>
@@ -1173,10 +1165,7 @@ textarea.form-input{resize:vertical;min-height:80px}
   <div class="footer-top-inner">
     <div>
       <div class="footer-logo">
-        <svg width="36" height="36" viewBox="0 0 44 44" fill="none">
-          <circle cx="22" cy="22" r="21" stroke="#E8192C" stroke-width="2"/>
-          <circle cx="22" cy="22" r="6" fill="#E8192C"/>
-        </svg>
+        <img src="https://www.qubicaamfbowling.com/static/media/qubicaminilogo.604a5c88.png" alt="QubicaAMF" style="width:36px;height:36px;object-fit:contain">
         <div>
           <div class="logo-main" style="font-family:var(--font-display);font-weight:800;font-size:17px;letter-spacing:-.02em">Qubica<em style="color:var(--red);font-style:normal">AMF</em></div>
           <div class="logo-sub" style="font-size:9px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:rgba(255,255,255,.35)">Official Merch Store</div>
@@ -1447,11 +1436,7 @@ textarea.form-input{resize:vertical;min-height:80px}
 <!-- NAV -->
 <nav>
   <a href="#store" class="nav-logo" style="text-decoration:none">
-    <svg class="nav-logomark" viewBox="0 0 38 38" fill="none">
-      <circle cx="19" cy="19" r="18" stroke="#E8192C" stroke-width="2"/>
-      <circle cx="19" cy="19" r="11" stroke="#E8192C" stroke-width="1.4" opacity=".35"/>
-      <circle cx="19" cy="19" r="5.5" fill="#E8192C"/>
-    </svg>
+    <img class="nav-logomark" src="https://www.qubicaamfbowling.com/static/media/qubicaminilogo.604a5c88.png" alt="QubicaAMF" style="object-fit:contain">
     <div>
       <div class="nav-brand">Qubica<span>AMF</span></div>
       <div class="nav-sub">Marketing Suite</div>
@@ -1932,10 +1917,7 @@ textarea.form-input{resize:vertical;min-height:80px}
 <!-- ADMIN HEADER -->
 <header class="admin-header">
   <div class="admin-logo">
-    <svg viewBox="0 0 38 38" fill="none">
-      <circle cx="19" cy="19" r="18" stroke="#E8192C" stroke-width="2"/>
-      <circle cx="19" cy="19" r="5.5" fill="#E8192C"/>
-    </svg>
+    <img src="https://www.qubicaamfbowling.com/static/media/qubicaminilogo.604a5c88.png" alt="QubicaAMF" style="width:28px;height:28px;object-fit:contain">
     <span class="admin-logo-text">Qubica<em>AMF</em></span>
     <span class="admin-badge">Admin</span>
   </div>
