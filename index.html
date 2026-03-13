@@ -185,26 +185,16 @@ body.view-admin button,body.view-admin input,body.view-admin select,body.view-ad
 .perk-name{font-size:13px;font-weight:700;color:var(--dark);letter-spacing:-.01em}
 .perk-sub{font-size:11px;color:var(--muted);font-weight:400}
 
-/* ─── BUNDLE HERO CARDS ─── */
-.bundle-grid{display:grid;grid-template-columns:1.55fr 1fr;gap:20px}
-.bcard{border-radius:var(--radius-xl);overflow:hidden;position:relative;min-height:320px;display:flex;flex-direction:column;justify-content:flex-end;padding:40px;transition:transform .3s}
-.bcard:hover{transform:translateY(-4px)}
-.bcard-1{background:linear-gradient(135deg,#0A0A0B 0%,#1a0508 100%);border:1px solid rgba(255,255,255,.06)}
-.bcard-2{background:linear-gradient(135deg,#E8192C 0%,#9a0012 100%)}
-.bcard-emoji{position:absolute;top:0;right:0;bottom:0;display:flex;align-items:center;padding-right:36px;font-size:130px;opacity:.12;pointer-events:none}
-.bcard-tag{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:12px}
-.bcard-1 .bcard-tag{color:var(--red)}
-.bcard-2 .bcard-tag{color:rgba(255,255,255,.7)}
-.bcard-title{font-family:var(--font-display);font-weight:800;font-size:32px;color:#fff;line-height:1.05;margin-bottom:12px}
-.bcard-desc{font-size:13px;color:rgba(255,255,255,.5);margin-bottom:24px;max-width:300px;line-height:1.6;font-weight:400}
-.bcard-row{display:flex;align-items:center;gap:16px}
-.bcard-price{font-family:var(--font-display);font-weight:800;font-size:30px;color:#fff}
-.bcard-price s{font-size:16px;opacity:.4;font-family:var(--font-body);font-weight:400}
-.btn-bundle{padding:12px 24px;border-radius:10px;border:none;font-size:13px;font-weight:700;transition:all .25s;font-family:var(--font-body)}
-.bcard-1 .btn-bundle{background:var(--red);color:#fff}
-.bcard-1 .btn-bundle:hover{background:var(--red2);transform:translateY(-1px);box-shadow:0 8px 24px rgba(232,25,44,.4)}
-.bcard-2 .btn-bundle{background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);color:#fff;backdrop-filter:blur(8px)}
-.bcard-2 .btn-bundle:hover{background:rgba(255,255,255,.25)}
+/* ─── SEASONAL COLLECTION ─── */
+.seasonal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+.seasonal-card{border-radius:var(--radius-lg);overflow:hidden;position:relative;aspect-ratio:3/4;cursor:pointer;transition:transform .3s}
+.seasonal-card:hover{transform:translateY(-4px)}
+.seasonal-card img{width:100%;height:100%;object-fit:cover}
+.seasonal-card-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:64px;background:linear-gradient(135deg,#0A0A0B,#1a0508);border:1px solid rgba(255,255,255,.06)}
+.seasonal-card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,10,11,.8) 0%,transparent 50%);display:flex;flex-direction:column;justify-content:flex-end;padding:20px}
+.seasonal-card-name{color:#fff;font-family:var(--font-display);font-size:15px;font-weight:700}
+.seasonal-card-price{color:rgba(255,255,255,.6);font-size:13px;margin-top:2px}
+@media(max-width:768px){.seasonal-grid{grid-template-columns:1fr 1fr}.seasonal-card{aspect-ratio:3/4}}
 
 /* ─── CUSTOM FULFILLMENT BADGE ─── */
 .pcard-custom-badge{position:absolute;top:10px;left:10px;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:6px;z-index:2;display:flex;align-items:center;gap:4px}
@@ -401,7 +391,7 @@ body.view-admin button,body.view-admin input,body.view-admin select,body.view-ad
   .product-grid{grid-template-columns:repeat(3,1fr)}
   .hero-inner{grid-template-columns:1fr;min-height:auto}
   .hero-visual{display:none}
-  .bundle-grid{grid-template-columns:1fr}
+  .seasonal-grid{grid-template-columns:1fr 1fr}
   .footer-top-inner{grid-template-columns:1fr 1fr;gap:32px}
   .perks-inner{grid-template-columns:repeat(3,1fr);gap:16px}
   .perk:nth-child(n+4){border-right:none}
@@ -1150,39 +1140,16 @@ textarea.form-input{resize:vertical;min-height:80px}
   </div>
 </div>
 
-<!-- BUNDLES -->
-<div class="section">
+<!-- SEASONAL COLLECTION -->
+<div class="section" id="seasonal-section" style="display:none">
   <div class="sec-head">
     <div>
-      <div class="sec-title">Team &amp; <em>Center Bundles</em></div>
-      <div class="sec-sub">Outfit your staff — bulk discounts available on request</div>
+      <div class="sec-title" id="seasonal-title">Seasonal <em>Collection</em></div>
+      <div class="sec-sub" id="seasonal-subtitle">Curated picks for the season</div>
     </div>
     <a href="javascript:void(0)" class="sec-link" onclick="document.querySelectorAll('.header-nav a[data-nav-cat]').forEach(a=>a.classList.remove('active'));activeCategory='All';renderProducts(allProducts,'All');document.getElementById('product-grid').scrollIntoView({behavior:'smooth'})">View all products →</a>
   </div>
-
-  <div class="bundle-grid">
-    <div class="bcard bcard-1">
-      <div class="bcard-emoji">👕</div>
-      <div style="position:relative;z-index:1">
-        <div class="bcard-tag">⚡ Best Seller Bundle</div>
-        <div class="bcard-title">The Full<br>Strike Kit</div>
-        <div class="bcard-desc">Tee + Hoodie + Hat + Bottle — everything your team needs to represent QubicaAMF on and off the lanes.</div>
-        <div class="bcard-row">
-          <div class="bcard-price">$129 <s>$160</s></div>
-          <button class="btn-bundle" onclick="document.getElementById('product-grid').scrollIntoView({behavior:'smooth'})">Shop Bundle →</button>
-        </div>
-      </div>
-    </div>
-    <div class="bcard bcard-2">
-      <div class="bcard-emoji">🏆</div>
-      <div style="position:relative;z-index:1">
-        <div class="bcard-tag">★ Exclusive Access</div>
-        <div class="bcard-title">Employee<br>Collection</div>
-        <div class="bcard-desc">Exclusive styles available only to QubicaAMF staff and certified partners worldwide.</div>
-        <button class="btn-bundle" style="width:fit-content" onclick="document.getElementById('product-grid').scrollIntoView({behavior:'smooth'})">View Collection →</button>
-      </div>
-    </div>
-  </div>
+  <div id="seasonal-grid" class="seasonal-grid"></div>
 </div>
 
 <!-- LOOKBOOK -->
@@ -1993,6 +1960,7 @@ textarea.form-input{resize:vertical;min-height:80px}
     <button class="tab active" data-panel="products">Products</button>
     <button class="tab" data-panel="featured">Featured Drops</button>
     <button class="tab" data-panel="lookbook">Lookbook</button>
+    <button class="tab" data-panel="seasonal">Seasonal</button>
     <button class="tab" data-panel="settings">Settings</button>
     <button class="tab" data-panel="export">Export / Import</button>
   </div>
@@ -2135,6 +2103,55 @@ textarea.form-input{resize:vertical;min-height:80px}
           </div>
         </div>
         <div id="lb-product-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ SEASONAL PANEL ═══════════ -->
+  <div class="panel" id="panel-seasonal">
+    <div class="settings-grid">
+      <div class="settings-card">
+        <h4>Seasonal Collection</h4>
+        <p>Build a curated seasonal collection that appears on the storefront</p>
+        <div class="form-group" style="margin-bottom:10px">
+          <label>Collection Name</label>
+          <input type="text" class="form-input" id="sc-title" placeholder="Spring Strike Season" value="Spring Strike Season">
+        </div>
+        <div class="form-group" style="margin-bottom:10px">
+          <label>Subtitle</label>
+          <input type="text" class="form-input" id="sc-desc" placeholder="Curated picks for the season">
+        </div>
+        <div class="form-group" style="margin-bottom:10px">
+          <label>Season</label>
+          <select class="form-input" id="sc-season">
+            <option value="spring">🌸 Spring</option>
+            <option value="summer">☀️ Summer</option>
+            <option value="fall">🍂 Fall</option>
+            <option value="winter">❄️ Winter</option>
+            <option value="holiday">🎄 Holiday</option>
+            <option value="custom">🎳 Custom</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:12px">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <input type="checkbox" id="sc-visible" checked style="width:16px;height:16px;accent-color:var(--red)">
+            Show collection on storefront
+          </label>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="saveSeasonal()">Save Collection</button>
+      </div>
+      <div class="settings-card" style="grid-column:1/-1">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div>
+            <h4>Select Products</h4>
+            <p>Click products to add or remove from the seasonal collection. <span id="sc-count-label" style="font-weight:600;color:var(--dark)">0 selected</span></p>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="text" class="form-input" id="sc-search" placeholder="Search..." style="width:180px;padding:8px 12px;font-size:12px">
+            <button class="btn btn-secondary btn-sm" onclick="clearSeasonal()">Clear</button>
+          </div>
+        </div>
+        <div id="sc-product-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px"></div>
       </div>
     </div>
   </div>
@@ -3039,6 +3056,72 @@ function renderStoreLookbook(products) {
   });
 }
 
+// ─── Render seasonal collection on the storefront ─────────────────────────────
+function renderStoreSeasonal(products) {
+  const section = document.getElementById('seasonal-section');
+  const grid = document.getElementById('seasonal-grid');
+  if (!section || !grid) return;
+
+  let sc = {};
+  try {
+    const ss = localStorage.getItem('qamf_admin_settings');
+    if (ss) sc = JSON.parse(ss).seasonal || {};
+  } catch(e) {}
+
+  const ids = sc.product_ids || [];
+  if (ids.length === 0 || sc.visible === false) {
+    section.style.display = 'none';
+    return;
+  }
+
+  section.style.display = '';
+
+  // Set title/subtitle
+  const titleEl = document.getElementById('seasonal-title');
+  const subtitleEl = document.getElementById('seasonal-subtitle');
+  if (titleEl) {
+    const t = sc.title || 'Seasonal Collection';
+    const words = t.split(' ');
+    if (words.length > 1) {
+      titleEl.innerHTML = esc(words.slice(0, -1).join(' ')) + ' <em>' + esc(words[words.length - 1]) + '</em>';
+    } else {
+      titleEl.innerHTML = '<em>' + esc(t) + '</em>';
+    }
+  }
+  if (subtitleEl) subtitleEl.textContent = sc.desc || '';
+
+  const EMOJI = {'T-Shirts':'👕','Hoodies':'🧥','Polos':'👔','Jackets':'🧥','Hats & Caps':'🧢','Bags':'🎒','Drinkware':'☕','Equipment':'🎳','Awards':'🏆','Other':'📦'};
+  const scProducts = ids.map(id => products.find(p => p.id === id)).filter(Boolean);
+
+  grid.innerHTML = scProducts.map(p => {
+    const hasImg = p.images && p.images[0] && p.images[0].src;
+    const emoji = EMOJI[p.category] || '📦';
+    if (hasImg) {
+      return '<div class="seasonal-card" data-product-id="' + esc(p.id) + '">'
+        + '<img src="' + esc(p.images[0].src) + '" alt="' + esc(p.title) + '" loading="lazy">'
+        + '<div class="seasonal-card-overlay">'
+        + '<div class="seasonal-card-name">' + esc(p.title) + '</div>'
+        + '<div class="seasonal-card-price">' + esc(p.priceFormatted || '') + '</div>'
+        + '</div></div>';
+    } else {
+      return '<div class="seasonal-card" data-product-id="' + esc(p.id) + '">'
+        + '<div class="seasonal-card-placeholder">' + emoji + '</div>'
+        + '<div class="seasonal-card-overlay">'
+        + '<div class="seasonal-card-name">' + esc(p.title) + '</div>'
+        + '<div class="seasonal-card-price">' + esc(p.priceFormatted || '') + '</div>'
+        + '</div></div>';
+    }
+  }).join('');
+
+  // Click card to open product modal
+  grid.querySelectorAll('.seasonal-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const product = products.find(p => p.id === card.dataset.productId);
+      if (product) openProductModal(product);
+    });
+  });
+}
+
 // ─── Load products from products.json + custom-products.json ────────────────
 async function loadProducts() {
   try {
@@ -3089,8 +3172,9 @@ async function loadProducts() {
     const statNums = document.querySelectorAll('.h-stat-num');
     if (statNums[0]) statNums[0].innerHTML = `${allProducts.length}<sup>+</sup>`;
 
-    // Render lookbook on storefront
+    // Render lookbook + seasonal collection on storefront
     renderStoreLookbook(allProducts);
+    renderStoreSeasonal(allProducts);
   } catch (err) {
     console.warn('Could not load products:', err.message);
     console.log('Run "npm run sync:demo" or "npm run sync" to generate product data.');
@@ -3206,7 +3290,8 @@ let settings = {
   stripe_pk: '',
   woo_url: '',
   featured_ids: [],
-  lookbook: { title: 'The Lookbook', desc: 'Curated styles from the QubicaAMF collection', layout: 'cols-mixed', visible: true, product_ids: [] }
+  lookbook: { title: 'The Lookbook', desc: 'Curated styles from the QubicaAMF collection', layout: 'cols-mixed', visible: true, product_ids: [] },
+  seasonal: { title: 'Spring Strike Season', desc: 'Curated picks for the season', season: 'spring', visible: true, product_ids: [] }
 };
 let editingId = null; // null = add mode, string = editing existing
 
@@ -3261,6 +3346,7 @@ document.querySelectorAll('#page-admin .tab').forEach(tab => {
     if (tab.dataset.panel === 'export') updateJSONPreview();
     if (tab.dataset.panel === 'featured') renderFeaturedGrid();
     if (tab.dataset.panel === 'lookbook') renderLookbookAdmin();
+    if (tab.dataset.panel === 'seasonal') renderSeasonalAdmin();
   });
 });
 
@@ -3780,6 +3866,97 @@ function clearLookbook() {
 document.getElementById('lb-search').addEventListener('input', function() {
   clearTimeout(_lbSearchTimer);
   _lbSearchTimer = setTimeout(renderLookbookAdmin, 200);
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SEASONAL COLLECTION
+// ═══════════════════════════════════════════════════════════════════════════
+let _scSearchTimer = null;
+
+function renderSeasonalAdmin() {
+  const grid = document.getElementById('sc-product-grid');
+  const search = (document.getElementById('sc-search').value || '').toLowerCase();
+  const sc = settings.seasonal || {};
+
+  // Load settings into form
+  document.getElementById('sc-title').value = sc.title || 'Spring Strike Season';
+  document.getElementById('sc-desc').value = sc.desc || '';
+  document.getElementById('sc-season').value = sc.season || 'spring';
+  document.getElementById('sc-visible').checked = sc.visible !== false;
+
+  let all = [
+    ...printifyProducts.map(p => ({ ...p, fulfillment: 'printify' })),
+    ...customProducts.map(p => ({ ...p, fulfillment: 'custom' }))
+  ];
+
+  if (search) {
+    all = all.filter(p =>
+      p.title.toLowerCase().includes(search) ||
+      (p.category || '').toLowerCase().includes(search)
+    );
+  }
+
+  const selectedIds = sc.product_ids || [];
+  all.sort((a, b) => {
+    const aS = selectedIds.includes(a.id) ? 0 : 1;
+    const bS = selectedIds.includes(b.id) ? 0 : 1;
+    if (aS !== bS) return aS - bS;
+    return a.title.localeCompare(b.title);
+  });
+
+  const EMOJI = {'T-Shirts':'👕','Hoodies':'🧥','Polos':'👔','Jackets':'🧥','Hats & Caps':'🧢','Bags':'🎒','Drinkware':'☕','Equipment':'🎳','Awards':'🏆','Other':'📦'};
+  grid.innerHTML = all.map(p => {
+    const isSelected = selectedIds.includes(p.id);
+    const hasImg = p.images && p.images[0] && p.images[0].src;
+    const emoji = EMOJI[p.category] || '📦';
+    const imgContent = hasImg
+      ? '<img src="' + esc(p.images[0].src) + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:8px">'
+      : '<span style="font-size:32px">' + emoji + '</span>';
+    return '<div class="feat-card' + (isSelected ? ' selected' : '') + '" data-id="' + esc(p.id) + '" style="padding:8px">'
+      + '<div class="feat-card-star" style="width:22px;height:22px;font-size:12px">' + (isSelected ? '★' : '☆') + '</div>'
+      + '<div style="width:100%;aspect-ratio:1;border-radius:8px;background:var(--bg);display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:6px">' + imgContent + '</div>'
+      + '<div class="feat-card-name" style="font-size:11px">' + esc(p.title) + '</div>'
+      + '</div>';
+  }).join('');
+
+  document.getElementById('sc-count-label').textContent = selectedIds.length + ' selected';
+}
+
+document.getElementById('sc-product-grid').addEventListener('click', function(e) {
+  const card = e.target.closest('.feat-card');
+  if (!card) return;
+  const id = card.dataset.id;
+  if (!settings.seasonal) settings.seasonal = { title: '', desc: '', season: 'spring', visible: true, product_ids: [] };
+  if (!settings.seasonal.product_ids) settings.seasonal.product_ids = [];
+  const idx = settings.seasonal.product_ids.indexOf(id);
+  if (idx >= 0) {
+    settings.seasonal.product_ids.splice(idx, 1);
+  } else {
+    settings.seasonal.product_ids.push(id);
+  }
+  renderSeasonalAdmin();
+});
+
+function saveSeasonal() {
+  if (!settings.seasonal) settings.seasonal = {};
+  settings.seasonal.title = document.getElementById('sc-title').value.trim() || 'Seasonal Collection';
+  settings.seasonal.desc = document.getElementById('sc-desc').value.trim();
+  settings.seasonal.season = document.getElementById('sc-season').value;
+  settings.seasonal.visible = document.getElementById('sc-visible').checked;
+  localStorage.setItem('qamf_admin_settings', JSON.stringify(settings));
+  showToast('Seasonal collection saved! ' + (settings.seasonal.product_ids || []).length + ' products.', 'success');
+}
+
+function clearSeasonal() {
+  if (!confirm('Remove all products from the seasonal collection?')) return;
+  if (!settings.seasonal) settings.seasonal = {};
+  settings.seasonal.product_ids = [];
+  renderSeasonalAdmin();
+}
+
+document.getElementById('sc-search').addEventListener('input', function() {
+  clearTimeout(_scSearchTimer);
+  _scSearchTimer = setTimeout(renderSeasonalAdmin, 200);
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
