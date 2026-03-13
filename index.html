@@ -929,7 +929,7 @@ textarea.form-input{resize:vertical;min-height:80px}
     </button>
     <div class="header-right">
       <input type="text" class="search-input" id="store-search" placeholder="Search merch..." aria-label="Search products">
-      <button class="h-btn outline">Sign In</button>
+      <button class="h-btn outline" onclick="window.location.hash='admin'">Sign In</button>
       <button class="h-btn primary" id="cart-toggle-btn" aria-label="Open cart">
         <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Cart
@@ -947,8 +947,8 @@ textarea.form-input{resize:vertical;min-height:80px}
       <h1>Gear Up.<br><mark>Strike Bold.</mark></h1>
       <p class="hero-desc">Official QubicaAMF merchandise for employees, bowling centers, and fans worldwide. Premium print-on-demand — delivered to your door.</p>
       <div class="hero-actions">
-        <button class="btn-hero solid">Shop the Collection</button>
-        <button class="btn-hero ghost">View Lookbook →</button>
+        <button class="btn-hero solid" onclick="document.getElementById('product-grid').scrollIntoView({behavior:'smooth'})">Shop the Collection</button>
+        <button class="btn-hero ghost" onclick="document.getElementById('product-grid').scrollIntoView({behavior:'smooth'})">Browse All Products →</button>
       </div>
       <div class="hero-stats">
         <div>
@@ -1118,7 +1118,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div class="sec-title">Team &amp; <em>Center Bundles</em></div>
       <div class="sec-sub">Outfit your staff — bulk discounts available on request</div>
     </div>
-    <a href="#" class="sec-link">View all bundles →</a>
+    <a href="javascript:void(0)" class="sec-link" onclick="document.querySelectorAll('.header-nav a[data-nav-cat]').forEach(a=>a.classList.remove('active'));activeCategory='All';renderProducts(allProducts,'All');document.getElementById('product-grid').scrollIntoView({behavior:'smooth'})">View all products →</a>
   </div>
 
   <div class="bundle-grid">
@@ -1130,7 +1130,7 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div class="bcard-desc">Tee + Hoodie + Hat + Bottle — everything your team needs to represent QubicaAMF on and off the lanes.</div>
         <div class="bcard-row">
           <div class="bcard-price">$129 <s>$160</s></div>
-          <button class="btn-bundle">Shop Bundle →</button>
+          <button class="btn-bundle" onclick="document.getElementById('product-grid').scrollIntoView({behavior:'smooth'})">Shop Bundle →</button>
         </div>
       </div>
     </div>
@@ -1140,7 +1140,7 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div class="bcard-tag">★ Exclusive Access</div>
         <div class="bcard-title">Employee<br>Collection</div>
         <div class="bcard-desc">Exclusive styles available only to QubicaAMF staff and certified partners worldwide.</div>
-        <button class="btn-bundle" style="width:fit-content">View Collection →</button>
+        <button class="btn-bundle" style="width:fit-content" onclick="document.getElementById('product-grid').scrollIntoView({behavior:'smooth'})">View Collection →</button>
       </div>
     </div>
   </div>
@@ -1175,36 +1175,35 @@ textarea.form-input{resize:vertical;min-height:80px}
       </div>
       <p class="footer-desc">Official merchandise for QubicaAMF employees, bowling centers, and fans. All products are print-on-demand via Printify. No inventory minimums required.</p>
       <div class="footer-social">
-        <a class="fsoc" href="#">𝕏</a>
-        <a class="fsoc" href="#">in</a>
-        <a class="fsoc" href="#">📘</a>
-        <a class="fsoc" href="#">📸</a>
+        <a class="fsoc" href="https://x.com/QubicaAMF" target="_blank" rel="noopener" aria-label="X (Twitter)">𝕏</a>
+        <a class="fsoc" href="https://www.linkedin.com/company/qubicaamf" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+        <a class="fsoc" href="https://www.facebook.com/QubicaAMF" target="_blank" rel="noopener" aria-label="Facebook">📘</a>
+        <a class="fsoc" href="https://www.instagram.com/qubicaamf" target="_blank" rel="noopener" aria-label="Instagram">📸</a>
       </div>
     </div>
     <div class="footer-col">
       <h5>Shop</h5>
-      <a href="#">T-Shirts</a>
-      <a href="#">Hoodies</a>
-      <a href="#">Hats &amp; Caps</a>
-      <a href="#">Drinkware</a>
-      <a href="#">Accessories</a>
-      <a href="#">Bundles</a>
+      <a href="javascript:void(0)" onclick="activeCategory='T-Shirts';renderProducts(allProducts,'T-Shirts');window.scrollTo({top:0,behavior:'smooth'})">T-Shirts</a>
+      <a href="javascript:void(0)" onclick="activeCategory='Hoodies';renderProducts(allProducts,'Hoodies');window.scrollTo({top:0,behavior:'smooth'})">Hoodies</a>
+      <a href="javascript:void(0)" onclick="activeCategory='Hats &amp; Caps';renderProducts(allProducts,'Hats &amp; Caps');window.scrollTo({top:0,behavior:'smooth'})">Hats &amp; Caps</a>
+      <a href="javascript:void(0)" onclick="activeCategory='Drinkware';renderProducts(allProducts,'Drinkware');window.scrollTo({top:0,behavior:'smooth'})">Drinkware</a>
+      <a href="javascript:void(0)" onclick="activeCategory='Bags';renderProducts(allProducts,'Bags');window.scrollTo({top:0,behavior:'smooth'})">Bags</a>
+      <a href="javascript:void(0)" onclick="activeCategory='All';renderProducts(allProducts,'All');window.scrollTo({top:0,behavior:'smooth'})">All Products</a>
     </div>
     <div class="footer-col">
       <h5>Support</h5>
-      <a href="#">Track Your Order</a>
-      <a href="#">Returns &amp; Exchanges</a>
+      <a href="mailto:support@qubicaamf.com">Contact Us</a>
       <a href="javascript:void(0)" onclick="openSizeGuide()">Sizing Guide</a>
-      <a href="#">FAQ</a>
-      <a href="#">Contact Us</a>
+      <a href="mailto:support@qubicaamf.com?subject=Return%20Request">Returns &amp; Exchanges</a>
+      <a href="mailto:orders@qubicaamf.com?subject=Order%20Status%20Inquiry">Track Your Order</a>
+      <a href="https://besxtras.com/" target="_blank" rel="noopener">Blog — BesXtras</a>
     </div>
     <div class="footer-col">
       <h5>Company</h5>
-      <a href="#">About QubicaAMF</a>
-      <a href="#">Bulk &amp; Team Orders</a>
-      <a href="#">Careers</a>
-      <a href="#">Privacy Policy</a>
-      <a href="#">Terms of Service</a>
+      <a href="https://www.qubicaamf.com" target="_blank" rel="noopener">About QubicaAMF</a>
+      <a href="mailto:orders@qubicaamf.com?subject=Bulk%20%26%20Team%20Order%20Inquiry">Bulk &amp; Team Orders</a>
+      <a href="https://www.qubicaamf.com/careers" target="_blank" rel="noopener">Careers</a>
+      <a href="#marketing" onclick="setTimeout(()=>document.getElementById('pricing').scrollIntoView({behavior:'smooth'}),300)">Marketing Suite</a>
     </div>
   </div>
 </div>
@@ -1401,7 +1400,7 @@ textarea.form-input{resize:vertical;min-height:80px}
     <a href="javascript:void(0)" onclick="document.getElementById('blog').scrollIntoView({behavior:'smooth'})">Blog</a>
   </div>
   <div class="nav-cta">
-    <button class="btn btn-ghost">Sign In</button>
+    <button class="btn btn-ghost" onclick="window.location.hash='admin'">Sign In</button>
     <button class="btn btn-red" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">Start Subscription</button>
   </div>
 </nav>
@@ -1636,7 +1635,7 @@ textarea.form-input{resize:vertical;min-height:80px}
           <div class="pf"><span class="pf-check">✓</span> 30-day content calendar</div>
           <div class="pf"><span class="pf-check">✓</span> Canva editable files</div>
         </div>
-        <button class="btn btn-ghost" style="width:100%;padding:12px;border-radius:9px;font-size:14px;font-weight:700">Get Started</button>
+        <a href="mailto:marketing@qubicaamf.com?subject=Starter%20Plan%20Inquiry&body=I'm%20interested%20in%20the%20Starter%20plan%20(%2429%2Fmo).%20Please%20send%20more%20info." class="btn btn-ghost" style="width:100%;padding:12px;border-radius:9px;font-size:14px;font-weight:700;text-align:center;display:block">Get Started</a>
       </div>
 
       <!-- Pro (Featured) -->
@@ -1656,7 +1655,7 @@ textarea.form-input{resize:vertical;min-height:80px}
           <div class="pf"><span class="pf-check">✓</span> 4 email templates</div>
           <div class="pf"><span class="pf-check">✓</span> Priority email support</div>
         </div>
-        <button class="btn btn-red" style="width:100%;padding:12px;border-radius:9px;font-size:14px;font-weight:700">Start Pro Plan</button>
+        <a href="mailto:marketing@qubicaamf.com?subject=Pro%20Plan%20Inquiry&body=I'm%20interested%20in%20the%20Pro%20plan%20(%2459%2Fmo)%20with%20printed%20materials.%20Please%20send%20more%20info." class="btn btn-red" style="width:100%;padding:12px;border-radius:9px;font-size:14px;font-weight:700;text-align:center;display:block">Start Pro Plan</a>
       </div>
 
       <!-- Center Pack -->
@@ -1675,7 +1674,7 @@ textarea.form-input{resize:vertical;min-height:80px}
           <div class="pf"><span class="pf-check">✓</span> Dedicated account manager</div>
           <div class="pf"><span class="pf-check">✓</span> Bulk center discount available</div>
         </div>
-        <button class="btn btn-ghost" style="width:100%;padding:12px;border-radius:9px;font-size:14px;font-weight:700">Contact Sales</button>
+        <a href="mailto:marketing@qubicaamf.com?subject=Center%20Pack%20Inquiry&body=I'm%20interested%20in%20the%20Center%20Pack%20(%2499%2Fmo)%20for%20my%20bowling%20center.%20Please%20send%20more%20info." class="btn btn-ghost" style="width:100%;padding:12px;border-radius:9px;font-size:14px;font-weight:700;text-align:center;display:block">Contact Sales</a>
       </div>
     </div>
   </div>
@@ -1709,8 +1708,8 @@ textarea.form-input{resize:vertical;min-height:80px}
         </div>
         <div class="vmm-price-note">Billed monthly · No shipping costs · Cancel anytime</div>
         <div class="vmm-cta-row">
-          <button class="btn btn-red btn-lg">Start Digital Pack</button>
-          <button class="btn-outline-white">Compare Plans</button>
+          <a href="mailto:marketing@qubicaamf.com?subject=Virtual%20Marketing%20Manager%20Inquiry&body=I'm%20interested%20in%20the%20Digital%20Pack%20(%2439%2Fmo).%20Please%20send%20more%20info." class="btn btn-red btn-lg" style="text-align:center">Start Digital Pack</a>
+          <button class="btn-outline-white" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">Compare Plans</button>
         </div>
       </div>
       <div class="vmm-card reveal">
@@ -1838,7 +1837,7 @@ textarea.form-input{resize:vertical;min-height:80px}
     <p>Join QubicaAMF centers worldwide getting professionally designed marketing materials delivered to their door every month.</p>
     <div class="cta-band-actions">
       <button class="btn btn-red btn-lg" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">Start Your Subscription</button>
-      <button class="btn-outline-white">Schedule a Demo</button>
+      <a href="mailto:marketing@qubicaamf.com?subject=Schedule%20a%20Demo&body=I'd%20like%20to%20schedule%20a%20demo%20of%20the%20QubicaAMF%20Marketing%20Suite.%20Please%20contact%20me." class="btn-outline-white" style="text-align:center">Schedule a Demo</a>
     </div>
   </div>
 </section>
@@ -1848,10 +1847,10 @@ textarea.form-input{resize:vertical;min-height:80px}
   <div class="footer-inner">
     <div class="footer-brand">Qubica<span>AMF</span> Marketing Suite</div>
     <div class="footer-links">
-      <a href="#">Privacy Policy</a>
-      <a href="#">Terms of Service</a>
-      <a href="#">Contact</a>
-      <a href="#">Main Store</a>
+      <a href="https://www.qubicaamf.com/privacy" target="_blank" rel="noopener">Privacy Policy</a>
+      <a href="https://www.qubicaamf.com/terms" target="_blank" rel="noopener">Terms of Service</a>
+      <a href="mailto:marketing@qubicaamf.com">Contact</a>
+      <a href="#store">Main Store</a>
     </div>
     <div class="footer-copy">© 2026 QubicaAMF Worldwide. Powered by Stripe & Printify.</div>
   </div>
