@@ -26,7 +26,7 @@
       "category": "T-Shirts",
       "images": [
         {
-          "src": "",
+          "src": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&h=600&fit=crop",
           "variant_ids": [],
           "is_default": true
         }
@@ -227,7 +227,7 @@
       "category": "Hoodies",
       "images": [
         {
-          "src": "",
+          "src": "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&h=600&fit=crop",
           "variant_ids": [],
           "is_default": true
         }
@@ -382,7 +382,7 @@
       "category": "Hats & Caps",
       "images": [
         {
-          "src": "",
+          "src": "https://images.unsplash.com/photo-1588850561407-ed78c334e67a?w=600&h=600&fit=crop",
           "variant_ids": [],
           "is_default": true
         }
@@ -442,7 +442,7 @@
       "category": "Drinkware",
       "images": [
         {
-          "src": "",
+          "src": "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=600&h=600&fit=crop",
           "variant_ids": [],
           "is_default": true
         }
@@ -502,7 +502,7 @@
       "category": "Jackets",
       "images": [
         {
-          "src": "",
+          "src": "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&h=600&fit=crop",
           "variant_ids": [],
           "is_default": true
         }
@@ -629,7 +629,7 @@
       "category": "Bags",
       "images": [
         {
-          "src": "",
+          "src": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&h=600&fit=crop",
           "variant_ids": [],
           "is_default": true
         }
@@ -678,7 +678,7 @@
       "category": "Polos",
       "images": [
         {
-          "src": "",
+          "src": "https://images.unsplash.com/photo-1625910513413-5fc421e0da9d?w=600&h=600&fit=crop",
           "variant_ids": [],
           "is_default": true
         }
@@ -831,7 +831,7 @@
       "category": "Drinkware",
       "images": [
         {
-          "src": "",
+          "src": "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=600&h=600&fit=crop",
           "variant_ids": [],
           "is_default": true
         }
