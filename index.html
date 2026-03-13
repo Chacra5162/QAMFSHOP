@@ -1203,7 +1203,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <h5>Support</h5>
       <a href="mailto:support@qubicaamf.com">Contact Us</a>
       <a href="javascript:void(0)" onclick="openSizeGuide()">Sizing Guide</a>
-      <a href="mailto:support@qubicaamf.com?subject=Return%20Request">Returns &amp; Exchanges</a>
+      <a href="javascript:void(0)" onclick="openReturns()">Returns &amp; Exchanges</a>
       <a href="mailto:orders@qubicaamf.com?subject=Order%20Status%20Inquiry">Track Your Order</a>
       <a href="https://besxtras.com/" target="_blank" rel="noopener">Blog — BesXtras</a>
     </div>
@@ -1340,6 +1340,60 @@ textarea.form-input{resize:vertical;min-height:80px}
     <div class="size-table-section">
       <h4>Hats</h4>
       <p>All caps are One Size with adjustable snapback closure (fits 21.5"–24" head circumference).</p>
+    </div>
+  </div>
+</div>
+
+<!-- RETURNS & EXCHANGES MODAL -->
+<div class="order-overlay" id="returns-overlay" role="dialog" aria-modal="true" aria-label="Returns and exchanges">
+  <div class="order-card" style="max-width:520px">
+    <button class="order-close" onclick="closeReturns()">&times;</button>
+    <div id="returns-form-content">
+      <h3>Returns &amp; Exchanges</h3>
+      <div class="order-subtitle">Fill out the form below and our team will get back to you within 1–2 business days.</div>
+      <form id="returns-form" onsubmit="submitReturns(event)">
+        <div class="order-form-row">
+          <div class="order-form-group">
+            <label for="ret-fname">First Name <span style="color:var(--red)">*</span></label>
+            <input type="text" id="ret-fname" required placeholder="John">
+          </div>
+          <div class="order-form-group">
+            <label for="ret-lname">Last Name <span style="color:var(--red)">*</span></label>
+            <input type="text" id="ret-lname" required placeholder="Smith">
+          </div>
+        </div>
+        <div class="order-form-group">
+          <label for="ret-email">Email Address <span style="color:var(--red)">*</span></label>
+          <input type="email" id="ret-email" required placeholder="john@example.com">
+        </div>
+        <div class="order-form-group">
+          <label for="ret-order">Order Number <span style="color:var(--red)">*</span></label>
+          <input type="text" id="ret-order" required placeholder="ORD-123456">
+        </div>
+        <div class="order-form-group">
+          <label for="ret-type">Request Type <span style="color:var(--red)">*</span></label>
+          <select id="ret-type" required style="width:100%;padding:12px 14px;border:1.5px solid rgba(0,0,0,.1);border-radius:10px;font-size:14px;font-family:var(--font-body);outline:none;background:#fff;color:var(--dark)">
+            <option value="">Select...</option>
+            <option value="Return">Return (refund)</option>
+            <option value="Exchange">Exchange (different size/color)</option>
+            <option value="Damaged">Damaged or defective item</option>
+            <option value="Wrong Item">Wrong item received</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="order-form-group">
+          <label for="ret-items">Item(s) &amp; Details <span style="color:var(--red)">*</span></label>
+          <textarea id="ret-items" required placeholder="Which item(s)? Include size/color. For exchanges, note what you'd like instead."></textarea>
+        </div>
+        <div class="order-form-group">
+          <label for="ret-reason">Reason (optional)</label>
+          <textarea id="ret-reason" placeholder="Tell us more about why you're requesting this..."></textarea>
+        </div>
+        <div style="background:var(--bg);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12px;color:var(--mid);line-height:1.6">
+          📦 Returns accepted within 30 days of delivery. Items must be unworn and in original packaging. We'll email you a prepaid return label.
+        </div>
+        <button type="submit" class="order-submit" id="ret-submit-btn">Submit Request</button>
+      </form>
     </div>
   </div>
 </div>
@@ -3595,6 +3649,70 @@ document.getElementById('sizeguide-modal').addEventListener('click', function(e)
   if (e.target === this) closeSizeGuide();
 });
 
+// ═══════════════════════════════════════════════════════════════════════════
+// RETURNS & EXCHANGES
+// ═══════════════════════════════════════════════════════════════════════════
+const _returnsFormOriginalHTML = document.getElementById('returns-form-content').innerHTML;
+function openReturns() {
+  const existing = document.getElementById('returns-form');
+  if (!existing) document.getElementById('returns-form-content').innerHTML = _returnsFormOriginalHTML;
+  document.getElementById('returns-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeReturns() {
+  document.getElementById('returns-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('returns-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeReturns();
+});
+function submitReturns(e) {
+  e.preventDefault();
+  const btn = document.getElementById('ret-submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+  const data = {
+    name: document.getElementById('ret-fname').value + ' ' + document.getElementById('ret-lname').value,
+    email: document.getElementById('ret-email').value,
+    order: document.getElementById('ret-order').value,
+    type: document.getElementById('ret-type').value,
+    items: document.getElementById('ret-items').value,
+    reason: document.getElementById('ret-reason').value
+  };
+  // Send via FormSubmit.co (free, no signup, sends to email)
+  const formData = new FormData();
+  formData.append('name', data.name);
+  formData.append('email', data.email);
+  formData.append('_subject', 'Return/Exchange Request: ' + data.type + ' — Order ' + data.order);
+  formData.append('Order Number', data.order);
+  formData.append('Request Type', data.type);
+  formData.append('Items & Details', data.items);
+  formData.append('Reason', data.reason || 'Not specified');
+  formData.append('_replyto', data.email);
+  formData.append('_template', 'table');
+  fetch('https://formsubmit.co/ajax/support@qubicaamf.com', {
+    method: 'POST',
+    body: formData
+  }).then(resp => resp.json()).then(result => {
+    if (result.success) {
+      document.getElementById('returns-form-content').innerHTML =
+        '<div class="order-success">'
+        + '<div class="order-success-icon">✅</div>'
+        + '<h4>Request Submitted!</h4>'
+        + '<p>We\'ve received your ' + esc(data.type.toLowerCase()) + ' request for order <strong>' + esc(data.order) + '</strong>.<br><br>'
+        + 'Our team will review it and get back to you at <strong>' + esc(data.email) + '</strong> within 1–2 business days.</p>'
+        + '<button class="order-submit" style="margin-top:20px" onclick="closeReturns()">Close</button>'
+        + '</div>';
+    } else {
+      throw new Error('Submit failed');
+    }
+  }).catch(() => {
+    btn.disabled = false;
+    btn.textContent = 'Submit Request';
+    showToast('Could not send request. Please try again or email support@qubicaamf.com directly.', 'error');
+  });
+}
+
 // Mobile hamburger toggle
 document.getElementById('hamburger-btn').addEventListener('click', function() {
   document.querySelector('.header-nav').classList.toggle('mobile-open');
@@ -3609,6 +3727,7 @@ document.addEventListener('keydown', function(e) {
     closeOrderForm();
     closeCartDrawer();
     closeSizeGuide();
+    closeReturns();
     closeDrawer();
   }
 });
