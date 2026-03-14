@@ -94,11 +94,21 @@ class QAMF_Custom_Orders {
             'label'       => 'Custom Fulfillment',
             'description' => 'This item is fulfilled manually (not via Printify). Orders will be batched and emailed to the admin daily at 8 AM EST.',
         ]);
+        wp_nonce_field('qamf_save_custom_fulfillment', '_qamf_custom_nonce');
     }
 
     public function save_custom_fulfillment_field($post_id) {
+        if (!isset($_POST['_qamf_custom_nonce']) || !wp_verify_nonce($_POST['_qamf_custom_nonce'], 'qamf_save_custom_fulfillment')) {
+            return;
+        }
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+            return;
+        }
+        if (!current_user_can('edit_post', $post_id)) {
+            return;
+        }
         $value = isset($_POST[self::META_KEY]) ? 'yes' : 'no';
-        update_post_meta($post_id, self::META_KEY, $value);
+        update_post_meta($post_id, self::META_KEY, sanitize_text_field($value));
     }
 
     /**

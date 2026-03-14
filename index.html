@@ -13,6 +13,28 @@
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:title" content="QubicaAMF — Official Merch Store"/>
 <meta name="twitter:description" content="Premium bowling merchandise. Gear up and strike bold with official QubicaAMF apparel and accessories."/>
+<meta property="og:image" content="https://www.qubicaamfbowling.com/static/media/qubicaminilogo.604a5c88.png"/>
+<meta name="twitter:image" content="https://www.qubicaamfbowling.com/static/media/qubicaminilogo.604a5c88.png"/>
+<link rel="canonical" href="https://qamfshop.github.io/"/>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Store",
+  "name": "QubicaAMF Official Merch Store",
+  "description": "Official QubicaAMF merchandise store. Premium bowling apparel, accessories, and custom equipment.",
+  "url": "https://qamfshop.github.io/",
+  "logo": "https://www.qubicaamfbowling.com/static/media/qubicaminilogo.604a5c88.png",
+  "brand": {
+    "@type": "Brand",
+    "name": "QubicaAMF"
+  },
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://qamfshop.github.io/#store?q={search_term}",
+    "query-input": "required name=search_term"
+  }
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
@@ -1488,12 +1510,12 @@ textarea.form-input{resize:vertical;min-height:80px}
         <label>Shipping Address</label>
         <textarea id="ck-address" required placeholder="Street address, city, state, zip"></textarea>
       </div>
-      <div style="background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:10px;padding:14px 16px;margin-bottom:16px;font-size:13px;color:#166534;display:flex;align-items:center;gap:10px">
-        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="#166534" stroke-width="1.8"/></svg>
-        <span>Secure checkout powered by Stripe. Your payment info is never stored on our servers.</span>
+      <div id="checkout-stripe-warning" style="background:#fef3c7;border:1.5px solid #fbbf24;border-radius:10px;padding:14px 16px;margin-bottom:16px;font-size:13px;color:#92400e;display:flex;align-items:center;gap:10px">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#92400e" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span><strong>Demo Mode:</strong> Payment processing is not yet connected. Orders placed here are saved locally only — no payment will be charged. Full Stripe integration coming with WooCommerce migration.</span>
       </div>
-      <button type="submit" class="order-submit">Place Order — <span id="checkout-total2">$0.00</span></button>
-      <p style="text-align:center;font-size:11.5px;color:var(--muted);margin-top:10px">Stripe payment integration will process after submission</p>
+      <button type="submit" class="order-submit" style="background:#92400e">Place Demo Order — <span id="checkout-total2">$0.00</span></button>
+      <p style="text-align:center;font-size:11.5px;color:var(--muted);margin-top:10px">No payment will be charged — this is a demo checkout</p>
     </form>
   </div>
 </div>
@@ -2437,7 +2459,8 @@ function handleRoute() {
 }
 
 // SHA-256 hash of admin password (avoids plaintext in source)
-const ADMIN_PW_HASH = '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8'; // hash of 'password' — change via admin settings
+const ADMIN_PW_HASH = '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8'; // default — change via admin settings
+const _isDefaultPw = !localStorage.getItem('qamf_admin_pw_hash');
 async function sha256(str) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
@@ -2450,6 +2473,10 @@ async function attemptLogin() {
     sessionStorage.setItem('qamf_admin', 'true');
     document.getElementById('login-overlay').classList.remove('open');
     document.getElementById('login-pw').value = '';
+    // Force password change if still using default
+    if (_isDefaultPw) {
+      sessionStorage.setItem('qamf_force_pw_change', 'true');
+    }
     handleRoute();
   } else {
     document.getElementById('login-error').style.display = 'block';
@@ -2804,7 +2831,7 @@ function updateCategoryPills(products) {
   Object.entries(categories).forEach(([cat, count]) => {
     const btn = document.createElement('button');
     btn.className = 'cat-pill' + (cat === 'All' ? ' active' : '');
-    btn.innerHTML = `${cat} <span class="cat-count">${count}</span>`;
+    btn.innerHTML = `${esc(cat)} <span class="cat-count">${count}</span>`;
     btn.addEventListener('click', () => {
       catsInner.querySelectorAll('.cat-pill').forEach(x => x.classList.remove('active'));
       btn.classList.add('active');
@@ -2875,9 +2902,9 @@ function openProductModal(product) {
     colorsGroup.style.display = '';
     colorsEl.innerHTML = product.colors.map(c => `
       <button class="modal-color-btn${c === selectedColor ? ' selected' : ''}"
-              data-color="${c}"
+              data-color="${esc(c)}"
               style="background:${getColorCSS(c)}${c.toLowerCase() === 'white' ? ';border:2px solid #ddd' : ''}"
-              title="${c}"></button>
+              title="${esc(c)}"></button>
     `).join('');
     colorsEl.querySelectorAll('.modal-color-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -2899,7 +2926,7 @@ function openProductModal(product) {
     sizesEl.innerHTML = product.sizes.map(s => {
       const available = product.variants.some(v => v.size === s && v.is_available);
       return `<button class="modal-size-btn${s === selectedSize ? ' selected' : ''}${!available ? ' unavailable' : ''}"
-                      data-size="${s}"${!available ? ' disabled' : ''}>${s}</button>`;
+                      data-size="${esc(s)}"${!available ? ' disabled' : ''}>${esc(s)}</button>`;
     }).join('');
     sizesEl.querySelectorAll('.modal-size-btn:not(.unavailable)').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -2960,7 +2987,8 @@ document.getElementById('modal-add-btn').addEventListener('click', function() {
     (!selectedColor || v.color === selectedColor) &&
     (!selectedSize || v.size === selectedSize)
   );
-  addToCart(modalProduct, variant || modalProduct.variants[0]);
+  if (!variant || !variant.is_available) return;
+  addToCart(modalProduct, variant);
   const isCustom = modalProduct && modalProduct.fulfillment === 'custom';
   const orig = this.textContent;
   this.textContent = '✓ Added!';
@@ -3424,6 +3452,18 @@ let editingId = null; // null = add mode, string = editing existing
 // INIT
 // ═══════════════════════════════════════════════════════════════════════════
 async function initAdmin() {
+  // Force password change if using default password
+  if (sessionStorage.getItem('qamf_force_pw_change') === 'true') {
+    sessionStorage.removeItem('qamf_force_pw_change');
+    const newPw = prompt('Security Notice: You are using the default admin password.\nPlease set a new password now:');
+    if (newPw && newPw.length >= 6) {
+      const newHash = await sha256(newPw);
+      localStorage.setItem('qamf_admin_pw_hash', newHash);
+      showToast('Admin password updated successfully', 'success');
+    } else if (newPw) {
+      showToast('Password must be at least 6 characters. Please change it in Settings.', 'error');
+    }
+  }
   // Load saved settings from localStorage
   const saved = localStorage.getItem('qamf_admin_settings');
   if (saved) {
@@ -4318,17 +4358,17 @@ function submitCheckout(e) {
   e.preventDefault();
   const cart = getCart();
   const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
-  const name = document.getElementById('ck-fname').value + ' ' + document.getElementById('ck-lname').value;
   const email = document.getElementById('ck-email').value;
-  // Store order in localStorage for now (Stripe integration point)
-  const orders = JSON.parse(localStorage.getItem('qamf_orders') || '[]');
-  orders.push({ id: 'ORD-' + Date.now(), items: cart, total, name, email, address: document.getElementById('ck-address').value, date: new Date().toISOString(), status: 'pending' });
-  localStorage.setItem('qamf_orders', JSON.stringify(orders));
+  // Generate order ID (no PII stored — demo mode only)
+  const orderId = 'ORD-' + Date.now();
+  // Track order count only (no customer data in localStorage)
+  const orderCount = parseInt(localStorage.getItem('qamf_order_count') || '0') + 1;
+  localStorage.setItem('qamf_order_count', String(orderCount));
   // Clear cart
   localStorage.removeItem('qamf_cart');
   updateCartBadge();
   // Show success
-  document.getElementById('checkout-overlay').querySelector('.order-card').innerHTML = '<div class="order-success"><div class="order-success-icon">🎉</div><h4>Order Placed!</h4><p>Order #' + orders[orders.length-1].id + '<br><br>We\'ll send a confirmation to <strong>' + esc(email) + '</strong>.<br>Printify items ship in 3-7 business days.</p><button class="order-submit" style="margin-top:20px" onclick="closeCheckout()">Continue Shopping</button></div>';
+  document.getElementById('checkout-overlay').querySelector('.order-card').innerHTML = '<div class="order-success"><div class="order-success-icon">🎉</div><h4>Demo Order Placed!</h4><p>Order #' + esc(orderId) + '<br><br>This is a demo checkout — no payment was charged.<br>When Stripe is connected, a confirmation will be sent to <strong>' + esc(email) + '</strong>.</p><button class="order-submit" style="margin-top:20px" onclick="closeCheckout()">Continue Shopping</button></div>';
 }
 updateCartBadge();
 

@@ -32,8 +32,18 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Sync Printify products (demo)
-        run: npm run sync:demo
+      - name: Sync Printify products
+        run: |
+          if [ -n "$PRINTIFY_TOKEN" ]; then
+            echo "Syncing from live Printify API..."
+            npm run sync
+          else
+            echo "No PRINTIFY_TOKEN secret found — using demo data"
+            npm run sync:demo
+          fi
+        env:
+          PRINTIFY_TOKEN: ${{ secrets.PRINTIFY_TOKEN }}
+          PRINTIFY_SHOP_ID: ${{ secrets.PRINTIFY_SHOP_ID }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
